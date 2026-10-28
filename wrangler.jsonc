@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "amandok",
+  "compatibility_date": "2025-02-14",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    {
+      "pattern": "dokumen.ritonga.ai.id",
+      "custom_domain": true
+    }
+  ]
+}

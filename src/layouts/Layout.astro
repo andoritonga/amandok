@@ -1,0 +1,90 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalPath?: string;
+}
+
+const {
+  title = 'AmanDok — Watermark KTP, Sensor NIK & Kompresor Dokumen 100% Lokal (Tanpa Upload)',
+  description = 'Toolkit privasi dokumen #1 di Indonesia: beri watermark KTP anti-pinjol, sensor NIK & tanda tangan, kompres foto sesuai target KB (CPNS/BUMN), dan gabung PDF 100% di browser tanpa upload server.',
+  canonicalPath = '/',
+} = Astro.props;
+
+const siteUrl = 'https://dokumen.ritonga.ai.id';
+const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+const ogImageUrl = `${siteUrl}/og-image.svg`;
+
+const schemaOrg = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'AmanDok',
+  url: siteUrl,
+  applicationCategory: 'SecurityApplication',
+  operatingSystem: 'Any (Web Browser)',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'IDR',
+  },
+  description,
+  author: {
+    '@type': 'Person',
+    name: 'Aliando Ritonga',
+    url: 'https://ritonga.ai.id',
+  },
+};
+---
+
+<!doctype html>
+<html lang="id" class="dark scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="keywords"
+      content="watermark ktp, watermark ktp online aman, sensor nik ktp, kompres foto 200kb cpns, gabung ktp npwp jadi pdf, tanpa upload server, amandok"
+    />
+    <meta name="author" content="Aliando Ritonga" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#090D16" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:locale" content="id_ID" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(schemaOrg)} />
+  </head>
+  <body class="bg-grid-vault min-h-screen bg-[#090D16] font-sans text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+    <a
+      href="#studio"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-emerald-500 focus:px-4 focus:py-2 focus:font-bold focus:text-slate-950"
+    >
+      Langsung ke Studio Dokumen
+    </a>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "amandok",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AmanDok — 100% Client-Side Document Privacy, KTP Watermark, Redaction, Target-KB Compressor & PDF Merger",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "typecheck": "astro check",
+    "preview": "astro preview",
+    "cf:dev": "astro build && wrangler dev",
+    "deploy": "astro build && wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/react": "^3.6.2",
+    "@astrojs/tailwind": "^5.1.2",
+    "astro": "^4.16.18",
+    "lucide-react": "^0.454.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.16"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.7.2",
+    "wrangler": "^4.14.0"
+  }
+}

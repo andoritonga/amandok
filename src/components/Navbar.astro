@@ -1,0 +1,127 @@
+---
+---
+
+<header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
+    <!-- Brand Logo -->
+    <a
+      href="/"
+      class="group flex items-center gap-3 focus:outline-none"
+      aria-label="AmanDok Beranda"
+    >
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-inner transition group-hover:border-emerald-400 group-hover:bg-emerald-500/20">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-5 w-5"
+        >
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-lg font-extrabold tracking-tight text-white">
+            Aman<span class="text-emerald-400">Dok</span>
+          </span>
+          <span class="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-300">
+            ZERO-UPLOAD
+          </span>
+        </div>
+        <p class="hidden text-xs text-slate-400 sm:block" data-i18n-id="Toolkit Privasi KTP & Dokumen Lokal" data-i18n-en="Client-Side ID & Document Privacy Studio">
+          Toolkit Privasi KTP & Dokumen Lokal
+        </p>
+      </div>
+    </a>
+
+    <!-- Navigation & Language Switcher -->
+    <div class="flex items-center gap-3">
+      <a
+        href="#studio"
+        class="hidden rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-white md:inline-block"
+        data-i18n-id="Studio Dokumen"
+        data-i18n-en="Document Studio"
+      >
+        Studio Dokumen
+      </a>
+      <a
+        href="#jaminan-privasi"
+        class="hidden rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-white md:inline-block"
+        data-i18n-id="Arsitektur Keamanan"
+        data-i18n-en="Security Architecture"
+      >
+        Arsitektur Keamanan
+      </a>
+      <a
+        href="#panduan"
+        class="hidden rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-white md:inline-block"
+        data-i18n-id="Panduan CPNS & HRD"
+        data-i18n-en="Portal Guide"
+      >
+        Panduan CPNS & HRD
+      </a>
+
+      <!-- Bilingual Toggle (ID / EN) -->
+      <div class="inline-flex items-center rounded-xl border border-slate-800 bg-slate-900 p-0.5">
+        <button
+          type="button"
+          id="lang-btn-id"
+          class="rounded-lg bg-emerald-500 px-2.5 py-1 font-mono text-xs font-bold text-slate-950 transition"
+          aria-label="Bahasa Indonesia"
+        >
+          ID
+        </button>
+        <button
+          type="button"
+          id="lang-btn-en"
+          class="rounded-lg px-2.5 py-1 font-mono text-xs font-bold text-slate-400 transition hover:text-white"
+          aria-label="English"
+        >
+          EN
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  function setupLanguageSwitcher() {
+    const btnId = document.getElementById('lang-btn-id');
+    const btnEn = document.getElementById('lang-btn-en');
+
+    const applyLang = (lang: 'id' | 'en') => {
+      localStorage.setItem('amandok_lang', lang);
+      window.dispatchEvent(new CustomEvent('amandok-lang-change', { detail: lang }));
+
+      if (btnId && btnEn) {
+        if (lang === 'id') {
+          btnId.className = 'rounded-lg bg-emerald-500 px-2.5 py-1 font-mono text-xs font-bold text-slate-950 transition';
+          btnEn.className = 'rounded-lg px-2.5 py-1 font-mono text-xs font-bold text-slate-400 transition hover:text-white';
+        } else {
+          btnEn.className = 'rounded-lg bg-emerald-500 px-2.5 py-1 font-mono text-xs font-bold text-slate-950 transition';
+          btnId.className = 'rounded-lg px-2.5 py-1 font-mono text-xs font-bold text-slate-400 transition hover:text-white';
+        }
+      }
+
+      document.querySelectorAll<HTMLElement>('[data-i18n-id]').forEach((el) => {
+        const text = lang === 'id' ? el.getAttribute('data-i18n-id') : el.getAttribute('data-i18n-en');
+        if (text) el.textContent = text;
+      });
+    };
+
+    const saved = localStorage.getItem('amandok_lang');
+    if (saved === 'en') {
+      applyLang('en');
+    }
+
+    btnId?.addEventListener('click', () => applyLang('id'));
+    btnEn?.addEventListener('click', () => applyLang('en'));
+  }
+
+  setupLanguageSwitcher();
+</script>
