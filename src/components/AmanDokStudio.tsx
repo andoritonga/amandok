@@ -592,7 +592,7 @@ export default function AmanDokStudio() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-3 border-2 border-ink bg-ink px-4 py-3 font-mono text-xs font-semibold text-sheet shadow-press-vermilion"
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-3 border-2 border-ink bg-[#0B0E14] px-4 py-3 font-mono text-xs font-semibold text-[#FAF8F3] shadow-press-vermilion"
         >
           <CheckCircle2 className="h-4 w-4 shrink-0 text-[#34D399]" />
           <span>{toastMessage}</span>
@@ -602,7 +602,7 @@ export default function AmanDokStudio() {
       {/* Top Dossier Control Strip */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-2 border-ink bg-sheet px-4 py-3 shadow-press sm:px-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center border border-ink bg-verified text-sheet">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center border border-ink bg-[#0A6847] text-[#FAF8F3]">
             <ShieldCheck className="h-4 w-4" />
           </div>
           <div>
@@ -640,7 +640,7 @@ export default function AmanDokStudio() {
           <button
             type="button"
             onClick={handleWipeSessionMemory}
-            className="btn-press inline-flex items-center gap-1.5 bg-[#FEE2E2] px-3 py-1.5 font-mono text-xs font-bold text-vermilion hover:bg-vermilion hover:text-sheet"
+            className="btn-press inline-flex items-center gap-1.5 bg-[#FEE2E2] px-3 py-1.5 font-mono text-xs font-bold text-vermilion hover:bg-vermilion hover:text-[#FAF8F3] dark:bg-vermilion/20 dark:hover:bg-vermilion"
           >
             <Trash2 className="h-3.5 w-3.5" />
             {lang === 'id' ? 'Hancurkan Sesi RAM' : 'Purge Session RAM'}
@@ -721,7 +721,7 @@ export default function AmanDokStudio() {
               <div className="mb-2.5 flex w-full items-center justify-between pt-1">
                 <span
                   className={`font-mono text-[10px] font-bold tracking-widest ${
-                    isActive ? 'text-[#FCA5A5]' : 'text-slateink'
+                    isActive ? 'text-[#FCA5A5] dark:text-vermilion' : 'text-slateink'
                   }`}
                 >
                   {tab.step}
@@ -729,7 +729,7 @@ export default function AmanDokStudio() {
                 <span
                   className={`border px-1.5 py-0.5 font-mono text-[10px] font-bold ${
                     isActive
-                      ? 'border-sheet/30 bg-vermilion text-sheet'
+                      ? 'border-sheet/30 bg-vermilion text-[#FAF8F3]'
                       : 'border-ink bg-dossier text-ink'
                   }`}
                 >
@@ -786,14 +786,14 @@ export default function AmanDokStudio() {
       {activeTab !== 'pdf' ? (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* LEFT: FORENSIC OPTICAL LIGHTTABLE (7 columns) */}
-          <div className="flex flex-col border-2 border-ink bg-lighttable text-sheet shadow-press lg:col-span-7">
+          <div className="flex flex-col border-2 border-ink bg-lighttable text-[#FAF8F3] shadow-press lg:col-span-7">
             {/* Optical Lighttable Top Command Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sheet/15 bg-[#121721] px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#FAF8F3]/15 bg-[#121721] px-4 py-3">
               <div className="flex flex-wrap items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-2 border-2 border-sheet bg-vermilion px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-sheet shadow-[2px_2px_0px_#FAF8F3] transition hover:bg-[#b91c1c]"
+                  className="inline-flex items-center gap-2 border-2 border-[#FAF8F3] bg-vermilion px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#FAF8F3] shadow-[2px_2px_0px_#FAF8F3] transition hover:bg-[#b91c1c]"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   {lang === 'id' ? 'Muat Foto KTP / Dokumen' : 'Load ID / Document Photo'}
@@ -808,27 +808,27 @@ export default function AmanDokStudio() {
                     }))
                   }
                   title={lang === 'id' ? 'Putar Orientasi 90°' : 'Rotate Orientation 90°'}
-                  className="inline-flex items-center gap-1.5 border border-sheet/30 bg-sheet/10 px-2.5 py-1.5 font-mono text-xs font-semibold text-sheet transition hover:border-sheet hover:bg-sheet/20"
+                  className="inline-flex items-center gap-1.5 border border-[#FAF8F3]/30 bg-[#FAF8F3]/10 px-2.5 py-1.5 font-mono text-xs font-semibold text-[#FAF8F3] transition hover:border-[#FAF8F3] hover:bg-[#FAF8F3]/20"
                 >
                   <RotateCw className="h-3.5 w-3.5" />
                   <span>90°</span>
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 font-mono text-[11px] text-sheet/75">
+              <div className="flex items-center gap-2 font-mono text-[11px] text-[#FAF8F3]/75">
                 {isSampleLoaded && (
                   <span className="border border-[#F59E0B]/50 bg-[#F59E0B]/15 px-2 py-0.5 text-[10px] font-bold text-[#FCD34D]">
                     {lang === 'id' ? 'SPESIMEN SIMULASI' : 'SIMULATED SPECIMEN'}
                   </span>
                 )}
-                <span className="border border-sheet/20 bg-black/40 px-2 py-0.5">
+                <span className="border border-[#FAF8F3]/20 bg-black/40 px-2 py-0.5">
                   {sourceDimensions.width}×{sourceDimensions.height} PX
                 </span>
               </div>
             </div>
 
             {/* Horizontal Millimeter Calibration Ruler */}
-            <div className="flex h-6 items-center justify-between border-b border-sheet/15 bg-[#070A0E] px-6 font-mono text-[9px] tracking-widest text-sheet/50 ruler-ticks-x">
+            <div className="flex h-6 items-center justify-between border-b border-[#FAF8F3]/15 bg-[#070A0E] px-6 font-mono text-[9px] tracking-widest text-[#FAF8F3]/50 ruler-ticks-x">
               <span>0.0 MM</span>
               <span>ISO/IEC 7810 ID-1 OPTICAL CALIBRATION DECK</span>
               <span>85.60 MM</span>
@@ -848,23 +848,23 @@ export default function AmanDokStudio() {
               }`}
             >
               {/* Left Vertical Millimeter Ruler Strip */}
-              <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-5 flex-col justify-between border-r border-sheet/15 bg-[#070A0E]/80 py-3 text-center font-mono text-[8px] text-sheet/40 ruler-ticks-y sm:flex">
+              <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-5 flex-col justify-between border-r border-[#FAF8F3]/15 bg-[#070A0E]/80 py-3 text-center font-mono text-[8px] text-[#FAF8F3]/40 ruler-ticks-y sm:flex">
                 <span>0</span>
                 <span>25</span>
                 <span>54</span>
               </div>
 
               {/* Corner Registration Crosshairs (+) */}
-              <span className="pointer-events-none absolute left-7 top-3 font-mono text-xs font-light text-sheet/40">
+              <span className="pointer-events-none absolute left-7 top-3 font-mono text-xs font-light text-[#FAF8F3]/40">
                 +
               </span>
-              <span className="pointer-events-none absolute right-3 top-3 font-mono text-xs font-light text-sheet/40">
+              <span className="pointer-events-none absolute right-3 top-3 font-mono text-xs font-light text-[#FAF8F3]/40">
                 +
               </span>
-              <span className="pointer-events-none absolute bottom-3 left-7 font-mono text-xs font-light text-sheet/40">
+              <span className="pointer-events-none absolute bottom-3 left-7 font-mono text-xs font-light text-[#FAF8F3]/40">
                 +
               </span>
-              <span className="pointer-events-none absolute bottom-3 right-3 font-mono text-xs font-light text-sheet/40">
+              <span className="pointer-events-none absolute bottom-3 right-3 font-mono text-xs font-light text-[#FAF8F3]/40">
                 +
               </span>
 
@@ -882,7 +882,7 @@ export default function AmanDokStudio() {
 
               {activeTab === 'compress' && compressionResult ? (
                 <div className="relative flex flex-col items-center">
-                  <div className="border-2 border-sheet/30 bg-black p-1.5 shadow-2xl">
+                  <div className="border-2 border-[#FAF8F3]/30 bg-black p-1.5 shadow-2xl">
                     <img
                       src={compressionResult.dataUrl}
                       alt="Pratinjau Hasil Kompresi & Pasfoto"
@@ -890,7 +890,7 @@ export default function AmanDokStudio() {
                     />
                   </div>
                   <div className="mt-3 flex flex-wrap items-center justify-center gap-2 font-mono text-xs">
-                    <span className="border border-sheet/25 bg-black/80 px-2.5 py-1 text-sheet/80">
+                    <span className="border border-[#FAF8F3]/25 bg-black/80 px-2.5 py-1 text-[#FAF8F3]/80">
                       {lang === 'id' ? 'AWAL:' : 'RAW:'}{' '}
                       <strong>{formatBytes(compressionResult.originalBytes)}</strong>
                     </span>
@@ -902,7 +902,7 @@ export default function AmanDokStudio() {
                   </div>
                 </div>
               ) : (
-                <div className="relative inline-block max-w-full border border-sheet/25 bg-black p-1 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+                <div className="relative inline-block max-w-full border border-[#FAF8F3]/25 bg-black p-1 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
                   <canvas
                     ref={previewCanvasRef}
                     className="block max-h-[400px] w-auto max-w-full object-contain"
@@ -925,13 +925,13 @@ export default function AmanDokStudio() {
             </div>
 
             {/* Lighttable Bottom Export & Chaining Deck */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-sheet/15 bg-[#121721] px-4 py-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#FAF8F3]/15 bg-[#121721] px-4 py-3.5">
               <div className="flex flex-wrap items-center gap-2">
                 {activeTab === 'compress' && compressionResult ? (
                   <button
                     type="button"
                     onClick={handleDownloadCompressed}
-                    className="inline-flex items-center gap-2 border-2 border-sheet bg-[#10B981] px-4 py-2 font-mono text-xs font-bold uppercase text-ink shadow-[3px_3px_0px_#FAF8F3] transition hover:bg-[#34D399]"
+                    className="inline-flex items-center gap-2 border-2 border-[#FAF8F3] bg-[#10B981] px-4 py-2 font-mono text-xs font-bold uppercase text-[#121316] shadow-[3px_3px_0px_#FAF8F3] transition hover:bg-[#34D399]"
                   >
                     <Download className="h-4 w-4" />
                     {lang === 'id'
@@ -943,7 +943,7 @@ export default function AmanDokStudio() {
                     <button
                       type="button"
                       onClick={() => handleDownloadProtectedImage('jpeg')}
-                      className="inline-flex items-center gap-2 border-2 border-sheet bg-[#10B981] px-4 py-2 font-mono text-xs font-bold uppercase text-ink shadow-[3px_3px_0px_#FAF8F3] transition hover:bg-[#34D399]"
+                      className="inline-flex items-center gap-2 border-2 border-[#FAF8F3] bg-[#10B981] px-4 py-2 font-mono text-xs font-bold uppercase text-[#121316] shadow-[3px_3px_0px_#FAF8F3] transition hover:bg-[#34D399]"
                     >
                       <Download className="h-4 w-4" />
                       {lang === 'id' ? 'Unduh JPG Tersegel' : 'Download Sealed JPG'}
@@ -951,7 +951,7 @@ export default function AmanDokStudio() {
                     <button
                       type="button"
                       onClick={() => handleDownloadProtectedImage('png')}
-                      className="inline-flex items-center gap-1.5 border border-sheet/40 bg-sheet/10 px-3 py-2 font-mono text-xs font-bold text-sheet transition hover:border-sheet hover:bg-sheet/20"
+                      className="inline-flex items-center gap-1.5 border border-[#FAF8F3]/40 bg-[#FAF8F3]/10 px-3 py-2 font-mono text-xs font-bold text-[#FAF8F3] transition hover:border-[#FAF8F3] hover:bg-[#FAF8F3]/20"
                     >
                       <Download className="h-3.5 w-3.5" />
                       PNG
@@ -966,7 +966,7 @@ export default function AmanDokStudio() {
                   <button
                     type="button"
                     onClick={() => setActiveTab('redact')}
-                    className="inline-flex items-center gap-1.5 border border-sheet/40 bg-sheet/10 px-3 py-2 font-mono text-xs font-bold text-sheet transition hover:border-sheet hover:bg-sheet/20"
+                    className="inline-flex items-center gap-1.5 border border-[#FAF8F3]/40 bg-[#FAF8F3]/10 px-3 py-2 font-mono text-xs font-bold text-[#FAF8F3] transition hover:border-[#FAF8F3] hover:bg-[#FAF8F3]/20"
                   >
                     <span>{lang === 'id' ? '02. Sensor NIK' : '02. Redact ID'}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -977,7 +977,7 @@ export default function AmanDokStudio() {
                   <button
                     type="button"
                     onClick={() => setActiveTab('compress')}
-                    className="inline-flex items-center gap-1.5 border border-sheet/40 bg-sheet/10 px-3 py-2 font-mono text-xs font-bold text-sheet transition hover:border-sheet hover:bg-sheet/20"
+                    className="inline-flex items-center gap-1.5 border border-[#FAF8F3]/40 bg-[#FAF8F3]/10 px-3 py-2 font-mono text-xs font-bold text-[#FAF8F3] transition hover:border-[#FAF8F3] hover:bg-[#FAF8F3]/20"
                   >
                     <span>{lang === 'id' ? '03. Target KB' : '03. Target KB'}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -1057,7 +1057,7 @@ export default function AmanDokStudio() {
                           </span>
                           <span
                             className={`ml-1.5 shrink-0 text-[9px] ${
-                              isSelected ? 'text-[#FCA5A5]' : 'text-slateink'
+                              isSelected ? 'text-[#FCA5A5] dark:text-vermilion' : 'text-slateink'
                             }`}
                           >
                             {preset.code}
@@ -1133,7 +1133,7 @@ export default function AmanDokStudio() {
                           }
                           className={`border-2 border-ink py-1.5 font-mono text-xs font-bold transition ${
                             watermarkConfig.mode === m.id
-                              ? 'bg-vermilion text-sheet shadow-press-sm'
+                              ? 'bg-vermilion text-[#FAF8F3] shadow-press-sm'
                               : 'bg-dossier text-ink hover:bg-sheet'
                           }`}
                         >
@@ -1317,7 +1317,7 @@ export default function AmanDokStudio() {
                         onClick={() => setActiveRedactionStyle(st.id)}
                         className={`border-2 border-ink px-2.5 py-2 font-mono text-xs font-bold transition ${
                           activeRedactionStyle === st.id
-                            ? 'bg-vermilion text-sheet shadow-press-sm'
+                            ? 'bg-vermilion text-[#FAF8F3] shadow-press-sm'
                             : 'bg-dossier text-ink hover:bg-sheet'
                         }`}
                       >
@@ -1515,7 +1515,7 @@ export default function AmanDokStudio() {
                         onClick={() => setCropPreset(preset.id)}
                         className={`border-2 border-ink py-2 font-mono text-xs font-bold transition ${
                           cropPreset === preset.id
-                            ? 'bg-vermilion text-sheet shadow-press-sm'
+                            ? 'bg-vermilion text-[#FAF8F3] shadow-press-sm'
                             : 'bg-dossier text-ink hover:bg-sheet'
                         }`}
                       >
@@ -1560,9 +1560,9 @@ export default function AmanDokStudio() {
 
                 {/* Compression Telemetry Readout */}
                 {compressionResult && (
-                  <div className="border-2 border-ink bg-ink p-4 text-sheet">
-                    <div className="mb-2.5 flex items-center justify-between border-b border-sheet/20 pb-2">
-                      <span className="font-mono text-[11px] uppercase tracking-wider text-sheet/70">
+                  <div className="border-2 border-ink bg-[#0B0E14] p-4 text-[#FAF8F3]">
+                    <div className="mb-2.5 flex items-center justify-between border-b border-[#FAF8F3]/20 pb-2">
+                      <span className="font-mono text-[11px] uppercase tracking-wider text-[#FAF8F3]/70">
                         {lang === 'id' ? 'TELEMETRI KOMPRESI' : 'COMPRESSION TELEMETRY'}
                       </span>
                       <span className="border border-[#34D399] bg-[#064E3B] px-2 py-0.5 font-mono text-[10px] font-bold text-[#6EE7B7]">
@@ -1576,20 +1576,20 @@ export default function AmanDokStudio() {
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
-                      <div className="border border-sheet/20 bg-white/5 p-2">
-                        <div className="text-[10px] text-sheet/60">UKURAN AKHIR</div>
+                      <div className="border border-[#FAF8F3]/20 bg-white/5 p-2">
+                        <div className="text-[10px] text-[#FAF8F3]/60">UKURAN AKHIR</div>
                         <div className="font-bold text-[#6EE7B7]">
                           {formatBytes(compressionResult.compressedBytes)}
                         </div>
                       </div>
-                      <div className="border border-sheet/20 bg-white/5 p-2">
-                        <div className="text-[10px] text-sheet/60">DIMENSI PX</div>
-                        <div className="font-bold text-sheet">
+                      <div className="border border-[#FAF8F3]/20 bg-white/5 p-2">
+                        <div className="text-[10px] text-[#FAF8F3]/60">DIMENSI PX</div>
+                        <div className="font-bold text-[#FAF8F3]">
                           {compressionResult.width}×{compressionResult.height}
                         </div>
                       </div>
-                      <div className="border border-sheet/20 bg-white/5 p-2">
-                        <div className="text-[10px] text-sheet/60">KUALITAS JPG</div>
+                      <div className="border border-[#FAF8F3]/20 bg-white/5 p-2">
+                        <div className="text-[10px] text-[#FAF8F3]/60">KUALITAS JPG</div>
                         <div className="font-bold text-[#FCD34D]">
                           {compressionResult.qualityUsed}%
                         </div>
@@ -1629,7 +1629,7 @@ export default function AmanDokStudio() {
                 <button
                   type="button"
                   onClick={() => pdfFileInputRef.current?.click()}
-                  className="btn-press inline-flex items-center gap-1.5 bg-vermilion px-3.5 py-2 font-mono text-xs font-bold text-sheet"
+                  className="btn-press inline-flex items-center gap-1.5 bg-vermilion px-3.5 py-2 font-mono text-xs font-bold text-[#FAF8F3]"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   {lang === 'id' ? 'Tambah Gambar / PDF' : 'Add Images / PDFs'}
@@ -1723,7 +1723,7 @@ export default function AmanDokStudio() {
                       <button
                         type="button"
                         onClick={() => removePdfQueueItem(item.id)}
-                        className="border border-ink bg-[#FEE2E2] p-1.5 text-vermilion hover:bg-vermilion hover:text-sheet"
+                        className="border border-ink bg-[#FEE2E2] p-1.5 text-vermilion hover:bg-vermilion hover:text-[#FAF8F3] dark:bg-vermilion/20 dark:hover:bg-vermilion"
                         title="Hapus"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1796,7 +1796,7 @@ export default function AmanDokStudio() {
                     >
                       <div
                         className={`font-mono text-[10px] font-bold ${
-                          isSelected ? 'text-[#FCA5A5]' : 'text-vermilion'
+                          isSelected ? 'text-[#FCA5A5] dark:text-vermilion' : 'text-vermilion'
                         }`}
                       >
                         {opt.code}
@@ -1822,7 +1822,7 @@ export default function AmanDokStudio() {
                 type="button"
                 disabled={pdfQueue.length === 0 || isBuildingPdf}
                 onClick={handleGenerateCombinedPdf}
-                className="btn-press flex w-full items-center justify-center gap-2 bg-vermilion px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-sheet disabled:cursor-not-allowed disabled:opacity-40"
+                className="btn-press flex w-full items-center justify-center gap-2 bg-vermilion px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-[#FAF8F3] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <FileStack className="h-4 w-4" />
                 {isBuildingPdf
@@ -1838,7 +1838,7 @@ export default function AmanDokStudio() {
                 <a
                   href={pdfDownloadUrl}
                   download={`bundel-amandok-${todayStr}.pdf`}
-                  className="btn-press flex w-full items-center justify-center gap-2 bg-verified px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-sheet"
+                  className="btn-press flex w-full items-center justify-center gap-2 bg-[#0A6847] px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-[#FAF8F3]"
                 >
                   <Download className="h-4 w-4" />
                   {lang === 'id'

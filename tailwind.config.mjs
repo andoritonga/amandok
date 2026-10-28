@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
@@ -9,18 +10,18 @@ export default {
         mono: ['IBM Plex Mono', 'monospace'],
       },
       colors: {
-        dossier: '#F3EFE6',
-        sheet: '#FAF8F3',
-        ink: '#121316',
-        slateink: '#4A4E58',
-        vermilion: '#D92B2B',
-        verified: '#0A6847',
-        cobalt: '#1D4ED8',
+        dossier: 'rgb(var(--color-dossier) / <alpha-value>)',
+        sheet: 'rgb(var(--color-sheet) / <alpha-value>)',
+        ink: 'rgb(var(--color-ink) / <alpha-value>)',
+        slateink: 'rgb(var(--color-slateink) / <alpha-value>)',
+        vermilion: 'rgb(var(--color-vermilion) / <alpha-value>)',
+        verified: 'rgb(var(--color-verified) / <alpha-value>)',
+        cobalt: 'rgb(var(--color-cobalt) / <alpha-value>)',
         lighttable: '#0B0E14',
       },
       boxShadow: {
-        press: '4px 4px 0px 0px #121316',
-        'press-sm': '2px 2px 0px 0px #121316',
+        press: '4px 4px 0px 0px var(--shadow-ink)',
+        'press-sm': '2px 2px 0px 0px var(--shadow-ink)',
         'press-vermilion': '4px 4px 0px 0px #D92B2B',
       },
     },

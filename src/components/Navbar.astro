@@ -1,21 +1,21 @@
 ---
 ---
 
-<header class="sticky top-0 z-40 border-b-2 border-ink bg-sheet/95 backdrop-blur-md">
+<header class="sticky top-0 z-40 border-b-2 border-ink bg-sheet/95 backdrop-blur-md transition-colors">
   <!-- Top Cryptographic Classification Ticker -->
-  <div class="border-b border-ink/20 bg-ink px-4 py-1 text-sheet">
+  <div class="border-b border-ink/20 bg-[#0B0E14] px-4 py-1 text-[#FAF8F3]">
     <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 font-mono text-[10px] tracking-wider">
       <div class="flex items-center gap-3">
         <span class="inline-flex items-center gap-1.5 font-semibold text-[#6EE7B7]">
           <span class="h-1.5 w-1.5 rounded-full bg-[#10B981]"></span>
           SANDBOX LOKAL AKTIF
         </span>
-        <span class="hidden text-sheet/40 sm:inline">|</span>
-        <span class="hidden text-sheet/80 sm:inline">STANDAR KARTU: ISO/IEC 7810 ID-1 (85.60 × 53.98 MM)</span>
+        <span class="hidden text-[#FAF8F3]/40 sm:inline">|</span>
+        <span class="hidden text-[#FAF8F3]/80 sm:inline">STANDAR KARTU: ISO/IEC 7810 ID-1 (85.60 × 53.98 MM)</span>
       </div>
-      <div class="flex items-center gap-3 text-sheet/80">
+      <div class="flex items-center gap-3 text-[#FAF8F3]/80">
         <span>NETWORK EGRESS: <strong class="text-[#6EE7B7]">0.00 KB</strong></span>
-        <span class="hidden text-sheet/40 md:inline">|</span>
+        <span class="hidden text-[#FAF8F3]/40 md:inline">|</span>
         <span class="hidden md:inline">EXIF/GPS SCRUBBER: <strong class="text-[#FCD34D]">AUTO-PURGE</strong></span>
       </div>
     </div>
@@ -29,7 +29,7 @@
       class="group flex items-center gap-3.5 focus:outline-none"
       aria-label="AmanDok Beranda"
     >
-      <div class="flex h-10 w-10 items-center justify-center border-2 border-ink bg-vermilion text-sheet shadow-press-sm transition-transform group-hover:-translate-y-0.5">
+      <div class="flex h-10 w-10 items-center justify-center border-2 border-ink bg-vermilion text-[#FAF8F3] shadow-press-sm transition-transform group-hover:-translate-y-0.5">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -111,14 +111,111 @@
           EN
         </button>
       </div>
+
+      <!-- Mechanical Dark Mode Toggle -->
+      <button
+        type="button"
+        id="theme-toggle-btn"
+        aria-label="Toggle Dark Mode"
+        aria-pressed="false"
+        title="Beralih Mode Gelap / Terang (Dark / Light Mode)"
+        class="btn-press inline-flex items-center gap-1.5 bg-dossier px-2.5 py-1.5 font-mono text-xs font-bold text-ink hover:bg-sheet"
+      >
+        <!-- Sun Icon (shown in Dark Mode to switch to Light) -->
+        <svg
+          id="theme-icon-sun"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="hidden h-3.5 w-3.5 text-[#F59E0B]"
+        >
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2"></path>
+          <path d="M12 20v2"></path>
+          <path d="m4.93 4.93 1.41 1.41"></path>
+          <path d="m17.66 17.66 1.41 1.41"></path>
+          <path d="M2 12h2"></path>
+          <path d="M20 12h2"></path>
+          <path d="m6.34 17.66-1.41 1.41"></path>
+          <path d="m19.07 4.93-1.41 1.41"></path>
+        </svg>
+        <!-- Moon Icon (shown in Light Mode to switch to Dark) -->
+        <svg
+          id="theme-icon-moon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-3.5 w-3.5 text-ink"
+        >
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+        </svg>
+        <span
+          id="theme-toggle-label"
+          class="hidden sm:inline"
+          data-i18n-id="GELAP"
+          data-i18n-en="DARK"
+        >
+          GELAP
+        </span>
+      </button>
     </div>
   </div>
 </header>
 
 <script>
-  function setupLanguageSwitcher() {
+  function setupNavbarControls() {
     const btnId = document.getElementById('lang-btn-id');
     const btnEn = document.getElementById('lang-btn-en');
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const iconSun = document.getElementById('theme-icon-sun');
+    const iconMoon = document.getElementById('theme-icon-moon');
+    const themeLabel = document.getElementById('theme-toggle-label');
+    const themeMeta = document.getElementById('theme-color-meta');
+
+    const getActiveLang = (): 'id' | 'en' => {
+      return localStorage.getItem('amandok_lang') === 'en' ? 'en' : 'id';
+    };
+
+    const syncThemeUI = (isDark: boolean, lang: 'id' | 'en' = getActiveLang()) => {
+      if (themeBtn) {
+        themeBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      }
+      if (iconSun && iconMoon) {
+        if (isDark) {
+          iconSun.classList.remove('hidden');
+          iconMoon.classList.add('hidden');
+        } else {
+          iconSun.classList.add('hidden');
+          iconMoon.classList.remove('hidden');
+        }
+      }
+      if (themeLabel) {
+        const idText = isDark ? 'TERANG' : 'GELAP';
+        const enText = isDark ? 'LIGHT' : 'DARK';
+        themeLabel.setAttribute('data-i18n-id', idText);
+        themeLabel.setAttribute('data-i18n-en', enText);
+        themeLabel.textContent = lang === 'id' ? idText : enText;
+      }
+      if (themeMeta) {
+        themeMeta.setAttribute('content', isDark ? '#0D1117' : '#F3EFE6');
+      }
+    };
+
+    const applyTheme = (theme: 'light' | 'dark') => {
+      const isDark = theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('amandok_theme', theme);
+      syncThemeUI(isDark);
+      window.dispatchEvent(new CustomEvent('amandok-theme-change', { detail: theme }));
+    };
 
     const applyLang = (lang: 'id' | 'en') => {
       localStorage.setItem('amandok_lang', lang);
@@ -134,20 +231,32 @@
         }
       }
 
+      const isDark = document.documentElement.classList.contains('dark');
+      syncThemeUI(isDark, lang);
+
       document.querySelectorAll<HTMLElement>('[data-i18n-id]').forEach((el) => {
         const text = lang === 'id' ? el.getAttribute('data-i18n-id') : el.getAttribute('data-i18n-en');
         if (text) el.textContent = text;
       });
     };
 
-    const saved = localStorage.getItem('amandok_lang');
-    if (saved === 'en') {
+    // Initialize Theme UI state from documentElement class
+    syncThemeUI(document.documentElement.classList.contains('dark'));
+
+    // Initialize Language UI state
+    const savedLang = localStorage.getItem('amandok_lang');
+    if (savedLang === 'en') {
       applyLang('en');
     }
 
     btnId?.addEventListener('click', () => applyLang('id'));
     btnEn?.addEventListener('click', () => applyLang('en'));
+
+    themeBtn?.addEventListener('click', () => {
+      const currentlyDark = document.documentElement.classList.contains('dark');
+      applyTheme(currentlyDark ? 'light' : 'dark');
+    });
   }
 
-  setupLanguageSwitcher();
+  setupNavbarControls();
 </script>

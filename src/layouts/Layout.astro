@@ -52,7 +52,23 @@ const schemaOrg = {
     <meta name="author" content="Aliando Ritonga" />
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#F3EFE6" />
+    <meta name="theme-color" id="theme-color-meta" content="#F3EFE6" />
+
+    <script is:inline>
+      (function () {
+        try {
+          const saved = localStorage.getItem('amandok_theme');
+          const prefersDark =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const isDark = saved === 'dark' || (!saved && prefersDark);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            const meta = document.getElementById('theme-color-meta');
+            if (meta) meta.setAttribute('content', '#0D1117');
+          }
+        } catch (_) {}
+      })();
+    </script>
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
@@ -81,7 +97,7 @@ const schemaOrg = {
   <body class="bg-archival-paper min-h-screen text-ink antialiased">
     <a
       href="#studio"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border-2 focus:border-ink focus:bg-vermilion focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:font-bold focus:text-sheet focus:shadow-press"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border-2 focus:border-ink focus:bg-vermilion focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:font-bold focus:text-[#FAF8F3] focus:shadow-press"
     >
       [LANGSUNG KE MEJA INSPEKSI DOKUMEN]
     </a>
