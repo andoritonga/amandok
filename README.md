@@ -63,4 +63,4 @@ npm run build
 
 ## 👨‍💻 Pengembang
 
-Dirancang dan dikembangkan oleh **[Aliando Ritonga](https://ritonga.ai.id)**.
+Dirancang dan dikembangkan oleh **[Ando Ritonga](https://ando.ritonga.ai.id)**.
