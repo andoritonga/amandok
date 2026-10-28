@@ -5,27 +5,29 @@ import Footer from '../components/Footer.astro';
 ---
 
 <Layout
-  title="404 Halaman Tidak Ditemukan — AmanDok"
+  title="404 Berkas Tidak Ditemukan — AmanDok"
   description="Halaman yang Anda cari tidak ditemukan di AmanDok."
 >
   <Navbar />
 
   <main class="mx-auto flex max-w-3xl flex-col items-center justify-center px-4 py-24 text-center">
-    <div class="mb-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 font-mono text-xs font-bold text-emerald-400">
-      ERROR 404 • SANDBOX ROUTE NOT FOUND
+    <div class="border-2 border-ink bg-sheet p-8 shadow-press sm:p-12">
+      <div class="mx-auto mb-4 inline-block border border-ink bg-vermilion px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-sheet">
+        KODE 404 // ARSIP TIDAK DITEMUKAN
+      </div>
+      <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">
+        Halaman Tidak Ditemukan
+      </h1>
+      <p class="mx-auto mt-3 max-w-md text-sm text-slateink">
+        Rute dokumen yang Anda tuju tidak tersedia. Kembali ke meja kerja utama untuk membubuhkan segel watermark KTP, menyensor NIK, atau mengompres berkas secara lokal.
+      </p>
+      <a
+        href="/"
+        class="btn-press mt-8 inline-flex items-center gap-2 bg-ink px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-sheet"
+      >
+        [ KEMBALI KE MEJA KERJA AMANDOK ]
+      </a>
     </div>
-    <h1 class="text-3xl font-extrabold text-white sm:text-4xl">
-      Halaman Tidak Ditemukan
-    </h1>
-    <p class="mt-3 max-w-md text-sm text-slate-400">
-      Rute yang Anda tuju tidak tersedia. Kembali ke studio utama untuk memberi watermark KTP, menyensor NIK, atau mengompres dokumen secara lokal.
-    </p>
-    <a
-      href="/"
-      class="mt-8 inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-xs font-bold text-slate-950 transition hover:bg-emerald-400"
-    >
-      Kembali ke Studio AmanDok
-    </a>
   </main>
 
   <Footer />

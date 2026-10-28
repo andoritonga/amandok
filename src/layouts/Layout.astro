@@ -8,8 +8,8 @@ interface Props {
 }
 
 const {
-  title = 'AmanDok — Watermark KTP, Sensor NIK & Kompresor Dokumen 100% Lokal (Tanpa Upload)',
-  description = 'Toolkit privasi dokumen #1 di Indonesia: beri watermark KTP anti-pinjol, sensor NIK & tanda tangan, kompres foto sesuai target KB (CPNS/BUMN), dan gabung PDF 100% di browser tanpa upload server.',
+  title = 'AmanDok — Meja Kerja Privasi KTP, Sensor NIK & Kompresor Dokumen 100% Lokal',
+  description = 'Instrumen privasi dokumen warga Indonesia: beri segel watermark KTP anti-pinjol, sensor NIK & tanda tangan, kompres foto sesuai target KB (SSCASN/CPNS/BUMN), dan jilid PDF A4 100% di RAM browser tanpa upload server.',
   canonicalPath = '/',
 } = Astro.props;
 
@@ -39,7 +39,7 @@ const schemaOrg = {
 ---
 
 <!doctype html>
-<html lang="id" class="dark scroll-smooth">
+<html lang="id" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -52,7 +52,7 @@ const schemaOrg = {
     <meta name="author" content="Aliando Ritonga" />
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#090D16" />
+    <meta name="theme-color" content="#F3EFE6" />
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
@@ -68,22 +68,22 @@ const schemaOrg = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
 
-    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <!-- Google Fonts: Fraunces (Display Serif), Plus Jakarta Sans (Body), IBM Plex Mono (Technical) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
     <script type="application/ld+json" set:html={JSON.stringify(schemaOrg)} />
   </head>
-  <body class="bg-grid-vault min-h-screen bg-[#090D16] font-sans text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+  <body class="bg-archival-paper min-h-screen text-ink antialiased">
     <a
       href="#studio"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-emerald-500 focus:px-4 focus:py-2 focus:font-bold focus:text-slate-950"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border-2 focus:border-ink focus:bg-vermilion focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:font-bold focus:text-sheet focus:shadow-press"
     >
-      Langsung ke Studio Dokumen
+      [LANGSUNG KE MEJA INSPEKSI DOKUMEN]
     </a>
     <slot />
   </body>

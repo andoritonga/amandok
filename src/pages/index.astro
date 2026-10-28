@@ -9,173 +9,259 @@ import AmanDokStudio from '../components/AmanDokStudio';
   <Navbar />
 
   <main class="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
-    <!-- Hero Header -->
-    <section class="mb-8 text-center sm:mb-10">
-      <div class="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 font-mono text-xs font-semibold text-emerald-300">
-        <span>🛡️</span>
-        <span
-          data-i18n-id="100% Client-Side • Tanpa Upload Server • Aman Bahkan Saat Wi-Fi Dimatikan"
-          data-i18n-en="100% Client-Side • Zero Server Upload • Works Even With Wi-Fi Turned Off"
-        >
-          100% Client-Side • Tanpa Upload Server • Aman Bahkan Saat Wi-Fi Dimatikan
-        </span>
+    <!-- Asymmetric Editorial & Utilitarian Dossier Hero -->
+    <section class="mb-10 border-2 border-ink bg-sheet shadow-press">
+      <div class="grid grid-cols-1 lg:grid-cols-12">
+        <!-- Left 8 Cols: Monumental Editorial Headline -->
+        <div class="border-b-2 border-ink p-6 sm:p-8 lg:col-span-8 lg:border-b-0 lg:border-r-2">
+          <div class="mb-4 flex flex-wrap items-center gap-2">
+            <span class="border border-ink bg-vermilion px-2.5 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wider text-sheet">
+              PROTOKOL ANTI-PINJOL
+            </span>
+            <span
+              class="border border-ink bg-dossier px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-ink"
+              data-i18n-id="DOKUMEN TIDAK PERNAH MENINGGALKAN PERANGKAT ANDA"
+              data-i18n-en="DOCUMENTS NEVER LEAVE YOUR DEVICE"
+            >
+              DOKUMEN TIDAK PERNAH MENINGGALKAN PERANGKAT ANDA
+            </span>
+          </div>
+
+          <h1
+            class="font-display text-3xl font-bold leading-[1.08] tracking-tight text-ink sm:text-4xl lg:text-[44px]"
+            data-i18n-id="Segel KTP, Sensor NIK & Presisi Berkas Lamaran Tanpa Risiko Kebocoran Server."
+            data-i18n-en="Stamp ID Cards, Redact Sensitive Numbers & Compress Portal Files With Zero Server Upload."
+          >
+            Segel KTP, Sensor NIK & Presisi Berkas Lamaran Tanpa Risiko Kebocoran Server.
+          </h1>
+
+          <p
+            class="mt-4 max-w-2xl text-sm leading-relaxed text-slateink sm:text-base"
+            data-i18n-id="Meja kerja forensik mandiri untuk membubuhkan stempel watermark KTP, menghancurkan piksel NIK & tanda tangan, menekan ukuran kilobyte sesuai syarat portal SSCASN/CPNS/BUMN, dan menjilid PDF A4 100% di dalam RAM browser Anda."
+            data-i18n-en="A self-contained forensic workbench to stamp anti-fraud watermarks on ID cards, permanently destroy ID number & signature pixels, hit exact kilobyte caps, and bind A4 PDFs strictly inside your browser RAM."
+          >
+            Meja kerja forensik mandiri untuk membubuhkan stempel watermark KTP, menghancurkan piksel NIK & tanda tangan, menekan ukuran kilobyte sesuai syarat portal SSCASN/CPNS/BUMN, dan menjilid PDF A4 100% di dalam RAM browser Anda.
+          </p>
+        </div>
+
+        <!-- Right 4 Cols: Technical Audit Spec Sheet -->
+        <div class="flex flex-col justify-between bg-dossier p-6 sm:p-7 lg:col-span-4">
+          <div>
+            <div class="flex items-center justify-between border-b-2 border-ink pb-2">
+              <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">
+                SPESIFIKASI KEAMANAN
+              </span>
+              <span class="font-mono text-[10px] font-bold text-verified">
+                [VERIFIED // LOCAL]
+              </span>
+            </div>
+
+            <dl class="mt-3 divide-y divide-ink/20 font-mono text-xs">
+              <div class="flex items-center justify-between py-2">
+                <dt class="text-slateink">UNGGAHAN SERVER</dt>
+                <dd class="font-bold text-ink">0.00 KB (NIHIL)</dd>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <dt class="text-slateink">KOORDINAT EXIF/GPS</dt>
+                <dd class="font-bold text-vermilion">DIHAPUS OTOMATIS</dd>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <dt class="text-slateink">SENSOR PIKSEL</dt>
+                <dd class="font-bold text-ink">RASTER PERMANEN</dd>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <dt class="text-slateink">MODE TANPA WI-FI</dt>
+                <dd class="font-bold text-verified">BERFUNGSI 100%</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="mt-4 border border-ink bg-sheet p-2.5 font-mono text-[11px] leading-snug text-ink">
+            <strong>UJI BUKTI:</strong> Anda dapat mematikan Wi-Fi / data seluler sekarang juga—seluruh instrumen di bawah tetap bekerja penuh.
+          </div>
+        </div>
       </div>
-
-      <h1
-        class="mx-auto max-w-4xl text-2xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-[42px] lg:leading-[1.15]"
-        data-i18n-id="Lindungi KTP & Siapkan Dokumen Lamaran Tanpa Takut Kebocoran Data"
-        data-i18n-en="Protect Your ID Card & Prepare Application Documents With Zero Data Leak Risk"
-      >
-        Lindungi KTP & Siapkan Dokumen Lamaran Tanpa Takut Kebocoran Data
-      </h1>
-
-      <p
-        class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-400 sm:text-base"
-        data-i18n-id="Beri watermark anti-pinjol pada KTP, sensor NIK & tanda tangan, kompres pasfoto sesuai batas KB portal CPNS/BUMN, dan gabungkan ke PDF A4 langsung di dalam memori browser Anda."
-        data-i18n-en="Add anti-fraud watermarks to ID cards, redact ID numbers & signatures, compress photos to exact KB limits, and merge into A4 PDFs strictly inside your browser memory."
-      >
-        Beri watermark anti-pinjol pada KTP, sensor NIK & tanda tangan, kompres pasfoto sesuai batas KB portal CPNS/BUMN, dan gabungkan ke PDF A4 langsung di dalam memori browser Anda.
-      </p>
     </section>
 
-    <!-- Interactive Studio Workspace -->
-    <section id="studio" class="scroll-mt-20">
+    <!-- Interactive Forensic Lighttable & Security Press -->
+    <section id="studio" class="scroll-mt-24">
       <AmanDokStudio client:load />
     </section>
 
-    <!-- Zero-Upload Security Architecture Proof Section -->
-    <section id="jaminan-privasi" class="mt-20 scroll-mt-20">
-      <div class="mb-8 text-center">
-        <span class="font-mono text-xs font-bold uppercase tracking-widest text-emerald-400">
-          VERIFIABLE PRIVACY ARCHITECTURE
+    <!-- Zero-Upload Security Architecture Ledger -->
+    <section id="jaminan-privasi" class="mt-20 scroll-mt-24">
+      <div class="mb-6 flex flex-col justify-between gap-2 border-b-2 border-ink pb-4 sm:flex-row sm:items-end">
+        <div>
+          <span class="font-mono text-xs font-bold uppercase tracking-widest text-vermilion">
+            ARSITEKTUR KEDAULATAN DATA // ZERO-TRUST
+          </span>
+          <h2
+            class="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl"
+            data-i18n-id="Mengapa AmanDok Berbeda dari Situs Edit PDF & Kompres Foto Biasa?"
+            data-i18n-en="Why AmanDok Differs From Typical Online PDF & Image Converters"
+          >
+            Mengapa AmanDok Berbeda dari Situs Edit PDF & Kompres Foto Biasa?
+          </h2>
+        </div>
+        <span class="font-mono text-xs font-bold text-slateink">
+          DOKUMEN AUDIT // REV 2.0
         </span>
-        <h2
-          class="mt-2 text-2xl font-extrabold text-white sm:text-3xl"
-          data-i18n-id="Mengapa AmanDok Lebih Aman dari Kompresor PDF/Gambar Online Biasa?"
-          data-i18n-en="Why Is AmanDok Safer Than Standard Online Image/PDF Converters?"
-        >
-          Mengapa AmanDok Lebih Aman dari Kompresor PDF/Gambar Online Biasa?
-        </h2>
       </div>
 
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 font-mono text-sm font-bold text-emerald-400">
-            01
+      <div class="grid grid-cols-1 border-2 border-ink bg-sheet shadow-press md:grid-cols-3">
+        <!-- Pillar 01 -->
+        <div class="border-b-2 border-ink p-6 md:border-b-0 md:border-r-2">
+          <div class="mb-4 flex items-baseline justify-between border-b border-ink/20 pb-2">
+            <span class="font-display text-3xl font-bold text-vermilion">01.</span>
+            <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-slateink">
+              LOCAL RAM EXECUTION
+            </span>
           </div>
           <h3
-            class="text-base font-bold text-white"
-            data-i18n-id="Zero-Network Transfer (100% RAM Lokal)"
-            data-i18n-en="Zero-Network Transfer (100% Local RAM)"
+            class="font-display text-lg font-bold text-ink"
+            data-i18n-id="Tanpa Unggahan Cloud (Zero-Network Egress)"
+            data-i18n-en="Zero Cloud Upload (Zero-Network Egress)"
           >
-            Zero-Network Transfer (100% RAM Lokal)
+            Tanpa Unggahan Cloud (Zero-Network Egress)
           </h3>
           <p
-            class="mt-2 text-xs leading-relaxed text-slate-400"
-            data-i18n-id="Situs kompres foto atau PDF biasa mengunggah KTP Anda ke server cloud mereka. Di AmanDok, seluruh pemrosesan berjalan di browser perangkat Anda menggunakan HTML5 Canvas & pdf-lib. Anda bahkan bisa mematikan koneksi internet setelah halaman terbuka."
-            data-i18n-en="Typical online converters upload your ID card to remote servers. AmanDok processes everything locally in your browser using HTML5 Canvas & pdf-lib. You can even disconnect from the internet while processing."
+            class="mt-2 text-xs leading-relaxed text-slateink"
+            data-i18n-id="Kompresor gambar atau penggabung PDF online konvensional mengirim foto KTP Anda ke server pihak ketiga. AmanDok memproses seluruh byte di dalam memori RAM perangkat Anda menggunakan HTML5 Canvas & pdf-lib."
+            data-i18n-en="Conventional online converters upload your ID card to third-party cloud servers. AmanDok processes every byte strictly inside your device RAM using HTML5 Canvas & pdf-lib."
           >
-            Situs kompres foto atau PDF biasa mengunggah KTP Anda ke server cloud mereka. Di AmanDok, seluruh pemrosesan berjalan di browser perangkat Anda menggunakan HTML5 Canvas & pdf-lib. Anda bahkan bisa mematikan koneksi internet setelah halaman terbuka.
+            Kompresor gambar atau penggabung PDF online konvensional mengirim foto KTP Anda ke server pihak ketiga. AmanDok memproses seluruh byte di dalam memori RAM perangkat Anda menggunakan HTML5 Canvas & pdf-lib.
           </p>
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/15 font-mono text-sm font-bold text-sky-400">
-            02
+        <!-- Pillar 02 -->
+        <div class="border-b-2 border-ink p-6 md:border-b-0 md:border-r-2">
+          <div class="mb-4 flex items-baseline justify-between border-b border-ink/20 pb-2">
+            <span class="font-display text-3xl font-bold text-verified">02.</span>
+            <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-slateink">
+              EXIF & GPS PURGE
+            </span>
           </div>
           <h3
-            class="text-base font-bold text-white"
-            data-i18n-id="Pembersih Otomatis Metadata EXIF & GPS"
-            data-i18n-en="Automatic Camera EXIF & GPS Scrubber"
+            class="font-display text-lg font-bold text-ink"
+            data-i18n-id="Pembersihan Otomatis Koordinat GPS Kamera"
+            data-i18n-en="Automatic Camera EXIF & GPS Stripping"
           >
-            Pembersih Otomatis Metadata EXIF & GPS
+            Pembersihan Otomatis Koordinat GPS Kamera
           </h3>
           <p
-            class="mt-2 text-xs leading-relaxed text-slate-400"
-            data-i18n-id="Foto KTP yang diambil dari kamera smartphone menyimpan koordinat GPS rumah, tipe HP, dan jam pengambilan. Saat Anda memuat dokumen ke AmanDok, semua metadata tersembunyi tersebut otomatis dihapus bersih."
-            data-i18n-en="Smartphone photos embed exact home GPS coordinates and device serial data. When you load an image into AmanDok, all hidden EXIF metadata is stripped automatically."
+            class="mt-2 text-xs leading-relaxed text-slateink"
+            data-i18n-id="Foto dokumen dari kamera smartphone menyimpan titik koordinat GPS rumah, seri perangkat, dan jam pengambilan. Begitu berkas dimuat ke meja kerja AmanDok, seluruh metadata EXIF otomatis dilucuti bersih."
+            data-i18n-en="Smartphone photos embed exact home GPS coordinates and device serial tags. The moment a document enters AmanDok, all hidden EXIF metadata is stripped clean."
           >
-            Foto KTP yang diambil dari kamera smartphone menyimpan koordinat GPS rumah, tipe HP, dan jam pengambilan. Saat Anda memuat dokumen ke AmanDok, semua metadata tersembunyi tersebut otomatis dihapus bersih.
+            Foto dokumen dari kamera smartphone menyimpan titik koordinat GPS rumah, seri perangkat, dan jam pengambilan. Begitu berkas dimuat ke meja kerja AmanDok, seluruh metadata EXIF otomatis dilucuti bersih.
           </p>
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 font-mono text-sm font-bold text-amber-400">
-            03
+        <!-- Pillar 03 -->
+        <div class="p-6">
+          <div class="mb-4 flex items-baseline justify-between border-b border-ink/20 pb-2">
+            <span class="font-display text-3xl font-bold text-cobalt">03.</span>
+            <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-slateink">
+              IRREVERSIBLE RASTER
+            </span>
           </div>
           <h3
-            class="text-base font-bold text-white"
-            data-i18n-id="Penghancuran Piksel Permanen (Anti Un-Blur)"
+            class="font-display text-lg font-bold text-ink"
+            data-i18n-id="Destruksi Piksel Permanen (Anti Un-Blur)"
             data-i18n-en="Irreversible Pixel Destruction"
           >
-            Penghancuran Piksel Permanen (Anti Un-Blur)
+            Destruksi Piksel Permanen (Anti Un-Blur)
           </h3>
           <p
-            class="mt-2 text-xs leading-relaxed text-slate-400"
-            data-i18n-id="Banyak orang menutupi NIK di PDF hanya dengan kotak gambar di atas teks yang masih bisa disalin (copy-paste). Fitur Sensor AmanDok meleburkan piksel ke dalam raster gambar secara permanen sehingga mustahil dibongkar kembali."
-            data-i18n-en="Adding shapes over PDFs often leaves underlying text selectable. AmanDok flattens and destroys underlying pixel data permanently before exporting."
+            class="mt-2 text-xs leading-relaxed text-slateink"
+            data-i18n-id="Menutupi NIK di dokumen dengan kotak lapisan biasa masih menyisakan data asli di bawahnya. Modul Sensor AmanDok meleburkan dan menghancurkan matriks piksel secara permanen sebelum berkas diunduh."
+            data-i18n-en="Placing vector shapes over PDFs often leaves underlying text intact. AmanDok flattens and destroys the underlying pixel matrix permanently before export."
           >
-            Banyak orang menutupi NIK di PDF hanya dengan kotak gambar di atas teks yang masih bisa disalin (copy-paste). Fitur Sensor AmanDok meleburkan piksel ke dalam raster gambar secara permanen sehingga mustahil dibongkar kembali.
+            Menutupi NIK di dokumen dengan kotak lapisan biasa masih menyisakan data asli di bawahnya. Modul Sensor AmanDok meleburkan dan menghancurkan matriks piksel secara permanen sebelum berkas diunduh.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- Indonesian Portal Standards Reference Table -->
-    <section id="panduan" class="mt-20 scroll-mt-20">
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8">
-        <div class="mb-6 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+    <!-- Indonesian Portal Standards Matrix -->
+    <section id="panduan" class="mt-20 scroll-mt-24">
+      <div class="border-2 border-ink bg-sheet p-6 shadow-press sm:p-8">
+        <div class="mb-6 flex flex-col justify-between gap-2 border-b-2 border-ink pb-4 sm:flex-row sm:items-end">
           <div>
-            <span class="font-mono text-xs font-bold uppercase tracking-widest text-sky-400">
-              STANDAR ADMINISTRASI INDONESIA
+            <span class="font-mono text-xs font-bold uppercase tracking-widest text-vermilion">
+              TABEL ACUAN ADMINISTRASI NASIONAL
             </span>
             <h2
-              class="mt-1 text-xl font-extrabold text-white sm:text-2xl"
-              data-i18n-id="Acuan Ukuran Berkas Portal Rekrutmen & Layanan Publik"
-              data-i18n-en="Standard Indonesian Portal Document Specifications"
+              class="mt-1 font-display text-2xl font-bold text-ink"
+              data-i18n-id="Matriks Spesifikasi Berkas Portal Rekrutmen & Layanan Publik"
+              data-i18n-en="Indonesian Recruitment & Public Service Portal Specification Matrix"
             >
-              Acuan Ukuran Berkas Portal Rekrutmen & Layanan Publik
+              Matriks Spesifikasi Berkas Portal Rekrutmen & Layanan Publik
             </h2>
           </div>
-          <p class="text-xs text-slate-400">
-            Gunakan Tab 03 (Target KB) & Tab 04 (Gabung PDF) sesuai ketentuan berikut:
+          <p class="font-mono text-xs text-slateink">
+            ACUAN STAGE 03 (TARGET KB) & STAGE 04 (BINDER PDF)
           </p>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
+          <table class="w-full border-collapse text-left text-xs">
             <thead>
-              <tr class="border-b border-slate-800 font-mono uppercase text-slate-400">
-                <th class="pb-3 pr-4">Keperluan / Portal</th>
-                <th class="pb-3 px-4">Jenis Dokumen</th>
-                <th class="pb-3 px-4">Rekomendasi Preset AmanDok</th>
-                <th class="pb-3 pl-4">Batas Ukuran Umum</th>
+              <tr class="border-b-2 border-ink bg-dossier font-mono uppercase text-ink">
+                <th class="border-r border-ink/30 px-3 py-3">Instansi / Portal</th>
+                <th class="border-r border-ink/30 px-3 py-3">Dokumen Wajib</th>
+                <th class="border-r border-ink/30 px-3 py-3">Konfigurasi AmanDok</th>
+                <th class="px-3 py-3">Batas Ukuran</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-800/70 text-slate-300">
-              <tr>
-                <td class="py-3.5 pr-4 font-bold text-white">SSCASN (CPNS & PPPK)</td>
-                <td class="py-3.5 px-4">Scan KTP & Pasfoto Latar Merah</td>
-                <td class="py-3.5 px-4 font-mono text-emerald-400">Rasio KTP / 3×4 • Target ≤ 200 KB</td>
-                <td class="py-3.5 pl-4 font-mono">100 KB – 200 KB (JPG)</td>
+            <tbody class="divide-y divide-ink/30 font-mono text-xs text-ink">
+              <tr class="hover:bg-dossier/60">
+                <td class="border-r border-ink/30 px-3 py-3.5 font-sans font-bold">
+                  SSCASN (CPNS & PPPK)
+                </td>
+                <td class="border-r border-ink/30 px-3 py-3.5 font-sans text-slateink">
+                  Scan KTP & Pasfoto Latar Merah
+                </td>
+                <td class="border-r border-ink/30 px-3 py-3.5 font-bold text-verified">
+                  Rasio KTP / 3×4 • Target ≤ 200 KB
+                </td>
+                <td class="px-3 py-3.5 font-bold">100 – 200 KB (JPG)</td>
               </tr>
-              <tr>
-                <td class="py-3.5 pr-4 font-bold text-white">Rekrutmen Bersama BUMN / HRD</td>
-                <td class="py-3.5 px-4">KTP + NPWP + Ijazah Gabungan</td>
-                <td class="py-3.5 px-4 font-mono text-emerald-400">Watermark HRD + PDF 2 Kartu/A4</td>
-                <td class="py-3.5 pl-4 font-mono">≤ 500 KB – 1 MB (PDF)</td>
+              <tr class="hover:bg-dossier/60">
+                <td class="border-r border-ink/30 px-3 py-3.5 font-sans font-bold">
+                  Rekrutmen Bersama BUMN / HRD
+                </td>
+                <td class="border-r border-ink/30 px-3 py-3.5 font-sans text-slateink">
+                  KTP + NPWP + Ijazah / Transkrip
+                </td>
+                <td class="border-r border-ink/30 px-3 py-3.5 font-bold text-verified">
+                  Segel HRD + Binder PDF 2 Kartu/A4
+                </td>
+                <td class="px-3 py-3.5 font-bold">≤ 500 KB – 1 MB (PDF)</td>
               </tr>
-              <tr>
-                <td class="py-3.5 pr-4 font-bold text-white">Pengajuan KPR / Bank / Leasing</td>
-                <td class="py-3.5 px-4">KTP Suami-Istri & NPWP</td>
-                <td class="py-3.5 px-4 font-mono text-emerald-400">Watermark Tiled "VERIFIKASI BANK"</td>
-                <td class="py-3.5 pl-4 font-mono">≤ 300 KB (JPG / PDF)</td>
+              <tr class="hover:bg-dossier/60">
+                <td class="border-r border-ink/30 px-3 py-3.5 font-sans font-bold">
+                  Verifikasi Bank / KPR / Leasing
+                </td>
+                <td class="border-r border-ink/30 px-3 py-3.5 font-sans text-slateink">
+                  KTP Pemohon, Pasangan & NPWP
+                </td>
+                <td class="border-r border-ink/30 px-3 py-3.5 font-bold text-verified">
+                  Segel Rapat "VERIFIKASI BANK" + Tanggal
+                </td>
+                <td class="px-3 py-3.5 font-bold">≤ 300 KB (JPG / PDF)</td>
               </tr>
-              <tr>
-                <td class="py-3.5 pr-4 font-bold text-white">Sewa Kos / Apartemen / Kendaraan</td>
-                <td class="py-3.5 px-4">Foto KTP & Bukti Identitas</td>
-                <td class="py-3.5 px-4 font-mono text-emerald-400">Watermark + Sensor NIK / Tanda Tangan</td>
-                <td class="py-3.5 pl-4 font-mono">≤ 200 KB (JPG)</td>
+              <tr class="hover:bg-dossier/60">
+                <td class="border-r border-ink/30 px-3 py-3.5 font-sans font-bold">
+                  Sewa Properti / Kos / Kendaraan
+                </td>
+                <td class="border-r border-ink/30 px-3 py-3.5 font-sans text-slateink">
+                  Foto KTP & Identitas Pendamping
+                </td>
+                <td class="border-r border-ink/30 px-3 py-3.5 font-bold text-verified">
+                  Segel Sewa + Sensor NIK & Tanda Tangan
+                </td>
+                <td class="px-3 py-3.5 font-bold">≤ 200 KB (JPG)</td>
               </tr>
             </tbody>
           </table>

@@ -2,61 +2,61 @@
 const year = new Date().getFullYear();
 ---
 
-<footer class="mt-20 border-t border-slate-800/80 bg-slate-950 py-12 text-slate-400">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-12">
-      <!-- Col 1: Brand & Zero-Upload Manifesto -->
-      <div class="md:col-span-6">
-        <div class="flex items-center gap-2.5">
-          <span class="text-lg font-extrabold text-white">
-            Aman<span class="text-emerald-400">Dok</span>
+<footer class="mt-24 border-t-2 border-ink bg-sheet text-ink">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 border-2 border-ink bg-dossier shadow-press md:grid-cols-12">
+      <!-- Col 1: Archival Manifesto -->
+      <div class="border-b-2 border-ink p-6 md:col-span-6 md:border-b-0 md:border-r-2">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <span class="font-display text-2xl font-bold tracking-tight text-ink">
+            AmanDok<span class="text-vermilion">.</span>
           </span>
-          <span class="rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-400">
-            100% LOCAL SANDBOX
+          <span class="border border-ink bg-verified px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-sheet">
+            100% RAM SANDBOX • ZERO SERVER
           </span>
         </div>
         <p
-          class="mt-3 max-w-md text-xs leading-relaxed text-slate-400"
-          data-i18n-id="AmanDok dirancang untuk melindungi masyarakat Indonesia dari kebocoran data KTP, KK, dan NPWP. Seluruh pemrosesan gambar dan PDF berjalan murni di dalam memori browser Anda menggunakan HTML5 Canvas & WebAssembly tanpa pengiriman ke server."
-          data-i18n-en="AmanDok is engineered to protect citizens from ID card and document leaks. All image and PDF processing runs strictly inside your browser memory using HTML5 Canvas & WebAssembly with zero server uploads."
+          class="mt-3 max-w-md text-xs leading-relaxed text-slateink"
+          data-i18n-id="AmanDok dirancang sebagai meja kerja forensik mandiri bagi warga Indonesia untuk mencegah penyalahgunaan scan KTP, KK, dan NPWP. Seluruh rasterisasi segel watermark, sensor piksel, dan penjilidan PDF dieksekusi di memori lokal browser tanpa transmisi jaringan."
+          data-i18n-en="AmanDok is engineered as a self-contained document security lightdesk to prevent ID card and tax document leaks. All watermark rasterization, pixel destruction, and PDF binding execute strictly inside local browser RAM with zero network transmission."
         >
-          AmanDok dirancang untuk melindungi masyarakat Indonesia dari kebocoran data KTP, KK, dan NPWP. Seluruh pemrosesan gambar dan PDF berjalan murni di dalam memori browser Anda menggunakan HTML5 Canvas & WebAssembly tanpa pengiriman ke server.
+          AmanDok dirancang sebagai meja kerja forensik mandiri bagi warga Indonesia untuk mencegah penyalahgunaan scan KTP, KK, dan NPWP. Seluruh rasterisasi segel watermark, sensor piksel, dan penjilidan PDF dieksekusi di memori lokal browser tanpa transmisi jaringan.
         </p>
       </div>
 
-      <!-- Col 2: Ekosistem & Tautan -->
-      <div class="md:col-span-3">
+      <!-- Col 2: Pipeline Modules -->
+      <div class="border-b-2 border-ink p-6 md:col-span-3 md:border-b-0 md:border-r-2">
         <h3
-          class="font-mono text-xs font-bold uppercase tracking-wider text-slate-200"
-          data-i18n-id="Fitur Utama"
-          data-i18n-en="Core Capabilities"
+          class="font-mono text-xs font-bold uppercase tracking-wider text-ink"
+          data-i18n-id="Modul Instrumen"
+          data-i18n-en="Instrument Modules"
         >
-          Fitur Utama
+          Modul Instrumen
         </h3>
-        <ul class="mt-3 space-y-2 text-xs">
-          <li><a href="#studio" class="hover:text-emerald-400">Watermark KTP Anti-Pinjol</a></li>
-          <li><a href="#studio" class="hover:text-emerald-400">Sensor & Blur NIK / Tanda Tangan</a></li>
-          <li><a href="#studio" class="hover:text-emerald-400">Kompresor Target KB (CPNS/SSCASN)</a></li>
-          <li><a href="#studio" class="hover:text-emerald-400">Gabung KTP & Berkas ke PDF A4</a></li>
+        <ul class="mt-3 space-y-2 font-mono text-xs text-slateink">
+          <li><a href="#studio" class="hover:text-vermilion hover:underline">[01] Segel Watermark KTP</a></li>
+          <li><a href="#studio" class="hover:text-vermilion hover:underline">[02] Sensor Piksel NIK & TTD</a></li>
+          <li><a href="#studio" class="hover:text-vermilion hover:underline">[03] Presisi Target KB (CPNS)</a></li>
+          <li><a href="#studio" class="hover:text-vermilion hover:underline">[04] Binder Dokumen PDF A4</a></li>
         </ul>
       </div>
 
-      <!-- Col 3: Developer Portfolio & Open Source -->
-      <div class="md:col-span-3">
+      <!-- Col 3: Colophon & Open Source -->
+      <div class="p-6 md:col-span-3">
         <h3
-          class="font-mono text-xs font-bold uppercase tracking-wider text-slate-200"
-          data-i18n-id="Open Source & Pengembang"
-          data-i18n-en="Open Source & Developer"
+          class="font-mono text-xs font-bold uppercase tracking-wider text-ink"
+          data-i18n-id="Kolofon & Kode Sumber"
+          data-i18n-en="Colophon & Source Code"
         >
-          Open Source & Pengembang
+          Kolofon & Kode Sumber
         </h3>
-        <ul class="mt-3 space-y-2 text-xs">
+        <ul class="mt-3 space-y-2 font-mono text-xs text-slateink">
           <li>
             <a
               href="https://ritonga.ai.id"
               target="_blank"
               rel="noopener noreferrer"
-              class="hover:text-emerald-400"
+              class="font-semibold text-ink hover:text-vermilion hover:underline"
             >
               Aliando Ritonga (Portfolio) ↗
             </a>
@@ -66,9 +66,9 @@ const year = new Date().getFullYear();
               href="https://github.com/andoritonga/amandok"
               target="_blank"
               rel="noopener noreferrer"
-              class="hover:text-emerald-400"
+              class="hover:text-vermilion hover:underline"
             >
-              Kode Sumber (GitHub Public Repo) ↗
+              GitHub Repository (Audit) ↗
             </a>
           </li>
           <li>
@@ -76,7 +76,7 @@ const year = new Date().getFullYear();
               href="https://gaji.ritonga.ai.id"
               target="_blank"
               rel="noopener noreferrer"
-              class="hover:text-emerald-400"
+              class="hover:text-vermilion hover:underline"
             >
               HitungGaji.id (PPh 21 TER) ↗
             </a>
@@ -85,10 +85,15 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
-    <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-800/80 pt-6 text-xs sm:flex-row">
-      <p>© {year} AmanDok • Built by <a href="https://ritonga.ai.id" class="font-semibold text-slate-200 hover:text-emerald-400">Aliando Ritonga</a></p>
-      <p class="font-mono text-[11px] text-emerald-400/90">
-        CSP: connect-src 'self' • Zero Telemetry • Zero Cloud Storage
+    <div class="mt-6 flex flex-col items-center justify-between gap-3 font-mono text-xs text-slateink sm:flex-row">
+      <p>
+        © {year} AmanDok — Dirancang & Dikembangkan oleh{' '}
+        <a href="https://ritonga.ai.id" class="font-bold text-ink underline decoration-vermilion decoration-2 underline-offset-2">
+          Aliando Ritonga
+        </a>
+      </p>
+      <p class="border border-ink bg-dossier px-2.5 py-1 text-[11px] font-semibold text-ink">
+        CSP: connect-src 'self' • ZERO TELEMETRY • ZERO CLOUD STORAGE
       </p>
     </div>
   </div>

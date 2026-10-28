@@ -17,6 +17,8 @@ import {
   MoveUp,
   MoveDown,
   Layers,
+  ShieldCheck,
+  Crosshair,
 } from 'lucide-react';
 import {
   type WatermarkConfig,
@@ -42,6 +44,7 @@ export type Lang = 'id' | 'en';
 
 const WATERMARK_PRESETS: {
   id: string;
+  code: string;
   labelId: string;
   labelEn: string;
   textId: string;
@@ -49,48 +52,53 @@ const WATERMARK_PRESETS: {
 }[] = [
   {
     id: 'bank',
+    code: 'PRM-01',
     labelId: 'Verifikasi Bank / KPR',
-    labelEn: 'Bank / Mortgage Verification',
+    labelEn: 'Bank / Mortgage',
     textId: 'HANYA UNTUK VERIFIKASI BANK',
     textEn: 'FOR BANK VERIFICATION ONLY',
   },
   {
     id: 'hrd',
+    code: 'PRM-02',
     labelId: 'Lamaran Kerja / HRD',
-    labelEn: 'Job Application / HR',
+    labelEn: 'HR Recruitment',
     textId: 'KHUSUS REKRUTMEN HRD PERUSAHAAN',
     textEn: 'FOR HR RECRUITMENT ONLY',
   },
   {
     id: 'cpns',
+    code: 'PRM-03',
     labelId: 'Seleksi CPNS / BUMN',
-    labelEn: 'Civil Service / SOE Portal',
+    labelEn: 'SSCASN / SOE Portal',
     textId: 'KHUSUS PENDAFTARAN SSCASN / BUMN',
     textEn: 'FOR SSCASN / SOE REGISTRATION ONLY',
   },
   {
     id: 'rental',
+    code: 'PRM-04',
     labelId: 'Sewa Properti / Kos',
-    labelEn: 'Property / Room Rental',
+    labelEn: 'Property Rental',
     textId: 'HANYA UNTUK ADMINISTRASI SEWA',
     textEn: 'FOR RENTAL ADMINISTRATION ONLY',
   },
   {
     id: 'telco',
-    labelId: 'Registrasi Layanan / Mitra',
-    labelEn: 'Partner / Service Onboarding',
+    code: 'PRM-05',
+    labelId: 'Registrasi Mitra Resmi',
+    labelEn: 'Partner Onboarding',
     textId: 'VERIFIKASI MITRA RESMI — DILARANG MENYALAHGUNAKAN',
     textEn: 'OFFICIAL PARTNER VERIFICATION ONLY',
   },
 ];
 
 const WATERMARK_COLORS = [
-  { id: 'crimson', label: 'Merah Keamanan', hex: '#e11d48' },
-  { id: 'cobalt', label: 'Biru Resmi', hex: '#0284c7' },
-  { id: 'slate', label: 'Hitam Arsip', hex: '#0f172a' },
-  { id: 'emerald', label: 'Hijau Verifikasi', hex: '#059669' },
-  { id: 'amber', label: 'Kuning Peringatan', hex: '#d97706' },
-  { id: 'white', label: 'Putih Kontras', hex: '#f8fafc' },
+  { id: 'crimson', label: 'Vermilion Stempel (#D92B2B)', hex: '#e11d48' },
+  { id: 'cobalt', label: 'Biru Birokrasi (#0284c7)', hex: '#0284c7' },
+  { id: 'slate', label: 'Karbon Arsip (#0f172a)', hex: '#0f172a' },
+  { id: 'emerald', label: 'Hijau Verifikasi (#059669)', hex: '#059669' },
+  { id: 'amber', label: 'Kuning Otorisasi (#d97706)', hex: '#d97706' },
+  { id: 'white', label: 'Putih Negatif (#f8fafc)', hex: '#f8fafc' },
 ];
 
 export default function AmanDokStudio() {
@@ -185,8 +193,8 @@ export default function AmanDokStudio() {
     setIsSampleLoaded(true);
     showToast(
       lang === 'id'
-        ? 'Simulasi KTP dimuat di memori lokal browser. Silakan uji semua fitur!'
-        : 'Simulated ID Card loaded in browser RAM. Test all tools freely!'
+        ? 'Spesimen KTP Simulasi dimuat ke meja inspeksi lokal.'
+        : 'Simulated ID specimen loaded onto the local inspection lighttable.'
     );
   }, [lang, showToast]);
 
@@ -225,7 +233,6 @@ export default function AmanDokStudio() {
     const canvas = previewCanvasRef.current;
     if (!canvas || !loadedImageEl) return;
 
-    // Ensure canvas is freshly rendered with current watermark + redactions
     renderDocumentCanvas(
       canvas,
       loadedImageEl,
@@ -285,13 +292,13 @@ export default function AmanDokStudio() {
       setIsSampleLoaded(false);
       showToast(
         lang === 'id'
-          ? 'Dokumen dimuat 100% lokal & metadata EXIF/GPS otomatis dibersihkan.'
-          : 'Document loaded 100% locally & EXIF/GPS metadata automatically stripped.'
+          ? 'Dokumen dimuat di RAM lokal & seluruh metadata EXIF/GPS telah dihancurkan.'
+          : 'Document loaded in local RAM & all camera EXIF/GPS metadata purged.'
       );
     } catch {
       showToast(
         lang === 'id'
-          ? 'Gagal membaca file gambar. Pastikan format JPG, PNG, atau WebP.'
+          ? 'Gagal membaca berkas gambar. Gunakan format JPG, PNG, atau WebP.'
           : 'Failed to read image file. Please use JPG, PNG, or WebP.'
       );
     } finally {
@@ -405,8 +412,8 @@ export default function AmanDokStudio() {
     ]);
     showToast(
       lang === 'id'
-        ? 'Area sensor berhasil ditambahkan. Anda juga bisa klik & seret langsung pada gambar.'
-        : 'Redaction mask added. You can also click & drag directly on the image.'
+        ? 'Zona sensor ditambahkan. Anda juga bisa klik & seret langsung di atas kanvas optik.'
+        : 'Redaction zone applied. You can also click & drag directly on the optical canvas.'
     );
   };
 
@@ -423,8 +430,8 @@ export default function AmanDokStudio() {
     link.click();
     showToast(
       lang === 'id'
-        ? 'Dokumen terlindungi berhasil diunduh ke perangkat Anda!'
-        : 'Protected document downloaded to your device!'
+        ? 'Dokumen tersegel berhasil diunduh ke perangkat Anda!'
+        : 'Sealed document downloaded to your device!'
     );
   };
 
@@ -438,7 +445,7 @@ export default function AmanDokStudio() {
     link.click();
     showToast(
       lang === 'id'
-        ? `File terkompresi (${formatBytes(compressionResult.compressedBytes)}) berhasil diunduh!`
+        ? `Berkas terkompresi (${formatBytes(compressionResult.compressedBytes)}) berhasil diunduh!`
         : `Compressed file (${formatBytes(compressionResult.compressedBytes)}) downloaded!`
     );
   };
@@ -469,8 +476,8 @@ export default function AmanDokStudio() {
     setActiveTab('pdf');
     showToast(
       lang === 'id'
-        ? 'Dokumen ditambahkan ke Antrean PDF!'
-        : 'Document added to PDF Queue!'
+        ? 'Dokumen dimasukkan ke Binder PDF A4!'
+        : 'Document inserted into A4 PDF Binder!'
     );
   };
 
@@ -510,8 +517,8 @@ export default function AmanDokStudio() {
       setPdfDownloadUrl(null);
       showToast(
         lang === 'id'
-          ? `${addedItems.length} berkas berhasil ditambahkan ke antrean PDF.`
-          : `${addedItems.length} file(s) added to PDF queue.`
+          ? `${addedItems.length} berkas ditambahkan ke Binder PDF.`
+          : `${addedItems.length} file(s) added to PDF Binder.`
       );
     }
     e.target.value = '';
@@ -548,15 +555,15 @@ export default function AmanDokStudio() {
       setPdfSizeBytes(blob.size);
       showToast(
         lang === 'id'
-          ? 'Dokumen PDF gabungan selesai dibuat di memori browser!'
-          : 'Combined PDF document generated in browser memory!'
+          ? 'Bundel PDF A4 selesai dijilid di memori lokal!'
+          : 'Combined A4 PDF bundle generated in local memory!'
       );
     } catch (err) {
       console.error(err);
       showToast(
         lang === 'id'
-          ? 'Terjadi kesalahan saat menggabungkan PDF.'
-          : 'An error occurred while building the PDF.'
+          ? 'Terjadi kesalahan saat menjilid PDF.'
+          : 'An error occurred while binding the PDF.'
       );
     } finally {
       setIsBuildingPdf(false);
@@ -573,119 +580,120 @@ export default function AmanDokStudio() {
     handleLoadSampleKtp();
     showToast(
       lang === 'id'
-        ? 'Seluruh memori sesi telah dihapus & dikembalikan ke simulasi awal.'
-        : 'All session memory wiped & reset to clean simulation.'
+        ? 'Memori RAM dibersihkan & dikembalikan ke spesimen simulasi.'
+        : 'Session RAM purged & restored to simulated specimen.'
     );
   };
 
   return (
     <div className="relative">
-      {/* Toast Notification */}
+      {/* Archival Stamp Toast Notification */}
       {toastMessage && (
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-xl border border-emerald-500/40 bg-slate-900/95 px-4 py-3 text-sm font-medium text-emerald-300 shadow-2xl backdrop-blur-md"
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-3 border-2 border-ink bg-ink px-4 py-3 font-mono text-xs font-semibold text-sheet shadow-press-vermilion"
         >
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-[#34D399]" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Zero-Upload Guarantee Strip & Quick Actions */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-500/25 bg-slate-900/80 px-4 py-3.5 shadow-lg backdrop-blur-md sm:px-6">
+      {/* Top Dossier Control Strip */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-2 border-ink bg-sheet px-4 py-3 shadow-press sm:px-5">
         <div className="flex items-center gap-3">
-          <span className="relative flex h-3 w-3">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
-          </span>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center border border-ink bg-verified text-sheet">
+            <ShieldCheck className="h-4 w-4" />
+          </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-ink">
                 {lang === 'id'
-                  ? '100% DIPROSES DI BROWSER ANDA (ZERO SERVER UPLOAD)'
-                  : '100% IN-BROWSER PROCESSING (ZERO SERVER UPLOAD)'}
+                  ? 'STATUS MEJA KERJA: TERISOLASI DI RAM LOKAL (0 KB UPLOAD)'
+                  : 'LIGHTDESK STATUS: ISOLATED IN LOCAL RAM (0 KB UPLOAD)'}
               </span>
-              <span className="hidden rounded-full border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 font-mono text-[11px] text-sky-300 sm:inline-flex items-center gap-1">
-                <WifiOff className="h-3 w-3" />
-                {lang === 'id' ? 'Aman Saat Offline' : 'Works Offline'}
+              <span className="hidden items-center gap-1 border border-ink bg-dossier px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-ink sm:inline-flex">
+                <WifiOff className="h-3 w-3 text-vermilion" />
+                {lang === 'id' ? 'SIAP MODE OFFLINE' : 'OFFLINE READY'}
               </span>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="font-mono text-[11px] text-slateink">
               {lang === 'id'
-                ? 'KTP, NPWP, dan dokumen Anda tidak pernah dikirim ke server mana pun. EXIF & lokasi GPS dihapus otomatis.'
-                : 'Your ID cards and documents never leave your device. Camera EXIF & GPS metadata are stripped automatically.'}
+                ? 'BERKAS AKTIF: '
+                : 'ACTIVE SPECIMEN: '}
+              <strong className="text-ink">{sourceFileName}</strong> ({sourceDimensions.width}×
+              {sourceDimensions.height}px • EXIF: PURGED)
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             type="button"
             onClick={handleLoadSampleKtp}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-sky-500/50 hover:text-sky-300"
+            className="btn-press inline-flex items-center gap-1.5 bg-dossier px-3 py-1.5 font-mono text-xs font-bold text-ink hover:bg-sheet"
           >
-            <Sparkles className="h-3.5 w-3.5 text-sky-400" />
-            {lang === 'id' ? 'Muat Simulasi KTP' : 'Load Simulated ID'}
+            <Sparkles className="h-3.5 w-3.5 text-cobalt" />
+            {lang === 'id' ? 'Spesimen Simulasi KTP' : 'Load Specimen ID'}
           </button>
 
           <button
             type="button"
             onClick={handleWipeSessionMemory}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/20"
+            className="btn-press inline-flex items-center gap-1.5 bg-[#FEE2E2] px-3 py-1.5 font-mono text-xs font-bold text-vermilion hover:bg-vermilion hover:text-sheet"
           >
             <Trash2 className="h-3.5 w-3.5" />
-            {lang === 'id' ? 'Bersihkan Memori' : 'Wipe Session RAM'}
+            {lang === 'id' ? 'Hancurkan Sesi RAM' : 'Purge Session RAM'}
           </button>
         </div>
       </div>
 
-      {/* 4-Step Studio Pipeline Tabs */}
+      {/* Die-Cut Archival Dossier Stage Tabs */}
       <div
         role="tablist"
         aria-label="AmanDok Document Pipeline"
-        className="mb-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4"
+        className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4"
       >
         {[
           {
             id: 'watermark' as StudioTab,
-            step: '01',
-            titleId: 'Watermark KTP',
-            titleEn: 'ID Watermark',
-            descId: 'Segel teks anti-pinjol',
+            step: 'STAGE 01',
+            titleId: 'Segel Watermark',
+            titleEn: 'Watermark Seal',
+            descId: 'Stempel teks anti-pinjol',
             descEn: 'Anti-fraud text stamp',
             icon: Stamp,
-            badge: watermarkEnabled ? 'ON' : 'OFF',
+            badge: watermarkEnabled ? 'AKTIF' : 'OFF',
           },
           {
             id: 'redact' as StudioTab,
-            step: '02',
-            titleId: 'Sensor & Redaksi',
-            titleEn: 'Redact & Blur',
-            descId: 'Tutup NIK & tanda tangan',
-            descEn: 'Mask ID number & signature',
+            step: 'STAGE 02',
+            titleId: 'Sensor Piksel',
+            titleEn: 'Pixel Redaction',
+            descId: 'Hancurkan NIK & tanda tangan',
+            descEn: 'Destroy ID & signature pixels',
             icon: EyeOff,
-            badge: redactions.length > 0 ? `${redactions.length}` : null,
+            badge: redactions.length > 0 ? `${redactions.length} ZONA` : 'SIAP',
           },
           {
             id: 'compress' as StudioTab,
-            step: '03',
-            titleId: 'Target KB & Pasfoto',
-            titleEn: 'Target KB & Crop',
-            descId: 'Pas <200KB & rasio 3x4/4x6',
-            descEn: 'Exact KB & 3x4/4x6 crop',
+            step: 'STAGE 03',
+            titleId: 'Presisi Target KB',
+            titleEn: 'Target KB Press',
+            descId: 'Kompresi CPNS & rasio 3×4',
+            descEn: 'Exact KB & 3×4 / 4×6 crop',
             icon: Minimize2,
-            badge: `${targetKb}KB`,
+            badge: `≤${targetKb}KB`,
           },
           {
             id: 'pdf' as StudioTab,
-            step: '04',
-            titleId: 'Gabung ke PDF',
-            titleEn: 'Merge to PDF',
-            descId: 'Susun berkas lamaran A4',
-            descEn: 'Combine into A4 PDF',
+            step: 'STAGE 04',
+            titleId: 'Binder PDF A4',
+            titleEn: 'A4 PDF Binder',
+            descId: 'Jilid KTP, NPWP & berkas',
+            descEn: 'Bind IDs & docs to A4 PDF',
             icon: FileStack,
-            badge: pdfQueue.length > 0 ? `${pdfQueue.length}` : null,
+            badge: pdfQueue.length > 0 ? `${pdfQueue.length} ITEM` : '0 ITEM',
           },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -697,49 +705,59 @@ export default function AmanDokStudio() {
               aria-selected={isActive}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`group relative flex flex-col items-start justify-between rounded-2xl border p-3.5 text-left transition-all ${
+              className={`group relative flex flex-col justify-between border-2 border-ink p-3.5 text-left transition-all ${
                 isActive
-                  ? 'border-emerald-500/60 bg-slate-900 shadow-lg shadow-emerald-950/30 ring-1 ring-emerald-500/30'
-                  : 'border-slate-800 bg-slate-900/50 hover:border-slate-700 hover:bg-slate-900/80'
+                  ? '-translate-y-0.5 bg-ink text-sheet shadow-press-vermilion'
+                  : 'bg-sheet text-ink shadow-press hover:-translate-y-0.5 hover:bg-dossier'
               }`}
             >
-              <div className="mb-2 flex w-full items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`flex h-8 w-8 items-center justify-center rounded-xl transition ${
-                      isActive
-                        ? 'bg-emerald-500 text-slate-950'
-                        : 'bg-slate-800 text-slate-400 group-hover:text-slate-200'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <span className="font-mono text-xs font-bold text-slate-500">
-                    {tab.step}
-                  </span>
-                </div>
-                {tab.badge && (
-                  <span
-                    className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold ${
-                      isActive
-                        ? 'bg-emerald-500/20 text-emerald-300'
-                        : 'bg-slate-800 text-slate-400'
-                    }`}
-                  >
-                    {tab.badge}
-                  </span>
-                )}
-              </div>
-              <div>
-                <div
-                  className={`text-sm font-bold ${
-                    isActive ? 'text-white' : 'text-slate-200'
+              {/* Top Active Vermilion Bar */}
+              <div
+                className={`absolute inset-x-0 top-0 h-1.5 ${
+                  isActive ? 'bg-vermilion' : 'bg-transparent group-hover:bg-ink/20'
+                }`}
+              />
+
+              <div className="mb-2.5 flex w-full items-center justify-between pt-1">
+                <span
+                  className={`font-mono text-[10px] font-bold tracking-widest ${
+                    isActive ? 'text-[#FCA5A5]' : 'text-slateink'
                   }`}
                 >
-                  {lang === 'id' ? tab.titleId : tab.titleEn}
+                  {tab.step}
+                </span>
+                <span
+                  className={`border px-1.5 py-0.5 font-mono text-[10px] font-bold ${
+                    isActive
+                      ? 'border-sheet/30 bg-vermilion text-sheet'
+                      : 'border-ink bg-dossier text-ink'
+                  }`}
+                >
+                  {tab.badge}
+                </span>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <div
+                  className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center border ${
+                    isActive
+                      ? 'border-sheet/40 bg-sheet/10 text-sheet'
+                      : 'border-ink bg-dossier text-ink'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
                 </div>
-                <div className="text-xs text-slate-400">
-                  {lang === 'id' ? tab.descId : tab.descEn}
+                <div>
+                  <div className="font-display text-sm font-bold tracking-tight sm:text-base">
+                    {lang === 'id' ? tab.titleId : tab.titleEn}
+                  </div>
+                  <div
+                    className={`text-[11px] ${
+                      isActive ? 'text-sheet/75' : 'text-slateink'
+                    }`}
+                  >
+                    {lang === 'id' ? tab.descId : tab.descEn}
+                  </div>
                 </div>
               </div>
             </button>
@@ -764,21 +782,21 @@ export default function AmanDokStudio() {
         className="hidden"
       />
 
-      {/* Main Workspace Grid */}
+      {/* Main Asymmetric Workbench */}
       {activeTab !== 'pdf' ? (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* LEFT / CENTER: Interactive Canvas Preview Area (7 cols) */}
-          <div className="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/75 p-4 shadow-xl sm:p-6 lg:col-span-7">
-            {/* Canvas Top Toolbar */}
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
-              <div className="flex items-center gap-2.5">
+          {/* LEFT: FORENSIC OPTICAL LIGHTTABLE (7 columns) */}
+          <div className="flex flex-col border-2 border-ink bg-lighttable text-sheet shadow-press lg:col-span-7">
+            {/* Optical Lighttable Top Command Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sheet/15 bg-[#121721] px-4 py-3">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-md shadow-emerald-950/50 transition hover:bg-emerald-400"
+                  className="inline-flex items-center gap-2 border-2 border-sheet bg-vermilion px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-sheet shadow-[2px_2px_0px_#FAF8F3] transition hover:bg-[#b91c1c]"
                 >
-                  <Upload className="h-4 w-4" />
-                  {lang === 'id' ? 'Pilih Foto Dokumen / KTP' : 'Select Document Image'}
+                  <Upload className="h-3.5 w-3.5" />
+                  {lang === 'id' ? 'Muat Foto KTP / Dokumen' : 'Load ID / Document Photo'}
                 </button>
 
                 <button
@@ -789,27 +807,34 @@ export default function AmanDokStudio() {
                       rotation: ((prev.rotation + 90) % 360) as 0 | 90 | 180 | 270,
                     }))
                   }
-                  title={lang === 'id' ? 'Putar 90 Derajat' : 'Rotate 90 Degrees'}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-slate-600 hover:bg-slate-700"
+                  title={lang === 'id' ? 'Putar Orientasi 90°' : 'Rotate Orientation 90°'}
+                  className="inline-flex items-center gap-1.5 border border-sheet/30 bg-sheet/10 px-2.5 py-1.5 font-mono text-xs font-semibold text-sheet transition hover:border-sheet hover:bg-sheet/20"
                 >
                   <RotateCw className="h-3.5 w-3.5" />
                   <span>90°</span>
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 font-mono text-xs text-slate-400">
+              <div className="flex items-center gap-2 font-mono text-[11px] text-sheet/75">
                 {isSampleLoaded && (
-                  <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
-                    {lang === 'id' ? 'MODE CONTOH SIMULASI' : 'SIMULATION SAMPLE'}
+                  <span className="border border-[#F59E0B]/50 bg-[#F59E0B]/15 px-2 py-0.5 text-[10px] font-bold text-[#FCD34D]">
+                    {lang === 'id' ? 'SPESIMEN SIMULASI' : 'SIMULATED SPECIMEN'}
                   </span>
                 )}
-                <span>
-                  {sourceDimensions.width}×{sourceDimensions.height}px
+                <span className="border border-sheet/20 bg-black/40 px-2 py-0.5">
+                  {sourceDimensions.width}×{sourceDimensions.height} PX
                 </span>
               </div>
             </div>
 
-            {/* Canvas Viewport */}
+            {/* Horizontal Millimeter Calibration Ruler */}
+            <div className="flex h-6 items-center justify-between border-b border-sheet/15 bg-[#070A0E] px-6 font-mono text-[9px] tracking-widest text-sheet/50 ruler-ticks-x">
+              <span>0.0 MM</span>
+              <span>ISO/IEC 7810 ID-1 OPTICAL CALIBRATION DECK</span>
+              <span>85.60 MM</span>
+            </div>
+
+            {/* Central Optical Inspection Viewport with Corner Registration Marks */}
             <div
               onMouseDown={handlePointerDown}
               onMouseMove={handlePointerMove}
@@ -818,34 +843,69 @@ export default function AmanDokStudio() {
               onTouchStart={handlePointerDown}
               onTouchMove={handlePointerMove}
               onTouchEnd={handlePointerUp}
-              className={`canvas-checkered relative flex min-h-[300px] flex-1 items-center justify-center overflow-hidden rounded-xl border border-slate-800 p-3 sm:min-h-[410px] ${
+              className={`bg-forensic-lighttable relative flex min-h-[320px] flex-1 items-center justify-center overflow-hidden p-5 sm:min-h-[430px] ${
                 activeTab === 'redact' ? 'cursor-crosshair select-none' : ''
               }`}
             >
+              {/* Left Vertical Millimeter Ruler Strip */}
+              <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-5 flex-col justify-between border-r border-sheet/15 bg-[#070A0E]/80 py-3 text-center font-mono text-[8px] text-sheet/40 ruler-ticks-y sm:flex">
+                <span>0</span>
+                <span>25</span>
+                <span>54</span>
+              </div>
+
+              {/* Corner Registration Crosshairs (+) */}
+              <span className="pointer-events-none absolute left-7 top-3 font-mono text-xs font-light text-sheet/40">
+                +
+              </span>
+              <span className="pointer-events-none absolute right-3 top-3 font-mono text-xs font-light text-sheet/40">
+                +
+              </span>
+              <span className="pointer-events-none absolute bottom-3 left-7 font-mono text-xs font-light text-sheet/40">
+                +
+              </span>
+              <span className="pointer-events-none absolute bottom-3 right-3 font-mono text-xs font-light text-sheet/40">
+                +
+              </span>
+
+              {/* Active Redaction Mode Banner Overlay */}
+              {activeTab === 'redact' && (
+                <div className="pointer-events-none absolute top-3 z-10 flex items-center gap-1.5 border border-vermilion bg-black/85 px-3 py-1 font-mono text-[11px] font-bold text-[#FCA5A5]">
+                  <Crosshair className="h-3.5 w-3.5 text-vermilion" />
+                  <span>
+                    {lang === 'id'
+                      ? 'MODE SENSOR AKTIF: KLIK & SERET KOTAK DI ATAS NIK / TTD'
+                      : 'REDACTION ARMED: CLICK & DRAG OVER ID NUMBER OR SIGNATURE'}
+                  </span>
+                </div>
+              )}
+
               {activeTab === 'compress' && compressionResult ? (
                 <div className="relative flex flex-col items-center">
-                  <img
-                    src={compressionResult.dataUrl}
-                    alt="Pratinjau Hasil Kompresi & Pasfoto"
-                    className="max-h-[420px] w-auto rounded-lg object-contain shadow-2xl"
-                  />
+                  <div className="border-2 border-sheet/30 bg-black p-1.5 shadow-2xl">
+                    <img
+                      src={compressionResult.dataUrl}
+                      alt="Pratinjau Hasil Kompresi & Pasfoto"
+                      className="max-h-[390px] w-auto object-contain"
+                    />
+                  </div>
                   <div className="mt-3 flex flex-wrap items-center justify-center gap-2 font-mono text-xs">
-                    <span className="rounded-lg border border-slate-700 bg-slate-900/90 px-2.5 py-1 text-slate-300">
-                      {lang === 'id' ? 'Awal:' : 'Original:'}{' '}
+                    <span className="border border-sheet/25 bg-black/80 px-2.5 py-1 text-sheet/80">
+                      {lang === 'id' ? 'AWAL:' : 'RAW:'}{' '}
                       <strong>{formatBytes(compressionResult.originalBytes)}</strong>
                     </span>
-                    <ArrowRight className="h-3.5 w-3.5 text-emerald-400" />
-                    <span className="rounded-lg border border-emerald-500/40 bg-emerald-950/80 px-2.5 py-1 font-bold text-emerald-300">
-                      {lang === 'id' ? 'Hasil:' : 'Output:'}{' '}
+                    <ArrowRight className="h-3.5 w-3.5 text-[#34D399]" />
+                    <span className="border border-[#34D399] bg-[#064E3B] px-2.5 py-1 font-bold text-[#6EE7B7]">
+                      {lang === 'id' ? 'HASIL:' : 'OUTPUT:'}{' '}
                       {formatBytes(compressionResult.compressedBytes)} (Q:{compressionResult.qualityUsed}%)
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="relative inline-block max-w-full">
+                <div className="relative inline-block max-w-full border border-sheet/25 bg-black p-1 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
                   <canvas
                     ref={previewCanvasRef}
-                    className="block max-h-[420px] w-auto max-w-full rounded-lg object-contain shadow-2xl"
+                    className="block max-h-[400px] w-auto max-w-full object-contain"
                   />
 
                   {/* Live Redaction Draft Box Overlay */}
@@ -857,21 +917,21 @@ export default function AmanDokStudio() {
                         width: `${draftBox.width * 100}%`,
                         height: `${draftBox.height * 100}%`,
                       }}
-                      className="pointer-events-none absolute border-2 border-dashed border-rose-400 bg-rose-500/25"
+                      className="pointer-events-none absolute border-2 border-dashed border-vermilion bg-vermilion/30"
                     />
                   )}
                 </div>
               )}
             </div>
 
-            {/* Canvas Bottom Action & Pipeline Bar */}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-2">
+            {/* Lighttable Bottom Export & Chaining Deck */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-sheet/15 bg-[#121721] px-4 py-3.5">
               <div className="flex flex-wrap items-center gap-2">
                 {activeTab === 'compress' && compressionResult ? (
                   <button
                     type="button"
                     onClick={handleDownloadCompressed}
-                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-950/50 transition hover:bg-emerald-400"
+                    className="inline-flex items-center gap-2 border-2 border-sheet bg-[#10B981] px-4 py-2 font-mono text-xs font-bold uppercase text-ink shadow-[3px_3px_0px_#FAF8F3] transition hover:bg-[#34D399]"
                   >
                     <Download className="h-4 w-4" />
                     {lang === 'id'
@@ -883,15 +943,15 @@ export default function AmanDokStudio() {
                     <button
                       type="button"
                       onClick={() => handleDownloadProtectedImage('jpeg')}
-                      className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-950/50 transition hover:bg-emerald-400"
+                      className="inline-flex items-center gap-2 border-2 border-sheet bg-[#10B981] px-4 py-2 font-mono text-xs font-bold uppercase text-ink shadow-[3px_3px_0px_#FAF8F3] transition hover:bg-[#34D399]"
                     >
                       <Download className="h-4 w-4" />
-                      {lang === 'id' ? 'Unduh JPG Aman' : 'Download Safe JPG'}
+                      {lang === 'id' ? 'Unduh JPG Tersegel' : 'Download Sealed JPG'}
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDownloadProtectedImage('png')}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-xs font-semibold text-slate-200 transition hover:border-slate-600 hover:bg-slate-700"
+                      className="inline-flex items-center gap-1.5 border border-sheet/40 bg-sheet/10 px-3 py-2 font-mono text-xs font-bold text-sheet transition hover:border-sheet hover:bg-sheet/20"
                     >
                       <Download className="h-3.5 w-3.5" />
                       PNG
@@ -900,15 +960,15 @@ export default function AmanDokStudio() {
                 )}
               </div>
 
-              {/* Pipeline Chaining Buttons */}
+              {/* Pipeline Chaining Controls */}
               <div className="flex flex-wrap items-center gap-2">
                 {activeTab === 'watermark' && (
                   <button
                     type="button"
                     onClick={() => setActiveTab('redact')}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/10 px-3.5 py-2.5 text-xs font-bold text-sky-300 transition hover:bg-sky-500/20"
+                    className="inline-flex items-center gap-1.5 border border-sheet/40 bg-sheet/10 px-3 py-2 font-mono text-xs font-bold text-sheet transition hover:border-sheet hover:bg-sheet/20"
                   >
-                    <span>{lang === 'id' ? 'Lanjut ke Sensor NIK' : 'Next: Redact ID'}</span>
+                    <span>{lang === 'id' ? '02. Sensor NIK' : '02. Redact ID'}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 )}
@@ -917,9 +977,9 @@ export default function AmanDokStudio() {
                   <button
                     type="button"
                     onClick={() => setActiveTab('compress')}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/10 px-3.5 py-2.5 text-xs font-bold text-sky-300 transition hover:bg-sky-500/20"
+                    className="inline-flex items-center gap-1.5 border border-sheet/40 bg-sheet/10 px-3 py-2 font-mono text-xs font-bold text-sheet transition hover:border-sheet hover:bg-sheet/20"
                   >
-                    <span>{lang === 'id' ? 'Lanjut Kompres KB' : 'Next: Target KB'}</span>
+                    <span>{lang === 'id' ? '03. Target KB' : '03. Target KB'}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 )}
@@ -927,78 +987,95 @@ export default function AmanDokStudio() {
                 <button
                   type="button"
                   onClick={handleSendCurrentToPdfQueue}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/90 px-3.5 py-2.5 text-xs font-semibold text-slate-200 transition hover:border-emerald-500/40 hover:text-emerald-300"
+                  className="inline-flex items-center gap-1.5 border border-[#FCD34D]/60 bg-[#F59E0B]/20 px-3 py-2 font-mono text-xs font-bold text-[#FDE68A] transition hover:bg-[#F59E0B]/30"
                 >
-                  <Plus className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>{lang === 'id' ? 'Masukkan ke PDF' : 'Add to PDF Queue'}</span>
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>{lang === 'id' ? 'Masukkan Binder PDF' : 'Send to PDF Binder'}</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: Context-Specific Studio Controls (5 cols) */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/75 p-5 shadow-xl sm:p-6 lg:col-span-5">
+          {/* RIGHT: ARCHITECTURAL CONTROL DECK (5 columns) */}
+          <div className="flex flex-col justify-between border-2 border-ink bg-sheet p-5 shadow-press sm:p-6 lg:col-span-5">
             {/* TAB 1: WATERMARK CONTROLS */}
             {activeTab === 'watermark' && (
               <div className="space-y-5">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-start justify-between border-b-2 border-ink pb-3.5">
                   <div>
-                    <h2 className="text-base font-bold text-white">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-vermilion">
+                      MODUL 01 // OTORISASI SEGEL
+                    </span>
+                    <h2 className="font-display text-lg font-bold text-ink">
                       {lang === 'id'
-                        ? 'Pengaturan Watermark Dokumen'
-                        : 'Document Watermark Controls'}
+                        ? 'Konfigurasi Stempel Watermark'
+                        : 'Watermark Stamp Configuration'}
                     </h2>
-                    <p className="text-xs text-slate-400">
-                      {lang === 'id'
-                        ? 'Cegah penyalahgunaan foto KTP untuk pinjol atau akun palsu.'
-                        : 'Prevent unauthorized reuse of your ID card scan.'}
-                    </p>
                   </div>
-                  <label className="inline-flex cursor-pointer items-center gap-2">
+                  <label className="inline-flex cursor-pointer items-center gap-2 border-2 border-ink bg-dossier px-2.5 py-1 shadow-press-sm">
                     <input
                       type="checkbox"
                       checked={watermarkEnabled}
                       onChange={(e) => setWatermarkEnabled(e.target.checked)}
-                      className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-emerald-500 focus:ring-emerald-500"
+                      className="h-3.5 w-3.5 accent-vermilion"
                     />
-                    <span className="font-mono text-xs font-bold text-emerald-400">
-                      {watermarkEnabled ? 'AKTIF' : 'NONAKTIF'}
+                    <span className="font-mono text-[11px] font-bold text-ink">
+                      {watermarkEnabled ? 'SEGEL ON' : 'SEGEL OFF'}
                     </span>
                   </label>
                 </div>
 
-                {/* Quick Purpose Templates */}
+                {/* Quick Rubber-Stamp Presets */}
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    {lang === 'id' ? 'Template Tujuan Cepat' : 'Quick Purpose Presets'}
+                  <label className="mb-2 block font-mono text-[11px] font-bold uppercase tracking-wider text-slateink">
+                    {lang === 'id'
+                      ? 'Preset Stempel Instansi (Klik untuk Terapkan)'
+                      : 'Official Purpose Stamp Presets'}
                   </label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {WATERMARK_PRESETS.map((preset) => (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() =>
-                          setWatermarkConfig((prev) => ({
-                            ...prev,
-                            text: lang === 'id' ? preset.textId : preset.textEn,
-                          }))
-                        }
-                        className="rounded-lg border border-slate-700/80 bg-slate-800/70 px-2.5 py-1.5 text-xs font-medium text-slate-200 transition hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-300"
-                      >
-                        {lang === 'id' ? preset.labelId : preset.labelEn}
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                    {WATERMARK_PRESETS.map((preset) => {
+                      const targetText = lang === 'id' ? preset.textId : preset.textEn;
+                      const isSelected = watermarkConfig.text === targetText;
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() =>
+                            setWatermarkConfig((prev) => ({
+                              ...prev,
+                              text: targetText,
+                            }))
+                          }
+                          className={`flex items-center justify-between border px-2.5 py-1.5 text-left font-mono text-xs transition ${
+                            isSelected
+                              ? 'border-ink bg-ink font-bold text-sheet'
+                              : 'border-ink/40 bg-dossier text-ink hover:border-ink hover:bg-sheet'
+                          }`}
+                        >
+                          <span className="truncate">
+                            {lang === 'id' ? preset.labelId : preset.labelEn}
+                          </span>
+                          <span
+                            className={`ml-1.5 shrink-0 text-[9px] ${
+                              isSelected ? 'text-[#FCA5A5]' : 'text-slateink'
+                            }`}
+                          >
+                            {preset.code}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Main Watermark Text & Subtext */}
-                <div className="space-y-3">
+                {/* Main Watermark Text & Subtext Inputs */}
+                <div className="space-y-3 border-t border-ink/20 pt-3">
                   <div>
                     <label
                       htmlFor="wm-main-text"
-                      className="mb-1 block text-xs font-semibold text-slate-300"
+                      className="mb-1 block font-mono text-[11px] font-bold uppercase text-ink"
                     >
-                      {lang === 'id' ? 'Teks Utama Watermark' : 'Primary Watermark Text'}
+                      {lang === 'id' ? 'Baris Stempel Utama' : 'Primary Stamp Line'}
                     </label>
                     <input
                       id="wm-main-text"
@@ -1008,18 +1085,18 @@ export default function AmanDokStudio() {
                         setWatermarkConfig((prev) => ({ ...prev, text: e.target.value }))
                       }
                       placeholder="HANYA UNTUK VERIFIKASI..."
-                      className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 font-mono text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                      className="w-full border-2 border-ink bg-dossier px-3 py-2 font-mono text-xs font-bold text-ink placeholder-slateink/60 focus:bg-sheet focus:outline-none"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="wm-sub-text"
-                      className="mb-1 block text-xs font-semibold text-slate-300"
+                      className="mb-1 block font-mono text-[11px] font-bold uppercase text-ink"
                     >
                       {lang === 'id'
-                        ? 'Baris Kedua (Tanggal / Nama Instansi)'
-                        : 'Secondary Line (Date / Institution)'}
+                        ? 'Baris Kedua (Tanggal / Penerima)'
+                        : 'Secondary Stamp Line (Date / Recipient)'}
                     </label>
                     <input
                       id="wm-sub-text"
@@ -1029,16 +1106,16 @@ export default function AmanDokStudio() {
                         setWatermarkConfig((prev) => ({ ...prev, subtext: e.target.value }))
                       }
                       placeholder={`TANGGAL: ${todayStr}`}
-                      className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 font-mono text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                      className="w-full border-2 border-ink bg-dossier px-3 py-2 font-mono text-xs text-ink placeholder-slateink/60 focus:bg-sheet focus:outline-none"
                     />
                   </div>
                 </div>
 
-                {/* Pattern Mode & Color */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {/* Pattern Mode & Ink Color */}
+                <div className="grid grid-cols-1 gap-4 border-t border-ink/20 pt-3 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-                      {lang === 'id' ? 'Pola Segel' : 'Stamp Pattern'}
+                    <label className="mb-1.5 block font-mono text-[11px] font-bold uppercase text-ink">
+                      {lang === 'id' ? 'Geometri Segel' : 'Stamp Geometry'}
                     </label>
                     <div className="grid grid-cols-3 gap-1.5">
                       {(
@@ -1054,10 +1131,10 @@ export default function AmanDokStudio() {
                           onClick={() =>
                             setWatermarkConfig((prev) => ({ ...prev, mode: m.id }))
                           }
-                          className={`rounded-lg border px-2 py-1.5 text-xs font-semibold transition ${
+                          className={`border-2 border-ink py-1.5 font-mono text-xs font-bold transition ${
                             watermarkConfig.mode === m.id
-                              ? 'border-emerald-500 bg-emerald-500/15 text-emerald-300'
-                              : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+                              ? 'bg-vermilion text-sheet shadow-press-sm'
+                              : 'bg-dossier text-ink hover:bg-sheet'
                           }`}
                         >
                           {lang === 'id' ? m.labelId : m.labelEn}
@@ -1067,8 +1144,8 @@ export default function AmanDokStudio() {
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-                      {lang === 'id' ? 'Warna Tinta Segel' : 'Ink Color'}
+                    <label className="mb-1.5 block font-mono text-[11px] font-bold uppercase text-ink">
+                      {lang === 'id' ? 'Tinta Segel Resmi' : 'Official Stamp Ink'}
                     </label>
                     <div className="flex items-center gap-2 pt-1">
                       {WATERMARK_COLORS.map((c) => (
@@ -1080,10 +1157,10 @@ export default function AmanDokStudio() {
                             setWatermarkConfig((prev) => ({ ...prev, color: c.hex }))
                           }
                           style={{ backgroundColor: c.hex }}
-                          className={`h-6 w-6 rounded-full border transition ${
+                          className={`h-7 w-7 border-2 border-ink transition ${
                             watermarkConfig.color === c.hex
-                              ? 'scale-110 border-white ring-2 ring-emerald-400'
-                              : 'border-slate-600 opacity-80 hover:opacity-100'
+                              ? '-translate-y-0.5 shadow-press-sm ring-2 ring-vermilion'
+                              : 'opacity-80 hover:opacity-100'
                           }`}
                         />
                       ))}
@@ -1091,14 +1168,14 @@ export default function AmanDokStudio() {
                   </div>
                 </div>
 
-                {/* Sliders: Opacity, Angle, Size, Spacing */}
-                <div className="grid grid-cols-2 gap-4 rounded-xl border border-slate-800 bg-slate-950/60 p-3.5">
+                {/* Precision Sliders */}
+                <div className="grid grid-cols-2 gap-4 border-2 border-ink bg-dossier p-3.5">
                   <div>
-                    <div className="mb-1 flex justify-between text-xs">
-                      <span className="text-slate-400">
-                        {lang === 'id' ? 'Transparansi' : 'Opacity'}
+                    <div className="mb-1.5 flex justify-between font-mono text-[11px]">
+                      <span className="font-semibold text-slateink">
+                        {lang === 'id' ? 'KEPEKATAN' : 'OPACITY'}
                       </span>
-                      <span className="font-mono text-slate-200">
+                      <span className="font-bold text-ink">
                         {Math.round(watermarkConfig.opacity * 100)}%
                       </span>
                     </div>
@@ -1114,18 +1191,16 @@ export default function AmanDokStudio() {
                           opacity: parseFloat(e.target.value),
                         }))
                       }
-                      className="w-full accent-emerald-500"
+                      className="archival-slider w-full"
                     />
                   </div>
 
                   <div>
-                    <div className="mb-1 flex justify-between text-xs">
-                      <span className="text-slate-400">
-                        {lang === 'id' ? 'Kemiringan' : 'Angle'}
+                    <div className="mb-1.5 flex justify-between font-mono text-[11px]">
+                      <span className="font-semibold text-slateink">
+                        {lang === 'id' ? 'SUDUT ROTASI' : 'ANGLE'}
                       </span>
-                      <span className="font-mono text-slate-200">
-                        {watermarkConfig.angle}°
-                      </span>
+                      <span className="font-bold text-ink">{watermarkConfig.angle}°</span>
                     </div>
                     <input
                       type="range"
@@ -1139,16 +1214,16 @@ export default function AmanDokStudio() {
                           angle: parseInt(e.target.value, 10),
                         }))
                       }
-                      className="w-full accent-emerald-500"
+                      className="archival-slider w-full"
                     />
                   </div>
 
                   <div>
-                    <div className="mb-1 flex justify-between text-xs">
-                      <span className="text-slate-400">
-                        {lang === 'id' ? 'Ukuran Huruf' : 'Font Scale'}
+                    <div className="mb-1.5 flex justify-between font-mono text-[11px]">
+                      <span className="font-semibold text-slateink">
+                        {lang === 'id' ? 'SKALA HURUF' : 'FONT SCALE'}
                       </span>
-                      <span className="font-mono text-slate-200">
+                      <span className="font-bold text-ink">
                         {Math.round(watermarkConfig.fontSizeScale * 100)}%
                       </span>
                     </div>
@@ -1164,16 +1239,16 @@ export default function AmanDokStudio() {
                           fontSizeScale: parseFloat(e.target.value),
                         }))
                       }
-                      className="w-full accent-emerald-500"
+                      className="archival-slider w-full"
                     />
                   </div>
 
                   <div>
-                    <div className="mb-1 flex justify-between text-xs">
-                      <span className="text-slate-400">
-                        {lang === 'id' ? 'Jarak Antar Teks' : 'Grid Spacing'}
+                    <div className="mb-1.5 flex justify-between font-mono text-[11px]">
+                      <span className="font-semibold text-slateink">
+                        {lang === 'id' ? 'JARAK GRID' : 'GRID SPACING'}
                       </span>
-                      <span className="font-mono text-slate-200">
+                      <span className="font-bold text-ink">
                         {Math.round(watermarkConfig.spacingScale * 100)}%
                       </span>
                     </div>
@@ -1189,16 +1264,16 @@ export default function AmanDokStudio() {
                           spacingScale: parseFloat(e.target.value),
                         }))
                       }
-                      className="w-full accent-emerald-500"
+                      className="archival-slider w-full"
                     />
                   </div>
                 </div>
 
-                {/* Security Tip Note */}
-                <div className="rounded-xl border border-sky-500/25 bg-sky-500/10 p-3 text-xs text-sky-200">
-                  <strong>Tips Kominfo & Keamanan Data:</strong> Letakkan watermark memotong
-                  bagian tengah KTP (bukan hanya di pinggir kosong) agar tidak bisa di-crop
-                  oleh pihak tidak bertanggung jawab.
+                {/* Archival Security Advisory */}
+                <div className="border-l-4 border-vermilion bg-dossier p-3 font-mono text-[11px] leading-relaxed text-ink">
+                  <strong>PROTOKOL KOMINFO:</strong> Pastikan teks segel memotong area NIK &
+                  wajah KTP (bukan di pinggir kosong) agar tidak dapat dipotong (crop) oleh
+                  pelaku penyalahgunaan data.
                 </div>
               </div>
             )}
@@ -1206,29 +1281,32 @@ export default function AmanDokStudio() {
             {/* TAB 2: REDACTION & BLUR CONTROLS */}
             {activeTab === 'redact' && (
               <div className="space-y-5">
-                <div className="border-b border-slate-800 pb-3">
-                  <h2 className="text-base font-bold text-white">
+                <div className="border-b-2 border-ink pb-3.5">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-vermilion">
+                    MODUL 02 // DESTRUKSI RASTER
+                  </span>
+                  <h2 className="font-display text-lg font-bold text-ink">
                     {lang === 'id'
-                      ? 'Sensor & Redaksi Data Sensitif'
-                      : 'Sensitive Data Redaction'}
+                      ? 'Sensor Permanen NIK & Tanda Tangan'
+                      : 'Irreversible Pixel Redaction'}
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="mt-0.5 text-xs text-slateink">
                     {lang === 'id'
-                      ? 'Klik & seret langsung pada gambar di sebelah kiri untuk menutup NIK, nomor KK, atau tanda tangan.'
-                      : 'Click & drag directly on the image to mask ID numbers, signatures, or faces.'}
+                      ? 'Klik & seret langsung pada meja optik hitam di kiri, atau tekan tombol koordinat cepat di bawah.'
+                      : 'Click & drag directly on the dark optical canvas, or trigger quick coordinate masks below.'}
                   </p>
                 </div>
 
-                {/* Redaction Style Selector */}
+                {/* Redaction Method Selector */}
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    {lang === 'id' ? 'Metode Sensor Piksel' : 'Redaction Style'}
+                  <label className="mb-2 block font-mono text-[11px] font-bold uppercase tracking-wider text-ink">
+                    {lang === 'id' ? 'Metode Penghancuran Piksel' : 'Pixel Destruction Mode'}
                   </label>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {(
                       [
-                        { id: 'pixelate', labelId: 'Mozaik Piksel', labelEn: 'Pixelate' },
-                        { id: 'blur', labelId: 'Blur Halus', labelEn: 'Gaussian Blur' },
+                        { id: 'pixelate', labelId: 'Mozaik', labelEn: 'Pixelate' },
+                        { id: 'blur', labelId: 'Blur Optik', labelEn: 'Blur' },
                         { id: 'blackout', labelId: 'Blok Hitam', labelEn: 'Blackout' },
                         { id: 'whiteout', labelId: 'Blok Putih', labelEn: 'Whiteout' },
                       ] as { id: RedactionStyle; labelId: string; labelEn: string }[]
@@ -1237,10 +1315,10 @@ export default function AmanDokStudio() {
                         key={st.id}
                         type="button"
                         onClick={() => setActiveRedactionStyle(st.id)}
-                        className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
+                        className={`border-2 border-ink px-2.5 py-2 font-mono text-xs font-bold transition ${
                           activeRedactionStyle === st.id
-                            ? 'border-emerald-500 bg-emerald-500/15 text-emerald-300'
-                            : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            ? 'bg-vermilion text-sheet shadow-press-sm'
+                            : 'bg-dossier text-ink hover:bg-sheet'
                         }`}
                       >
                         {lang === 'id' ? st.labelId : st.labelEn}
@@ -1249,94 +1327,94 @@ export default function AmanDokStudio() {
                   </div>
                 </div>
 
-                {/* One-Click KTP Area Presets */}
+                {/* One-Click Standard KTP Coordinate Masks */}
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <label className="mb-2 block font-mono text-[11px] font-bold uppercase tracking-wider text-ink">
                     {lang === 'id'
-                      ? 'Sensor Cepat Posisi KTP Standar'
-                      : 'Quick Standard ID Mask Presets'}
+                      ? 'Koordinat Cepat KTP Standar (ISO ID-1)'
+                      : 'Standard ID Card Coordinate Presets'}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => addQuickRedactionPreset('nik')}
-                      className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-emerald-500/50 hover:text-emerald-300"
+                      className="btn-press flex items-center justify-between bg-dossier px-3 py-2 font-mono text-xs font-bold text-ink hover:bg-sheet"
                     >
-                      <span>{lang === 'id' ? '+ Sensor Baris NIK' : '+ Mask ID Number'}</span>
-                      <EyeOff className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>{lang === 'id' ? '+ Baris NIK' : '+ ID Number'}</span>
+                      <EyeOff className="h-3.5 w-3.5 text-vermilion" />
                     </button>
 
                     <button
                       type="button"
                       onClick={() => addQuickRedactionPreset('signature')}
-                      className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-emerald-500/50 hover:text-emerald-300"
+                      className="btn-press flex items-center justify-between bg-dossier px-3 py-2 font-mono text-xs font-bold text-ink hover:bg-sheet"
                     >
-                      <span>{lang === 'id' ? '+ Sensor Tanda Tangan' : '+ Mask Signature'}</span>
-                      <EyeOff className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>{lang === 'id' ? '+ Tanda Tangan' : '+ Signature'}</span>
+                      <EyeOff className="h-3.5 w-3.5 text-vermilion" />
                     </button>
 
                     <button
                       type="button"
                       onClick={() => addQuickRedactionPreset('address')}
-                      className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-emerald-500/50 hover:text-emerald-300"
+                      className="btn-press flex items-center justify-between bg-dossier px-3 py-2 font-mono text-xs font-bold text-ink hover:bg-sheet"
                     >
-                      <span>{lang === 'id' ? '+ Sensor Nomor Rumah' : '+ Mask Street Address'}</span>
-                      <EyeOff className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>{lang === 'id' ? '+ Nomor Rumah' : '+ Address Line'}</span>
+                      <EyeOff className="h-3.5 w-3.5 text-vermilion" />
                     </button>
 
                     <button
                       type="button"
                       onClick={() => addQuickRedactionPreset('photo')}
-                      className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-emerald-500/50 hover:text-emerald-300"
+                      className="btn-press flex items-center justify-between bg-dossier px-3 py-2 font-mono text-xs font-bold text-ink hover:bg-sheet"
                     >
-                      <span>{lang === 'id' ? '+ Sensor Pasfoto Wajah' : '+ Mask Face Photo'}</span>
-                      <EyeOff className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>{lang === 'id' ? '+ Pasfoto Wajah' : '+ Portrait'}</span>
+                      <EyeOff className="h-3.5 w-3.5 text-vermilion" />
                     </button>
                   </div>
                 </div>
 
-                {/* Active Redaction List */}
-                <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3.5">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-300">
+                {/* Active Redaction Coordinates Log */}
+                <div className="border-2 border-ink bg-dossier p-3.5">
+                  <div className="mb-2 flex items-center justify-between border-b border-ink/20 pb-1.5">
+                    <span className="font-mono text-[11px] font-bold uppercase text-ink">
                       {lang === 'id'
-                        ? `Daftar Area Disensor (${redactions.length})`
-                        : `Active Redaction Masks (${redactions.length})`}
+                        ? `Log Zona Disensor (${redactions.length})`
+                        : `Active Redaction Zones (${redactions.length})`}
                     </span>
                     {redactions.length > 0 && (
                       <button
                         type="button"
                         onClick={() => setRedactions([])}
-                        className="text-xs font-semibold text-rose-400 hover:underline"
+                        className="font-mono text-[11px] font-bold text-vermilion underline"
                       >
-                        {lang === 'id' ? 'Hapus Semua' : 'Clear All'}
+                        {lang === 'id' ? 'Reset Semua' : 'Clear All'}
                       </button>
                     )}
                   </div>
 
                   {redactions.length === 0 ? (
-                    <p className="py-4 text-center text-xs text-slate-500">
+                    <p className="py-4 text-center font-mono text-xs text-slateink">
                       {lang === 'id'
-                        ? 'Belum ada area sensor. Klik & seret kursor pada gambar dokumen atau gunakan tombol cepat di atas.'
-                        : 'No redaction areas yet. Click & drag on the document preview or use the quick preset buttons above.'}
+                        ? '[BELUM ADA ZONA SENSOR — SERET KURSOR DI ATAS GAMBAR]'
+                        : '[NO REDACTION ZONES — DRAG CURSOR OVER IMAGE]'}
                     </p>
                   ) : (
-                    <ul className="max-h-40 space-y-1.5 overflow-y-auto pr-1">
+                    <ul className="max-h-36 space-y-1.5 overflow-y-auto pr-1">
                       {redactions.map((box, i) => (
                         <li
                           key={box.id}
-                          className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs"
+                          className="flex items-center justify-between border border-ink bg-sheet px-2.5 py-1.5 font-mono text-xs"
                         >
-                          <span className="font-mono text-slate-300">
-                            #{i + 1} • {box.style.toUpperCase()} ({Math.round(box.width * 100)}%×
-                            {Math.round(box.height * 100)}%)
+                          <span className="font-semibold text-ink">
+                            ZONA #{i + 1} • {box.style.toUpperCase()} ({Math.round(box.width * 100)}
+                            %×{Math.round(box.height * 100)}%)
                           </span>
                           <button
                             type="button"
                             onClick={() =>
                               setRedactions((prev) => prev.filter((r) => r.id !== box.id))
                             }
-                            className="text-slate-400 hover:text-rose-400"
+                            className="text-slateink hover:text-vermilion"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -1346,10 +1424,10 @@ export default function AmanDokStudio() {
                   )}
                 </div>
 
-                <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-3 text-xs text-emerald-200">
-                  <strong>Irreversible Raster Destruction:</strong> Area yang Anda sensor
-                  dihancurkan pada tingkat piksel sebelum diunduh, sehingga tidak bisa
-                  dikembalikan (un-blur) oleh aplikasi pihak ketiga.
+                <div className="border-l-4 border-verified bg-dossier p-3 font-mono text-[11px] leading-relaxed text-ink">
+                  <strong>DESTRUKSI RASTER PERMANEN:</strong> Piksel di bawah zona sensor
+                  dihancurkan secara matematis sebelum berkas diekspor—mustahil dibongkar ulang
+                  (anti un-blur).
                 </div>
               </div>
             )}
@@ -1357,25 +1435,28 @@ export default function AmanDokStudio() {
             {/* TAB 3: TARGET KB COMPRESSOR & PASFOTO CONTROLS */}
             {activeTab === 'compress' && (
               <div className="space-y-5">
-                <div className="border-b border-slate-800 pb-3">
-                  <h2 className="text-base font-bold text-white">
+                <div className="border-b-2 border-ink pb-3.5">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-vermilion">
+                    MODUL 03 // KOMPRESI PRESISI
+                  </span>
+                  <h2 className="font-display text-lg font-bold text-ink">
                     {lang === 'id'
-                      ? 'Kompresor Target KB & Rasio Pasfoto'
-                      : 'Target KB Compressor & ID Photo Crop'}
+                      ? 'Presisi Target Kilobyte & Rasio Pasfoto'
+                      : 'Target KB Press & Aspect Ratio Crop'}
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="mt-0.5 text-xs text-slateink">
                     {lang === 'id'
-                      ? 'Sesuaikan ukuran kilobyte secara presisi untuk syarat portal SSCASN/CPNS, BUMN, atau HRD.'
-                      : 'Fit strict portal file-size limits (100KB, 200KB, 300KB) and standard photo ratios.'}
+                      ? 'Pencarian biner otomatis agar ukuran berkas lolos batas ketat portal SSCASN/CPNS & BUMN.'
+                      : 'Binary-search encoding to fit strict portal upload caps (100KB, 200KB, 300KB).'}
                   </p>
                 </div>
 
-                {/* Strict Target KB Selector */}
+                {/* Target KB Presets */}
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  <label className="mb-2 block font-mono text-[11px] font-bold uppercase tracking-wider text-ink">
                     {lang === 'id'
-                      ? 'Batas Maksimal Ukuran File (Target KB)'
-                      : 'Maximum File Size Limit (Target KB)'}
+                      ? 'Batas Maksimal Ukuran Berkas (Target KB)'
+                      : 'Maximum File Size Cap (Target KB)'}
                   </label>
                   <div className="grid grid-cols-4 gap-2">
                     {[100, 200, 300, 500].map((kb) => (
@@ -1383,23 +1464,23 @@ export default function AmanDokStudio() {
                         key={kb}
                         type="button"
                         onClick={() => setTargetKb(kb)}
-                        className={`rounded-xl border py-2 font-mono text-xs font-bold transition ${
+                        className={`border-2 border-ink py-2 font-mono text-xs font-bold transition ${
                           targetKb === kb
-                            ? 'border-emerald-500 bg-emerald-500/15 text-emerald-300'
-                            : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            ? 'bg-ink text-sheet shadow-press-vermilion'
+                            : 'bg-dossier text-ink hover:bg-sheet'
                         }`}
                       >
-                        ≤ {kb} KB
+                        ≤ {kb}KB
                       </button>
                     ))}
                   </div>
 
-                  <div className="mt-3">
-                    <div className="mb-1 flex justify-between text-xs">
-                      <span className="text-slate-400">
-                        {lang === 'id' ? 'Atur Target Kustom:' : 'Custom KB Target:'}
+                  <div className="mt-3 border-2 border-ink bg-dossier p-3">
+                    <div className="mb-1.5 flex justify-between font-mono text-xs">
+                      <span className="font-semibold text-slateink">
+                        {lang === 'id' ? 'TARGET KUSTOM:' : 'CUSTOM CAP:'}
                       </span>
-                      <span className="font-mono font-bold text-emerald-400">{targetKb} KB</span>
+                      <span className="font-bold text-vermilion">{targetKb} KB</span>
                     </div>
                     <input
                       type="range"
@@ -1408,21 +1489,21 @@ export default function AmanDokStudio() {
                       step="10"
                       value={targetKb}
                       onChange={(e) => setTargetKb(parseInt(e.target.value, 10))}
-                      className="w-full accent-emerald-500"
+                      className="archival-slider w-full"
                     />
                   </div>
                 </div>
 
                 {/* Aspect Ratio / Pasfoto Preset */}
                 <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    {lang === 'id' ? 'Potong Rasio Dokumen / Pasfoto' : 'Aspect Ratio Crop'}
+                  <label className="mb-2 block font-mono text-[11px] font-bold uppercase tracking-wider text-ink">
+                    {lang === 'id' ? 'Pemotongan Rasio Standar' : 'Standard Ratio Crop'}
                   </label>
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                     {(
                       [
-                        { id: 'original', labelId: 'Asli', labelEn: 'Original' },
-                        { id: 'ktp', labelId: 'KTP', labelEn: 'ID Card' },
+                        { id: 'original', labelId: 'Asli', labelEn: 'Orig' },
+                        { id: 'ktp', labelId: 'KTP', labelEn: 'ID-1' },
                         { id: '3x4', labelId: '3×4', labelEn: '3×4' },
                         { id: '4x6', labelId: '4×6', labelEn: '4×6' },
                         { id: '1x1', labelId: '1×1', labelEn: '1×1' },
@@ -1432,10 +1513,10 @@ export default function AmanDokStudio() {
                         key={preset.id}
                         type="button"
                         onClick={() => setCropPreset(preset.id)}
-                        className={`rounded-xl border py-2 text-xs font-bold transition ${
+                        className={`border-2 border-ink py-2 font-mono text-xs font-bold transition ${
                           cropPreset === preset.id
-                            ? 'border-emerald-500 bg-emerald-500/15 text-emerald-300'
-                            : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            ? 'bg-vermilion text-sheet shadow-press-sm'
+                            : 'bg-dossier text-ink hover:bg-sheet'
                         }`}
                       >
                         {lang === 'id' ? preset.labelId : preset.labelEn}
@@ -1444,72 +1525,72 @@ export default function AmanDokStudio() {
                   </div>
                 </div>
 
-                {/* Background Fill Color (For transparent PNG pasfoto) */}
+                {/* Pasfoto Backdrop Color */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-slate-300">
+                  <label className="mb-1.5 block font-mono text-[11px] font-bold uppercase text-ink">
                     {lang === 'id'
-                      ? 'Warna Latar Pasfoto (Jika PNG Transparan)'
+                      ? 'Latar Pasfoto (Untuk PNG Transparan)'
                       : 'Backdrop Fill (For Transparent PNGs)'}
                   </label>
-                  <div className="flex items-center gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: 'red', label: 'Merah CPNS (#dc2626)', hex: '#dc2626' },
-                      { id: 'blue', label: 'Biru Resmi (#0284c7)', hex: '#0284c7' },
-                      { id: 'white', label: 'Putih Bersih (#ffffff)', hex: '#ffffff' },
+                      { id: 'red', label: 'Merah CPNS', hex: '#dc2626' },
+                      { id: 'blue', label: 'Biru Resmi', hex: '#0284c7' },
+                      { id: 'white', label: 'Putih Arsip', hex: '#ffffff' },
                     ].map((bg) => (
                       <button
                         key={bg.id}
                         type="button"
                         onClick={() => setPasfotoBg(bg.hex)}
-                        className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
+                        className={`flex items-center justify-center gap-2 border-2 border-ink px-2.5 py-1.5 font-mono text-xs font-bold transition ${
                           pasfotoBg === bg.hex
-                            ? 'border-emerald-500 bg-slate-800 text-white'
-                            : 'border-slate-700 bg-slate-900 text-slate-400'
+                            ? 'bg-ink text-sheet shadow-press-sm'
+                            : 'bg-dossier text-ink hover:bg-sheet'
                         }`}
                       >
                         <span
                           style={{ backgroundColor: bg.hex }}
-                          className="h-3.5 w-3.5 rounded-full border border-slate-600"
+                          className="h-3.5 w-3.5 shrink-0 border border-ink"
                         />
-                        <span>{bg.label.split(' ')[0]}</span>
+                        <span className="truncate">{bg.label.split(' ')[0]}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Compression Telemetry Box */}
+                {/* Compression Telemetry Readout */}
                 {compressionResult && (
-                  <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-4">
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="font-mono text-xs uppercase text-slate-400">
-                        {lang === 'id' ? 'Hasil Optimasi' : 'Optimization Result'}
+                  <div className="border-2 border-ink bg-ink p-4 text-sheet">
+                    <div className="mb-2.5 flex items-center justify-between border-b border-sheet/20 pb-2">
+                      <span className="font-mono text-[11px] uppercase tracking-wider text-sheet/70">
+                        {lang === 'id' ? 'TELEMETRI KOMPRESI' : 'COMPRESSION TELEMETRY'}
                       </span>
-                      <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 font-mono text-xs font-bold text-emerald-300">
+                      <span className="border border-[#34D399] bg-[#064E3B] px-2 py-0.5 font-mono text-[10px] font-bold text-[#6EE7B7]">
                         {compressionResult.compressedBytes <= targetKb * 1024
                           ? lang === 'id'
-                            ? 'LOLOS BATAS KB'
-                            : 'TARGET MET'
+                            ? 'LOLOS VERIFIKASI KB'
+                            : 'TARGET VERIFIED'
                           : lang === 'id'
                             ? 'KOMPRESI MAKSIMAL'
                             : 'MAX COMPRESSED'}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
-                      <div className="rounded-lg bg-slate-900 p-2">
-                        <div className="text-[10px] text-slate-500">UKURAN AKHIR</div>
-                        <div className="font-bold text-emerald-400">
+                      <div className="border border-sheet/20 bg-white/5 p-2">
+                        <div className="text-[10px] text-sheet/60">UKURAN AKHIR</div>
+                        <div className="font-bold text-[#6EE7B7]">
                           {formatBytes(compressionResult.compressedBytes)}
                         </div>
                       </div>
-                      <div className="rounded-lg bg-slate-900 p-2">
-                        <div className="text-[10px] text-slate-500">RESOLUSI</div>
-                        <div className="font-bold text-slate-200">
+                      <div className="border border-sheet/20 bg-white/5 p-2">
+                        <div className="text-[10px] text-sheet/60">DIMENSI PX</div>
+                        <div className="font-bold text-sheet">
                           {compressionResult.width}×{compressionResult.height}
                         </div>
                       </div>
-                      <div className="rounded-lg bg-slate-900 p-2">
-                        <div className="text-[10px] text-slate-500">KUALITAS JPG</div>
-                        <div className="font-bold text-sky-400">
+                      <div className="border border-sheet/20 bg-white/5 p-2">
+                        <div className="text-[10px] text-sheet/60">KUALITAS JPG</div>
+                        <div className="font-bold text-[#FCD34D]">
                           {compressionResult.qualityUsed}%
                         </div>
                       </div>
@@ -1521,36 +1602,34 @@ export default function AmanDokStudio() {
           </div>
         </div>
       ) : (
-        /* TAB 4: PDF MERGER & BUILDER WORKSPACE */
+        /* TAB 4: PDF MERGER & BINDER WORKSPACE */
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/75 p-5 shadow-xl sm:p-6 lg:col-span-7">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div className="border-2 border-ink bg-sheet p-5 shadow-press sm:p-6 lg:col-span-7">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink pb-4">
               <div>
-                <h2 className="text-base font-bold text-white">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-vermilion">
+                  MODUL 04 // PENJILIDAN BERKAS A4
+                </span>
+                <h2 className="font-display text-lg font-bold text-ink">
                   {lang === 'id'
-                    ? 'Antrean Gabung Dokumen PDF (100% Lokal)'
-                    : 'Local PDF Document Merge Queue'}
+                    ? 'Antrean Binder Dokumen PDF (100% Lokal)'
+                    : 'Local A4 PDF Document Binder Queue'}
                 </h2>
-                <p className="text-xs text-slate-400">
-                  {lang === 'id'
-                    ? 'Gabungkan KTP, NPWP, Ijazah, CV, atau PDF lain menjadi satu berkas PDF siap unggah.'
-                    : 'Combine ID cards, certificates, or existing PDFs into a single clean PDF file.'}
-                </p>
               </div>
 
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={handleSendCurrentToPdfQueue}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-300 transition hover:bg-emerald-500/20"
+                  className="btn-press inline-flex items-center gap-1.5 bg-dossier px-3 py-2 font-mono text-xs font-bold text-ink hover:bg-sheet"
                 >
-                  <Plus className="h-3.5 w-3.5" />
-                  {lang === 'id' ? '+ Dokumen Studio Saat Ini' : '+ Current Studio Image'}
+                  <Plus className="h-3.5 w-3.5 text-vermilion" />
+                  {lang === 'id' ? '+ Masukkan KTP Studio' : '+ Insert Studio ID'}
                 </button>
                 <button
                   type="button"
                   onClick={() => pdfFileInputRef.current?.click()}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 text-xs font-bold text-slate-950 transition hover:bg-emerald-400"
+                  className="btn-press inline-flex items-center gap-1.5 bg-vermilion px-3.5 py-2 font-mono text-xs font-bold text-sheet"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   {lang === 'id' ? 'Tambah Gambar / PDF' : 'Add Images / PDFs'}
@@ -1559,34 +1638,34 @@ export default function AmanDokStudio() {
             </div>
 
             {pdfQueue.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700 bg-slate-950/50 px-6 py-12 text-center">
-                <Layers className="mb-3 h-10 w-10 text-slate-500" />
-                <p className="mb-1 text-sm font-semibold text-slate-300">
+              <div className="flex flex-col items-center justify-center border-2 border-dashed border-ink bg-dossier px-6 py-12 text-center">
+                <Layers className="mb-3 h-10 w-10 text-ink" />
+                <p className="mb-1 font-display text-base font-bold text-ink">
                   {lang === 'id'
-                    ? 'Antrean PDF masih kosong'
-                    : 'Your PDF merge queue is empty'}
+                    ? 'Binder PDF Masih Kosong'
+                    : 'Your PDF Binder Queue Is Empty'}
                 </p>
-                <p className="mb-4 max-w-md text-xs text-slate-400">
+                <p className="mb-5 max-w-md text-xs text-slateink">
                   {lang === 'id'
-                    ? 'Anda dapat memasukkan hasil KTP ber-watermark dari studio atau memilih beberapa file JPG/PNG/PDF dari perangkat Anda.'
-                    : 'Add your watermarked ID card from the studio or select multiple JPG/PNG/PDF files from your device.'}
+                    ? 'Masukkan hasil KTP ber-watermark dari meja inspeksi atau tambahkan beberapa berkas JPG/PNG/PDF (NPWP, Ijazah, KK) untuk dijilid menjadi 1 dokumen A4.'
+                    : 'Insert your watermarked ID card from the lightdesk or select multiple JPG/PNG/PDF files from your device.'}
                 </p>
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap justify-center gap-3">
                   <button
                     type="button"
                     onClick={handleSendCurrentToPdfQueue}
-                    className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400"
+                    className="btn-press bg-ink px-4 py-2 font-mono text-xs font-bold text-sheet"
                   >
                     {lang === 'id'
-                      ? 'Masukkan KTP dari Studio'
-                      : 'Insert Current Studio ID Card'}
+                      ? '+ Masukkan Spesimen KTP Saat Ini'
+                      : '+ Insert Current Studio Specimen'}
                   </button>
                   <button
                     type="button"
                     onClick={() => pdfFileInputRef.current?.click()}
-                    className="rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700"
+                    className="btn-press bg-sheet px-4 py-2 font-mono text-xs font-bold text-ink"
                   >
-                    {lang === 'id' ? 'Pilih File dari Perangkat' : 'Browse Device Files'}
+                    {lang === 'id' ? 'Pilih Berkas dari Perangkat' : 'Browse Device Files'}
                   </button>
                 </div>
               </div>
@@ -1595,28 +1674,28 @@ export default function AmanDokStudio() {
                 {pdfQueue.map((item, idx) => (
                   <li
                     key={item.id}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/80 p-3"
+                    className="flex items-center justify-between gap-3 border-2 border-ink bg-dossier p-3 shadow-press-sm"
                   >
                     <div className="flex items-center gap-3 overflow-hidden">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-800 font-mono text-xs font-bold text-slate-300">
-                        {idx + 1}
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-ink bg-ink font-mono text-xs font-bold text-sheet">
+                        {String(idx + 1).padStart(2, '0')}
                       </span>
                       {item.type === 'image' && item.dataUrl ? (
                         <img
                           src={item.dataUrl}
                           alt={item.name}
-                          className="h-10 w-14 shrink-0 rounded border border-slate-700 object-cover"
+                          className="h-10 w-14 shrink-0 border border-ink object-cover"
                         />
                       ) : (
-                        <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded border border-slate-700 bg-slate-800 text-rose-400">
+                        <div className="flex h-10 w-14 shrink-0 items-center justify-center border border-ink bg-sheet text-vermilion">
                           <FileText className="h-5 w-5" />
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="truncate text-xs font-bold text-slate-200">
+                        <div className="truncate font-mono text-xs font-bold text-ink">
                           {item.name}
                         </div>
-                        <div className="font-mono text-[11px] text-slate-400">
+                        <div className="font-mono text-[11px] text-slateink">
                           {item.type.toUpperCase()} • {formatBytes(item.sizeBytes)}
                         </div>
                       </div>
@@ -1627,7 +1706,7 @@ export default function AmanDokStudio() {
                         type="button"
                         disabled={idx === 0}
                         onClick={() => movePdfQueueItem(idx, -1)}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-30"
+                        className="border border-ink bg-sheet p-1.5 text-ink hover:bg-ink hover:text-sheet disabled:opacity-30"
                         title="Naikkan urutan"
                       >
                         <MoveUp className="h-3.5 w-3.5" />
@@ -1636,7 +1715,7 @@ export default function AmanDokStudio() {
                         type="button"
                         disabled={idx === pdfQueue.length - 1}
                         onClick={() => movePdfQueueItem(idx, 1)}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-30"
+                        className="border border-ink bg-sheet p-1.5 text-ink hover:bg-ink hover:text-sheet disabled:opacity-30"
                         title="Turunkan urutan"
                       >
                         <MoveDown className="h-3.5 w-3.5" />
@@ -1644,7 +1723,7 @@ export default function AmanDokStudio() {
                       <button
                         type="button"
                         onClick={() => removePdfQueueItem(item.id)}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-500/20 hover:text-rose-400"
+                        className="border border-ink bg-[#FEE2E2] p-1.5 text-vermilion hover:bg-vermilion hover:text-sheet"
                         title="Hapus"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1657,99 +1736,114 @@ export default function AmanDokStudio() {
           </div>
 
           {/* PDF Layout & Export Column */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/75 p-5 shadow-xl sm:p-6 lg:col-span-5">
-            <div className="space-y-5">
-              <div className="border-b border-slate-800 pb-3">
-                <h3 className="text-base font-bold text-white">
-                  {lang === 'id' ? 'Tata Letak Halaman PDF' : 'PDF Page Layout'}
+          <div className="flex flex-col justify-between border-2 border-ink bg-sheet p-5 shadow-press sm:p-6 lg:col-span-5">
+            <div className="space-y-4">
+              <div className="border-b-2 border-ink pb-3">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-vermilion">
+                  SPESIFIKASI CETAK
+                </span>
+                <h3 className="font-display text-lg font-bold text-ink">
+                  {lang === 'id' ? 'Tata Letak Lembar PDF A4' : 'A4 PDF Sheet Layout'}
                 </h3>
-                <p className="text-xs text-slate-400">
-                  {lang === 'id'
-                    ? 'Pilih format penyusunan dokumen di dalam halaman PDF.'
-                    : 'Select how images are arranged on each PDF page.'}
-                </p>
               </div>
 
               <div className="space-y-2.5">
                 {[
                   {
                     id: 'a4-id-cards' as PdfPageLayout,
-                    titleId: 'KTP + NPWP Satu Halaman A4 (2 Kartu/Halaman)',
-                    titleEn: '2 ID Cards per A4 Page (KTP + NPWP Layout)',
+                    code: 'LAYOUT // ID-DUAL',
+                    titleId: 'KTP + NPWP Satu Lembar A4 (2 Kartu/Halaman)',
+                    titleEn: '2 ID Cards per A4 Sheet (KTP + NPWP)',
                     descId:
-                      'Ideal untuk lampiran administrasi bank/HRD: menyusun 2 kartu identitas secara proporsional di 1 lembar A4.',
+                      'Standar lampiran Bank/HRD: menyusun 2 kartu identitas secara proporsional di 1 halaman A4.',
                     descEn:
                       'Places up to 2 ID cards neatly centered on a single A4 portrait sheet.',
                   },
                   {
                     id: 'a4-portrait' as PdfPageLayout,
-                    titleId: 'Dokumen A4 Standar (1 Gambar/Halaman)',
-                    titleEn: 'Standard A4 Portrait (1 Image per Page)',
+                    code: 'LAYOUT // A4-STD',
+                    titleId: 'Dokumen A4 Standar (1 Berkas/Halaman)',
+                    titleEn: 'Standard A4 Portrait (1 Scan per Page)',
                     descId:
-                      'Cocok untuk Ijazah, Transkrip Nilai, Surat Keterangan, atau KK dengan margin rapi.',
+                      'Ideal untuk Ijazah, Transkrip Nilai, KK, atau Surat Keterangan dengan margin proporsional.',
                     descEn:
                       'Centers each document scan on a standard A4 portrait page with clean margins.',
                   },
                   {
                     id: 'fit-image' as PdfPageLayout,
-                    titleId: 'Sesuai Ukuran Asli Gambar (Tanpa Margin)',
-                    titleEn: 'Fit Exact Image Dimensions (Zero Margin)',
+                    code: 'LAYOUT // RAW-FIT',
+                    titleId: 'Dimensi Asli Gambar (Tanpa Margin)',
+                    titleEn: 'Exact Image Dimensions (Zero Margin)',
                     descId:
-                      'Ukuran halaman PDF mengikuti resolusi persis masing-masing gambar.',
+                      'Ukuran halaman PDF menyesuaikan resolusi piksel masing-masing berkas.',
                     descEn: 'Each PDF page matches the exact pixel dimensions of the image.',
                   },
-                ].map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => {
-                      setPdfLayout(opt.id);
-                      setPdfDownloadUrl(null);
-                    }}
-                    className={`w-full rounded-xl border p-3.5 text-left transition ${
-                      pdfLayout === opt.id
-                        ? 'border-emerald-500 bg-emerald-500/10 text-white'
-                        : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="text-xs font-bold">
-                      {lang === 'id' ? opt.titleId : opt.titleEn}
-                    </div>
-                    <div className="mt-1 text-[11px] text-slate-400">
-                      {lang === 'id' ? opt.descId : opt.descEn}
-                    </div>
-                  </button>
-                ))}
+                ].map((opt) => {
+                  const isSelected = pdfLayout === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setPdfLayout(opt.id);
+                        setPdfDownloadUrl(null);
+                      }}
+                      className={`w-full border-2 border-ink p-3.5 text-left transition ${
+                        isSelected
+                          ? 'bg-ink text-sheet shadow-press-vermilion'
+                          : 'bg-dossier text-ink hover:bg-sheet'
+                      }`}
+                    >
+                      <div
+                        className={`font-mono text-[10px] font-bold ${
+                          isSelected ? 'text-[#FCA5A5]' : 'text-vermilion'
+                        }`}
+                      >
+                        {opt.code}
+                      </div>
+                      <div className="mt-0.5 font-mono text-xs font-bold">
+                        {lang === 'id' ? opt.titleId : opt.titleEn}
+                      </div>
+                      <div
+                        className={`mt-1 text-[11px] ${
+                          isSelected ? 'text-sheet/75' : 'text-slateink'
+                        }`}
+                      >
+                        {lang === 'id' ? opt.descId : opt.descEn}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="mt-6 space-y-3 border-t border-slate-800 pt-4">
+            <div className="mt-6 space-y-3 border-t-2 border-ink pt-4">
               <button
                 type="button"
                 disabled={pdfQueue.length === 0 || isBuildingPdf}
                 onClick={handleGenerateCombinedPdf}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-950/50 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-40"
+                className="btn-press flex w-full items-center justify-center gap-2 bg-vermilion px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-sheet disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <FileStack className="h-4 w-4" />
                 {isBuildingPdf
                   ? lang === 'id'
-                    ? 'Memproses PDF di Browser...'
-                    : 'Building PDF in Browser...'
+                    ? 'Menjilid PDF di RAM Lokal...'
+                    : 'Binding PDF in Local RAM...'
                   : lang === 'id'
-                    ? `Proses & Gabungkan PDF (${pdfQueue.length} Berkas)`
-                    : `Build Combined PDF (${pdfQueue.length} Files)`}
+                    ? `Jilid & Buat PDF (${pdfQueue.length} Berkas)`
+                    : `Bind & Generate PDF (${pdfQueue.length} Files)`}
               </button>
 
               {pdfDownloadUrl && (
                 <a
                   href={pdfDownloadUrl}
-                  download={`berkas-amandok-${todayStr}.pdf`}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-sky-500/50 bg-sky-500/20 px-4 py-3 text-xs font-bold text-sky-200 transition hover:bg-sky-500/30"
+                  download={`bundel-amandok-${todayStr}.pdf`}
+                  className="btn-press flex w-full items-center justify-center gap-2 bg-verified px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-sheet"
                 >
                   <Download className="h-4 w-4" />
                   {lang === 'id'
-                    ? `Unduh PDF Gabungan (${formatBytes(pdfSizeBytes)})`
-                    : `Download Combined PDF (${formatBytes(pdfSizeBytes)})`}
+                    ? `Unduh Bundel PDF (${formatBytes(pdfSizeBytes)})`
+                    : `Download PDF Bundle (${formatBytes(pdfSizeBytes)})`}
                 </a>
               )}
             </div>
