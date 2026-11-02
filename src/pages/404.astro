@@ -5,27 +5,27 @@ import Footer from '../components/Footer.astro';
 ---
 
 <Layout
-  title="404 Berkas Tidak Ditemukan — AmanDok"
+  title="404 Halaman Tidak Ditemukan — AmanDok"
   description="Halaman yang Anda cari tidak ditemukan di AmanDok."
 >
   <Navbar />
 
-  <main class="mx-auto flex max-w-3xl flex-col items-center justify-center px-4 py-24 text-center">
-    <div class="border-2 border-ink bg-sheet p-8 shadow-press sm:p-12">
-      <div class="mx-auto mb-4 inline-block border border-ink bg-vermilion px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-[#FAF8F3]">
-        KODE 404 // ARSIP TIDAK DITEMUKAN
+  <main class="mx-auto flex max-w-3xl flex-1 flex-col items-center justify-center px-4 py-24 text-center">
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/80 sm:p-12">
+      <div class="mx-auto mb-4 inline-flex items-center rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+        404 • Tidak Ditemukan
       </div>
-      <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">
+      <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
         Halaman Tidak Ditemukan
       </h1>
-      <p class="mx-auto mt-3 max-w-md text-sm text-slateink">
-        Rute dokumen yang Anda tuju tidak tersedia. Kembali ke meja kerja utama untuk membubuhkan segel watermark KTP, menyensor NIK, atau mengompres berkas secara lokal.
+      <p class="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+        Halaman yang Anda tuju tidak tersedia. Kembali ke studio utama untuk memberi watermark KTP, menyensor NIK, atau mengompres dokumen secara lokal.
       </p>
       <a
         href="/"
-        class="btn-press mt-8 inline-flex items-center gap-2 bg-ink px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-sheet"
+        class="mt-6 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-500"
       >
-        [ KEMBALI KE MEJA KERJA AMANDOK ]
+        Kembali ke Beranda AmanDok
       </a>
     </div>
   </main>

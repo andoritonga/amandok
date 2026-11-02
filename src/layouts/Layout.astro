@@ -8,8 +8,8 @@ interface Props {
 }
 
 const {
-  title = 'AmanDok — Meja Kerja Privasi KTP, Sensor NIK & Kompresor Dokumen 100% Lokal',
-  description = 'Instrumen privasi dokumen warga Indonesia: beri segel watermark KTP anti-pinjol, sensor NIK & tanda tangan, kompres foto sesuai target KB (SSCASN/CPNS/BUMN), dan jilid PDF A4 100% di RAM browser tanpa upload server.',
+  title = 'AmanDok — Watermark KTP, Sensor NIK & Kompresor Dokumen 100% Lokal (Tanpa Upload)',
+  description = 'Toolkit privasi dokumen #1 di Indonesia: beri watermark KTP anti-pinjol, sensor NIK & tanda tangan, kompres foto sesuai target KB (CPNS/BUMN), dan gabung PDF 100% di browser tanpa upload server.',
   canonicalPath = '/',
 } = Astro.props;
 
@@ -32,7 +32,7 @@ const schemaOrg = {
   description,
   author: {
     '@type': 'Person',
-    name: 'Aliando Ritonga',
+    name: 'Ando',
     url: 'https://ritonga.ai.id',
   },
 };
@@ -49,26 +49,10 @@ const schemaOrg = {
       name="keywords"
       content="watermark ktp, watermark ktp online aman, sensor nik ktp, kompres foto 200kb cpns, gabung ktp npwp jadi pdf, tanpa upload server, amandok"
     />
-    <meta name="author" content="Aliando Ritonga" />
+    <meta name="author" content="Ando" />
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" id="theme-color-meta" content="#F3EFE6" />
-
-    <script is:inline>
-      (function () {
-        try {
-          const saved = localStorage.getItem('amandok_theme');
-          const prefersDark =
-            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          const isDark = saved === 'dark' || (!saved && prefersDark);
-          if (isDark) {
-            document.documentElement.classList.add('dark');
-            const meta = document.getElementById('theme-color-meta');
-            if (meta) meta.setAttribute('content', '#0D1117');
-          }
-        } catch (_) {}
-      })();
-    </script>
+    <meta name="theme-color" content="#F8FAFC" id="meta-theme-color" />
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
@@ -84,22 +68,37 @@ const schemaOrg = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
 
-    <!-- Google Fonts: Fraunces (Display Serif), Plus Jakarta Sans (Body), IBM Plex Mono (Technical) -->
+    <!-- Clean Typography: Plus Jakarta Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
     <script type="application/ld+json" set:html={JSON.stringify(schemaOrg)} />
+    <script is:inline>
+      (function () {
+        try {
+          var savedTheme = localStorage.getItem('amandok_theme');
+          var isDark = savedTheme === 'dark';
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            var meta = document.getElementById('meta-theme-color');
+            if (meta) meta.setAttribute('content', '#090D16');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-archival-paper min-h-screen text-ink antialiased">
+  <body class="min-h-screen flex flex-col">
     <a
       href="#studio"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border-2 focus:border-ink focus:bg-vermilion focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:font-bold focus:text-[#FAF8F3] focus:shadow-press"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-emerald-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
     >
-      [LANGSUNG KE MEJA INSPEKSI DOKUMEN]
+      Langsung ke Studio Dokumen
     </a>
     <slot />
   </body>

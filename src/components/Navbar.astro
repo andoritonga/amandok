@@ -1,129 +1,16 @@
 ---
 ---
 
-<header class="sticky top-0 z-40 border-b-2 border-ink bg-sheet/95 backdrop-blur-md transition-colors">
-  <!-- Top Cryptographic Classification Ticker -->
-  <div class="border-b border-ink/20 bg-[#0B0E14] px-4 py-1 text-[#FAF8F3]">
-    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 font-mono text-[10px] tracking-wider">
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center gap-1.5 font-semibold text-[#6EE7B7]">
-          <span class="h-1.5 w-1.5 rounded-full bg-[#10B981]"></span>
-          SANDBOX LOKAL AKTIF
-        </span>
-        <span class="hidden text-[#FAF8F3]/40 sm:inline">|</span>
-        <span class="hidden text-[#FAF8F3]/80 sm:inline">STANDAR KARTU: ISO/IEC 7810 ID-1 (85.60 × 53.98 MM)</span>
-      </div>
-      <div class="flex items-center gap-3 text-[#FAF8F3]/80">
-        <span>NETWORK EGRESS: <strong class="text-[#6EE7B7]">0.00 KB</strong></span>
-        <span class="hidden text-[#FAF8F3]/40 md:inline">|</span>
-        <span class="hidden md:inline">EXIF/GPS SCRUBBER: <strong class="text-[#FCD34D]">AUTO-PURGE</strong></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Architectural Header Bar -->
-  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-    <!-- Brand Identity Stamp -->
+<header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl transition-colors dark:border-slate-800/80 dark:bg-slate-950/85">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
+    <!-- Brand Identity -->
     <a
       href="/"
-      class="group flex items-center gap-3.5 focus:outline-none"
+      class="group flex items-center gap-3 focus:outline-none"
       aria-label="AmanDok Beranda"
     >
-      <div class="flex h-10 w-10 items-center justify-center border-2 border-ink bg-vermilion text-[#FAF8F3] shadow-press-sm transition-transform group-hover:-translate-y-0.5">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 transition group-hover:border-emerald-500/50 group-hover:bg-emerald-500/15 dark:text-emerald-400">
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.3"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="h-5 w-5"
-        >
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-          <path d="m9 12 2 2 4-4" />
-        </svg>
-      </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="font-display text-xl font-bold tracking-tight text-ink sm:text-2xl">
-            AmanDok<span class="text-vermilion">.</span>
-          </span>
-          <span class="border border-ink bg-dossier px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-ink">
-            SERI // ZERO-UPLOAD
-          </span>
-        </div>
-        <p
-          class="hidden font-mono text-[11px] text-slateink sm:block"
-          data-i18n-id="Instrumen Kedaulatan Dokumen & Privasi KTP Warga"
-          data-i18n-en="Citizen ID Privacy & Document Security Workbench"
-        >
-          Instrumen Kedaulatan Dokumen & Privasi KTP Warga
-        </p>
-      </div>
-    </a>
-
-    <!-- Navigation Links & Mechanical Language Switcher -->
-    <div class="flex items-center gap-3 sm:gap-5">
-      <nav class="hidden items-center gap-5 font-mono text-xs font-semibold uppercase tracking-wider text-ink md:flex">
-        <a
-          href="#studio"
-          class="border-b-2 border-transparent py-1 transition hover:border-vermilion hover:text-vermilion"
-          data-i18n-id="01. Meja Kerja"
-          data-i18n-en="01. Lightdesk"
-        >
-          01. Meja Kerja
-        </a>
-        <a
-          href="#jaminan-privasi"
-          class="border-b-2 border-transparent py-1 transition hover:border-vermilion hover:text-vermilion"
-          data-i18n-id="02. Protokol Privasi"
-          data-i18n-en="02. Privacy Protocol"
-        >
-          02. Protokol Privasi
-        </a>
-        <a
-          href="#panduan"
-          class="border-b-2 border-transparent py-1 transition hover:border-vermilion hover:text-vermilion"
-          data-i18n-id="03. Matriks Portal"
-          data-i18n-en="03. Portal Matrix"
-        >
-          03. Matriks Portal
-        </a>
-      </nav>
-
-      <!-- Mechanical Toggle (ID / EN) -->
-      <div class="inline-flex border-2 border-ink bg-dossier p-0.5 shadow-press-sm">
-        <button
-          type="button"
-          id="lang-btn-id"
-          class="bg-ink px-2.5 py-1 font-mono text-xs font-bold text-sheet transition"
-          aria-label="Bahasa Indonesia"
-        >
-          ID
-        </button>
-        <button
-          type="button"
-          id="lang-btn-en"
-          class="px-2.5 py-1 font-mono text-xs font-bold text-ink transition hover:bg-ink/10"
-          aria-label="English"
-        >
-          EN
-        </button>
-      </div>
-
-      <!-- Mechanical Dark Mode Toggle -->
-      <button
-        type="button"
-        id="theme-toggle-btn"
-        aria-label="Toggle Dark Mode"
-        aria-pressed="false"
-        title="Beralih Mode Gelap / Terang (Dark / Light Mode)"
-        class="btn-press inline-flex items-center gap-1.5 bg-dossier px-2.5 py-1.5 font-mono text-xs font-bold text-ink hover:bg-sheet"
-      >
-        <!-- Sun Icon (shown in Dark Mode to switch to Light) -->
-        <svg
-          id="theme-icon-sun"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="none"
@@ -131,7 +18,99 @@
           stroke-width="2.2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="hidden h-3.5 w-3.5 text-[#F59E0B]"
+          class="h-5 w-5"
+        >
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Aman<span class="text-emerald-600 dark:text-emerald-400">Dok</span>
+          </span>
+          <span class="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+            100% LOKAL
+          </span>
+        </div>
+        <p
+          class="hidden text-xs text-slate-500 dark:text-slate-400 sm:block"
+          data-i18n-id="Studio Privasi KTP & Dokumen Tanpa Upload"
+          data-i18n-en="Zero-Upload ID & Document Privacy Studio"
+        >
+          Studio Privasi KTP & Dokumen Tanpa Upload
+        </p>
+      </div>
+    </a>
+
+    <!-- Navigation, Language Switcher & Theme Toggle -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <nav class="hidden items-center gap-1 md:flex" aria-label="Navigasi Utama">
+        <a
+          href="#studio"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"
+          data-i18n-id="Studio Dokumen"
+          data-i18n-en="Document Studio"
+        >
+          Studio Dokumen
+        </a>
+        <a
+          href="#jaminan-privasi"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"
+          data-i18n-id="Jaminan Privasi"
+          data-i18n-en="Privacy Guarantee"
+        >
+          Jaminan Privasi
+        </a>
+        <a
+          href="#panduan"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"
+          data-i18n-id="Panduan Ukuran"
+          data-i18n-en="Size Guide"
+        >
+          Panduan Ukuran
+        </a>
+      </nav>
+
+      <!-- Bilingual Segmented Pill (ID / EN) -->
+      <div class="inline-flex items-center rounded-xl border border-slate-200 bg-slate-100 p-0.5 dark:border-slate-800 dark:bg-slate-900">
+        <button
+          type="button"
+          id="lang-btn-id"
+          class="rounded-lg bg-white px-2.5 py-1 font-mono text-xs font-bold text-slate-900 shadow-sm transition dark:bg-emerald-500 dark:text-slate-950"
+          aria-label="Bahasa Indonesia"
+        >
+          ID
+        </button>
+        <button
+          type="button"
+          id="lang-btn-en"
+          class="rounded-lg px-2.5 py-1 font-mono text-xs font-semibold text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+          aria-label="English"
+        >
+          EN
+        </button>
+      </div>
+
+      <!-- Dark / Light Theme Toggle -->
+      <button
+        type="button"
+        id="theme-toggle-btn"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+        aria-label="Ganti Tema Gelap atau Terang"
+        title="Ganti Tema (Terang / Gelap)"
+      >
+        <!-- Sun Icon (shown in dark mode) -->
+        <svg
+          id="theme-icon-sun"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="hidden h-4 w-4 text-amber-400"
         >
           <circle cx="12" cy="12" r="4"></circle>
           <path d="M12 2v2"></path>
@@ -143,28 +122,20 @@
           <path d="m6.34 17.66-1.41 1.41"></path>
           <path d="m19.07 4.93-1.41 1.41"></path>
         </svg>
-        <!-- Moon Icon (shown in Light Mode to switch to Dark) -->
+        <!-- Moon Icon (shown in light mode) -->
         <svg
           id="theme-icon-moon"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2.2"
+          stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="h-3.5 w-3.5 text-ink"
+          class="h-4 w-4"
         >
           <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
         </svg>
-        <span
-          id="theme-toggle-label"
-          class="hidden sm:inline"
-          data-i18n-id="GELAP"
-          data-i18n-en="DARK"
-        >
-          GELAP
-        </span>
       </button>
     </div>
   </div>
@@ -177,45 +148,12 @@
     const themeBtn = document.getElementById('theme-toggle-btn');
     const iconSun = document.getElementById('theme-icon-sun');
     const iconMoon = document.getElementById('theme-icon-moon');
-    const themeLabel = document.getElementById('theme-toggle-label');
-    const themeMeta = document.getElementById('theme-color-meta');
+    const metaTheme = document.getElementById('meta-theme-color');
 
-    const getActiveLang = (): 'id' | 'en' => {
-      return localStorage.getItem('amandok_lang') === 'en' ? 'en' : 'id';
-    };
-
-    const syncThemeUI = (isDark: boolean, lang: 'id' | 'en' = getActiveLang()) => {
-      if (themeBtn) {
-        themeBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-      }
-      if (iconSun && iconMoon) {
-        if (isDark) {
-          iconSun.classList.remove('hidden');
-          iconMoon.classList.add('hidden');
-        } else {
-          iconSun.classList.add('hidden');
-          iconMoon.classList.remove('hidden');
-        }
-      }
-      if (themeLabel) {
-        const idText = isDark ? 'TERANG' : 'GELAP';
-        const enText = isDark ? 'LIGHT' : 'DARK';
-        themeLabel.setAttribute('data-i18n-id', idText);
-        themeLabel.setAttribute('data-i18n-en', enText);
-        themeLabel.textContent = lang === 'id' ? idText : enText;
-      }
-      if (themeMeta) {
-        themeMeta.setAttribute('content', isDark ? '#0D1117' : '#F3EFE6');
-      }
-    };
-
-    const applyTheme = (theme: 'light' | 'dark') => {
-      const isDark = theme === 'dark';
-      document.documentElement.classList.toggle('dark', isDark);
-      localStorage.setItem('amandok_theme', theme);
-      syncThemeUI(isDark);
-      window.dispatchEvent(new CustomEvent('amandok-theme-change', { detail: theme }));
-    };
+    const activePillClass =
+      'rounded-lg bg-white px-2.5 py-1 font-mono text-xs font-bold text-slate-900 shadow-sm transition dark:bg-emerald-500 dark:text-slate-950';
+    const inactivePillClass =
+      'rounded-lg px-2.5 py-1 font-mono text-xs font-semibold text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white';
 
     const applyLang = (lang: 'id' | 'en') => {
       localStorage.setItem('amandok_lang', lang);
@@ -223,16 +161,13 @@
 
       if (btnId && btnEn) {
         if (lang === 'id') {
-          btnId.className = 'bg-ink px-2.5 py-1 font-mono text-xs font-bold text-sheet transition';
-          btnEn.className = 'px-2.5 py-1 font-mono text-xs font-bold text-ink transition hover:bg-ink/10';
+          btnId.className = activePillClass;
+          btnEn.className = inactivePillClass;
         } else {
-          btnEn.className = 'bg-ink px-2.5 py-1 font-mono text-xs font-bold text-sheet transition';
-          btnId.className = 'px-2.5 py-1 font-mono text-xs font-bold text-ink transition hover:bg-ink/10';
+          btnEn.className = activePillClass;
+          btnId.className = inactivePillClass;
         }
       }
-
-      const isDark = document.documentElement.classList.contains('dark');
-      syncThemeUI(isDark, lang);
 
       document.querySelectorAll<HTMLElement>('[data-i18n-id]').forEach((el) => {
         const text = lang === 'id' ? el.getAttribute('data-i18n-id') : el.getAttribute('data-i18n-en');
@@ -240,21 +175,38 @@
       });
     };
 
-    // Initialize Theme UI state from documentElement class
-    syncThemeUI(document.documentElement.classList.contains('dark'));
+    const syncThemeIcons = (isDark: boolean) => {
+      if (isDark) {
+        iconSun?.classList.remove('hidden');
+        iconMoon?.classList.add('hidden');
+        metaTheme?.setAttribute('content', '#090D16');
+      } else {
+        iconSun?.classList.add('hidden');
+        iconMoon?.classList.remove('hidden');
+        metaTheme?.setAttribute('content', '#F8FAFC');
+      }
+    };
 
-    // Initialize Language UI state
-    const savedLang = localStorage.getItem('amandok_lang');
-    if (savedLang === 'en') {
+    const applyTheme = (theme: 'light' | 'dark') => {
+      const isDark = theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('amandok_theme', theme);
+      syncThemeIcons(isDark);
+      window.dispatchEvent(new CustomEvent('amandok-theme-change', { detail: theme }));
+    };
+
+    syncThemeIcons(document.documentElement.classList.contains('dark'));
+
+    const saved = localStorage.getItem('amandok_lang');
+    if (saved === 'en') {
       applyLang('en');
     }
 
     btnId?.addEventListener('click', () => applyLang('id'));
     btnEn?.addEventListener('click', () => applyLang('en'));
-
     themeBtn?.addEventListener('click', () => {
-      const currentlyDark = document.documentElement.classList.contains('dark');
-      applyTheme(currentlyDark ? 'light' : 'dark');
+      const isCurrentlyDark = document.documentElement.classList.contains('dark');
+      applyTheme(isCurrentlyDark ? 'light' : 'dark');
     });
   }
 
