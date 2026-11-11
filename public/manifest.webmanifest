@@ -1,0 +1,46 @@
+{
+  "name": "AmanDok — Cyber-Vault Studio Privasi KTP & Dokumen",
+  "short_name": "AmanDok",
+  "description": "Studio privasi dokumen 100% lokal (Zero-Upload): Watermark KTP anti-pinjol, sensor piksel NIK & tanda tangan, kompresor target KB CPNS/BUMN, dan penggabung PDF A4.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B0F17",
+  "theme_color": "#0B0F17",
+  "categories": ["security", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Watermark KTP Anti-Pinjol",
+      "short_name": "Watermark",
+      "description": "Beri segel teks verifikasi pada KTP",
+      "url": "/?tab=watermark"
+    },
+    {
+      "name": "Sensor NIK & Tanda Tangan",
+      "short_name": "Sensor NIK",
+      "description": "Hancurkan piksel area sensitif KTP",
+      "url": "/?tab=redact"
+    },
+    {
+      "name": "Kompresor Target KB & Pasfoto",
+      "short_name": "Kompres KB",
+      "description": "Kompres foto sesuai batas KB CPNS/BUMN",
+      "url": "/?tab=compress"
+    },
+    {
+      "name": "Gabung Dokumen ke PDF A4",
+      "short_name": "Gabung PDF",
+      "description": "Susun KTP & berkas ke halaman PDF A4",
+      "url": "/?tab=pdf"
+    }
+  ]
+}

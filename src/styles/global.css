@@ -6,6 +6,7 @@
   html {
     scroll-behavior: smooth;
     color-scheme: light;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html.dark {
@@ -13,24 +14,53 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased transition-colors duration-200 selection:bg-emerald-500/20 selection:text-emerald-700 dark:bg-[#090D16] dark:text-slate-100 dark:selection:bg-emerald-500/30 dark:selection:text-emerald-200;
+    @apply bg-[#F4F6F9] text-slate-900 font-sans antialiased transition-colors duration-200 selection:bg-emerald-500/20 selection:text-emerald-700 dark:bg-[#0B0F17] dark:text-[#E6EDF7] dark:selection:bg-emerald-500/30 dark:selection:text-emerald-200;
   }
 }
 
-/* Subtle clean backdrop for canvas preview */
+/* Studio Workbench Dot-Grid Canvas Backdrop */
 .canvas-backdrop {
-  background-color: #f1f5f9;
-  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-  background-size: 16px 16px;
+  background-color: #eef2f6;
+  background-image:
+    radial-gradient(#cbd5e1 1.15px, transparent 1.15px),
+    radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
 }
 
 html.dark .canvas-backdrop {
-  background-color: #090d16;
-  background-image: radial-gradient(#1e293b 1px, transparent 1px);
-  background-size: 16px 16px;
+  background-color: #070a10;
+  background-image:
+    radial-gradient(#1e293b 1.15px, transparent 1.15px),
+    radial-gradient(#0f172a 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
 }
 
-/* Clean modern range slider */
+/* Cyber-Vault Custom Scrollbars for Inspector & Sidebar */
+.vault-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.vault-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.vault-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+html.dark .vault-scroll::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.65);
+}
+
+.vault-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.6);
+}
+
+/* Precision Cyber-Vault Range Slider */
 input[type='range'].clean-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -41,11 +71,11 @@ input[type='range'].clean-slider {
 input[type='range'].clean-slider::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 9999px;
-  background: #e2e8f0;
+  background: #cbd5e1;
 }
 
 html.dark input[type='range'].clean-slider::-webkit-slider-runnable-track {
-  background: #334155;
+  background: #1e293b;
 }
 
 input[type='range'].clean-slider::-webkit-slider-thumb {
@@ -56,28 +86,29 @@ input[type='range'].clean-slider::-webkit-slider-thumb {
   border-radius: 9999px;
   background: #10b981;
   border: 2px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.4), 0 2px 5px rgba(0, 0, 0, 0.35);
   margin-top: -5px;
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 html.dark input[type='range'].clean-slider::-webkit-slider-thumb {
-  border-color: #0f172a;
+  border-color: #0B0F17;
 }
 
 input[type='range'].clean-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  background: #059669;
+  transform: scale(1.12);
+  background: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 input[type='range'].clean-slider::-moz-range-track {
   height: 6px;
   border-radius: 9999px;
-  background: #e2e8f0;
+  background: #cbd5e1;
 }
 
 html.dark input[type='range'].clean-slider::-moz-range-track {
-  background: #334155;
+  background: #1e293b;
 }
 
 input[type='range'].clean-slider::-moz-range-thumb {
@@ -86,10 +117,10 @@ input[type='range'].clean-slider::-moz-range-thumb {
   border-radius: 9999px;
   background: #10b981;
   border: 2px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 html.dark input[type='range'].clean-slider::-moz-range-thumb {
-  border-color: #0f172a;
+  border-color: #0B0F17;
 }

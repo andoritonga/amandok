@@ -8,7 +8,7 @@ interface Props {
 }
 
 const {
-  title = 'AmanDok — Watermark KTP, Sensor NIK & Kompresor Dokumen 100% Lokal (Tanpa Upload)',
+  title = 'AmanDok — Cyber-Vault Studio Privasi KTP & Dokumen 100% Lokal (Tanpa Upload)',
   description = 'Toolkit privasi dokumen #1 di Indonesia: beri watermark KTP anti-pinjol, sensor NIK & tanda tangan, kompres foto sesuai target KB (CPNS/BUMN), dan gabung PDF 100% di browser tanpa upload server.',
   canonicalPath = '/',
 } = Astro.props;
@@ -23,7 +23,7 @@ const schemaOrg = {
   name: 'AmanDok',
   url: siteUrl,
   applicationCategory: 'SecurityApplication',
-  operatingSystem: 'Any (Web Browser)',
+  operatingSystem: 'Any (Web Browser / PWA)',
   offers: {
     '@type': 'Offer',
     price: '0',
@@ -32,27 +32,36 @@ const schemaOrg = {
   description,
   author: {
     '@type': 'Person',
-    name: 'Ando',
+    name: 'Ando Ritonga',
     url: 'https://ritonga.ai.id',
   },
 };
 ---
 
 <!doctype html>
-<html lang="id" class="scroll-smooth">
+<html lang="id" class="dark scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"
+    />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta
       name="keywords"
       content="watermark ktp, watermark ktp online aman, sensor nik ktp, kompres foto 200kb cpns, gabung ktp npwp jadi pdf, tanpa upload server, amandok"
     />
-    <meta name="author" content="Ando" />
+    <meta name="author" content="Ando Ritonga" />
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#F8FAFC" id="meta-theme-color" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#0B0F17" id="meta-theme-color" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="AmanDok" />
+    <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
@@ -81,19 +90,27 @@ const schemaOrg = {
       (function () {
         try {
           var savedTheme = localStorage.getItem('amandok_theme');
-          var isDark = savedTheme === 'dark';
+          // Default to Cyber-Vault Dark mode unless user explicitly chose 'light'
+          var isDark = savedTheme ? savedTheme === 'dark' : true;
+          var meta = document.getElementById('meta-theme-color');
           if (isDark) {
             document.documentElement.classList.add('dark');
-            var meta = document.getElementById('meta-theme-color');
-            if (meta) meta.setAttribute('content', '#090D16');
+            if (meta) meta.setAttribute('content', '#0B0F17');
           } else {
             document.documentElement.classList.remove('dark');
+            if (meta) meta.setAttribute('content', '#F4F6F9');
           }
         } catch (e) {}
+
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js').catch(function () {});
+          });
+        }
       })();
     </script>
   </head>
-  <body class="min-h-screen flex flex-col">
+  <body class="h-[100dvh] w-screen overflow-hidden flex flex-col select-none">
     <a
       href="#studio"
       class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-emerald-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
