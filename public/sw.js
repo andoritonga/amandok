@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amandok-vault-v2';
+const CACHE_NAME = 'amandok-vault-v3';
 const PRECACHE_URLS = ['/', '/favicon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {

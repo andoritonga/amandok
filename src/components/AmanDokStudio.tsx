@@ -309,7 +309,17 @@ export default function AmanDokStudio() {
     }
   }, [activeTab, loadedImageEl, targetKb, cropPreset, pasfotoBg, runCompressionFromCurrentCanvas]);
 
+  const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB client-side memory guard
+
   const loadSingleDocumentFile = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      showToast(
+        lang === 'id'
+          ? 'Ukuran berkas terlalu besar (maksimal 25 MB).'
+          : 'File size is too large (maximum 25 MB).'
+      );
+      return;
+    }
     try {
       const normalized = await loadNormalizedImage(file);
       setSourceDataUrl(normalized.dataUrl);
@@ -542,8 +552,13 @@ export default function AmanDokStudio() {
 
   const processPdfQueueFiles = async (files: File[]) => {
     const addedItems: PdfQueueItem[] = [];
+    let skippedOversized = 0;
 
     for (const file of files) {
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        skippedOversized++;
+        continue;
+      }
       if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
         const buffer = await file.arrayBuffer();
         addedItems.push({
@@ -572,8 +587,14 @@ export default function AmanDokStudio() {
       setPdfDownloadUrl(null);
       showToast(
         lang === 'id'
-          ? `${addedItems.length} berkas ditambahkan ke antrean PDF.`
-          : `${addedItems.length} file(s) added to PDF queue.`
+          ? `${addedItems.length} berkas ditambahkan ke antrean PDF.${skippedOversized > 0 ? ` (${skippedOversized} berkas >25 MB dilewati)` : ''}`
+          : `${addedItems.length} file(s) added to PDF queue.${skippedOversized > 0 ? ` (${skippedOversized} file(s) >25 MB skipped)` : ''}`
+      );
+    } else if (skippedOversized > 0) {
+      showToast(
+        lang === 'id'
+          ? 'Ukuran berkas melebihi batas maksimal 25 MB.'
+          : 'File size exceeds the 25 MB maximum limit.'
       );
     }
   };
