@@ -731,7 +731,13 @@ export default function AmanDokStudio() {
   ];
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-[#F4F6F9] text-slate-900 dark:bg-[#0B0F17] dark:text-[#E6EDF7]">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#F4F6F9] text-slate-900 dark:bg-[#080C14] dark:text-[#E6EDF7]">
+      {/* Ambient Liquid Glass Depth Orbs */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="animate-orb absolute -left-24 -top-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-500/15" />
+        <div className="animate-orb-slow absolute -bottom-24 -right-20 h-96 w-96 rounded-full bg-teal-400/20 blur-3xl dark:bg-cyan-500/12" />
+      </div>
+
       {/* Hidden File Inputs */}
       <input
         ref={fileInputRef}
@@ -754,9 +760,9 @@ export default function AmanDokStudio() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-20 right-4 z-50 flex items-center gap-2.5 rounded-xl border border-emerald-500/40 bg-slate-900/95 px-4 py-2.5 text-xs font-semibold text-white shadow-2xl backdrop-blur-md lg:bottom-5 lg:right-5"
+          className="glass-surface animate-toast-in fixed bottom-24 right-4 z-50 flex items-center gap-2.5 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white lg:bottom-5 lg:right-5"
         >
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -764,7 +770,7 @@ export default function AmanDokStudio() {
       {/* =========================================================
           TOP CYBER-VAULT COMMAND BAR (56px Fixed Studio Header)
          ========================================================= */}
-      <header className="z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200/90 bg-white/95 px-3.5 backdrop-blur-md dark:border-slate-800/90 dark:bg-[#0F1520]/95 sm:px-5">
+      <header className="glass-panel relative z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200/70 px-3.5 dark:border-white/[0.08] sm:px-5">
         {/* Left: Vault Brand Identity + Active File Pill */}
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex items-center gap-2.5">
@@ -885,13 +891,13 @@ export default function AmanDokStudio() {
       {/* =========================================================
           MAIN 3-PANE CYBER-VAULT WORKSPACE
          ========================================================= */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-16 lg:flex-row lg:overflow-hidden lg:pb-0">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto pb-20 lg:flex-row lg:overflow-hidden lg:pb-0">
         {/* -------------------------------------------------------
             PANE 1: LEFT VERTICAL PIPELINE RAIL (Desktop Only)
            ------------------------------------------------------- */}
         <aside
           aria-label="AmanDok Pipeline Tools"
-          className="hidden shrink-0 flex-col justify-between border-r border-slate-200/90 bg-white p-3 dark:border-slate-800/90 dark:bg-[#0F1520] lg:flex lg:w-[228px]"
+          className="glass-panel hidden shrink-0 flex-col justify-between border-r border-slate-200/70 p-3 dark:border-white/[0.08] lg:flex lg:w-[228px]"
         >
           <div className="space-y-1.5">
             <div className="px-2 pb-1.5 pt-1 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
@@ -906,10 +912,10 @@ export default function AmanDokStudio() {
                   key={tool.id}
                   type="button"
                   onClick={() => setActiveTab(tool.id)}
-                  className={`group relative flex w-full items-center gap-3 rounded-xl border p-2.5 text-left transition-all ${
+                  className={`group relative flex w-full items-center gap-3 rounded-xl border p-2.5 text-left transition-all duration-200 active:scale-[0.98] ${
                     isActive
-                      ? 'border-emerald-500/60 bg-emerald-500/10 shadow-sm dark:border-emerald-500/50 dark:bg-emerald-500/[0.12]'
-                      : 'border-transparent hover:border-slate-200 hover:bg-slate-100/70 dark:hover:border-slate-800 dark:hover:bg-slate-900/70'
+                      ? 'border-emerald-500/50 bg-emerald-500/15 shadow-sm shadow-emerald-500/10 dark:border-emerald-400/40 dark:bg-emerald-500/[0.14]'
+                      : 'border-transparent hover:border-slate-200/80 hover:bg-white/60 dark:hover:border-white/[0.08] dark:hover:bg-white/[0.04]'
                   }`}
                 >
                   {isActive && (
@@ -979,7 +985,7 @@ export default function AmanDokStudio() {
               </span>
             </button>
 
-            <div className="rounded-xl border border-slate-200/80 bg-slate-50 p-2.5 dark:border-slate-800/90 dark:bg-slate-900/60">
+            <div className="glass-pill rounded-xl p-2.5">
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
                 <Cpu className="h-3.5 w-3.5 shrink-0" />
                 <span>Zero-Cloud Vault</span>
@@ -1007,8 +1013,8 @@ export default function AmanDokStudio() {
         >
           {/* Drag-and-Drop Overlay */}
           {isDraggingFile && (
-            <div className="pointer-events-none absolute inset-3 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-emerald-400 bg-slate-950/80 text-white backdrop-blur-sm">
-              <Upload className="mb-2 h-10 w-10 text-emerald-400" />
+            <div className="animate-fade-in pointer-events-none absolute inset-3 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-emerald-400 bg-slate-950/75 text-white backdrop-blur-md">
+              <Upload className="mb-2 h-10 w-10 animate-bounce text-emerald-400" />
               <p className="text-sm font-bold">
                 {lang === 'id'
                   ? 'Lepaskan berkas untuk memuat ke brankas lokal (0 KB Upload)'
@@ -1020,7 +1026,7 @@ export default function AmanDokStudio() {
           {activeTab !== 'pdf' ? (
             <>
               {/* Workbench Floating Top Toolbar */}
-              <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 bg-white/80 px-4 py-2.5 backdrop-blur-sm dark:border-slate-800/80 dark:bg-[#0F1520]/80">
+              <div className="glass-panel flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-slate-200/70 px-4 py-2.5 dark:border-white/[0.08]">
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
@@ -1130,7 +1136,7 @@ export default function AmanDokStudio() {
               </div>
 
               {/* Workbench Bottom Export & Pipeline Chaining Bar */}
-              <div className="flex shrink-0 flex-wrap items-center justify-between gap-2.5 border-t border-slate-200/80 bg-white/95 px-4 py-2.5 dark:border-slate-800/80 dark:bg-[#0F1520]/95">
+              <div className="glass-panel flex shrink-0 flex-wrap items-center justify-between gap-2.5 border-t border-slate-200/70 px-4 py-2.5 dark:border-white/[0.08]">
                 <div className="flex flex-wrap items-center gap-2">
                   {activeTab === 'compress' && compressionResult ? (
                     <button
@@ -1341,7 +1347,8 @@ export default function AmanDokStudio() {
         {/* -------------------------------------------------------
             PANE 3: RIGHT PRECISION INSPECTOR PANEL
            ------------------------------------------------------- */}
-        <aside className="vault-scroll w-full shrink-0 border-t border-slate-200/90 bg-white p-4 dark:border-slate-800/90 dark:bg-[#0F1520] sm:p-5 lg:w-[376px] lg:overflow-y-auto lg:border-l lg:border-t-0 xl:w-[400px]">
+        <aside className="vault-scroll glass-panel w-full shrink-0 border-t border-slate-200/70 p-4 dark:border-white/[0.08] sm:p-5 lg:w-[376px] lg:overflow-y-auto lg:border-l lg:border-t-0 xl:w-[400px]">
+          <div key={activeTab} className="animate-panel-in">
           {/* INSPECTOR 1: WATERMARK */}
           {activeTab === 'watermark' && (
             <div className="space-y-4">
@@ -2037,15 +2044,16 @@ export default function AmanDokStudio() {
               </div>
             </div>
           )}
+          </div>
         </aside>
       </div>
 
       {/* =========================================================
-          MOBILE BOTTOM PIPELINE NAVIGATION BAR (< 1024px)
+          MOBILE FLOATING LIQUID GLASS DOCK (< 1024px)
          ========================================================= */}
       <nav
         aria-label="Mobile Studio Navigation"
-        className="fixed bottom-0 left-0 right-0 z-40 grid h-16 grid-cols-4 border-t border-slate-200/90 bg-white/95 px-2 backdrop-blur-md dark:border-slate-800/90 dark:bg-[#0F1520]/95 lg:hidden"
+        className="glass-dock fixed bottom-3 left-3 right-3 z-40 grid h-16 grid-cols-4 rounded-2xl px-2 lg:hidden"
       >
         {studioTools.map((tool) => {
           const Icon = tool.icon;
@@ -2055,10 +2063,10 @@ export default function AmanDokStudio() {
               key={tool.id}
               type="button"
               onClick={() => setActiveTab(tool.id)}
-              className={`relative flex flex-col items-center justify-center gap-1 transition ${
+              className={`relative my-1.5 flex flex-col items-center justify-center gap-1 rounded-xl transition-all duration-200 active:scale-95 ${
                 isActive
-                  ? 'text-emerald-600 dark:text-emerald-400'
-                  : 'text-slate-500 dark:text-slate-400'
+                  ? 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               {isActive && (
@@ -2085,11 +2093,11 @@ export default function AmanDokStudio() {
          ========================================================= */}
       {showVaultInfo && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"
+          className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-md"
           onClick={() => setShowVaultInfo(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-[#0F1520]"
+            className="glass-surface animate-modal-in w-full max-w-lg rounded-3xl p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between border-b border-slate-200/80 pb-3 dark:border-slate-800">
