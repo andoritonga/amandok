@@ -199,12 +199,6 @@ const TEXT = {
       guarantee: '100% Lokal di Peramban (Zero-Upload). EXIF/GPS dibersihkan saat ekspor.',
       attribution: 'Dikembangkan oleh Yohannes C. Ritonga',
     },
-    statusBar: {
-      docLabel: 'Dokumen',
-      none: 'Kosong',
-      redactionsLabel: 'Sensor',
-      queueLabel: 'Antrean PDF',
-    },
   },
   en: {
     brandSub: 'Local Privacy Studio',
@@ -349,12 +343,6 @@ const TEXT = {
       guarantee: '100% Browser-Local (Zero-Upload). Camera EXIF/GPS stripped on export.',
       attribution: 'Engineered by Yohannes C. Ritonga',
     },
-    statusBar: {
-      docLabel: 'Document',
-      none: 'Empty',
-      redactionsLabel: 'Redactions',
-      queueLabel: 'PDF Queue',
-    },
   },
 } as const;
 
@@ -497,7 +485,7 @@ export default function AmanDokStudio() {
     }
     const meta = document.getElementById('amandok-theme-color');
     if (meta) {
-      meta.setAttribute('content', isDark ? '#090d16' : '#f1f5f9');
+      meta.setAttribute('content', isDark ? '#060d17' : '#e6f0f2');
     }
     try {
       localStorage.setItem('amandok_theme', isDark ? 'dark' : 'light');
@@ -922,6 +910,13 @@ export default function AmanDokStudio() {
         )
       : 0;
 
+  const renderTabIcon = (tabKey: StudioTab) => {
+    if (tabKey === 'watermark') return <Stamp className="w-4 h-4 shrink-0" aria-hidden="true" />;
+    if (tabKey === 'redact') return <EyeOff className="w-4 h-4 shrink-0" aria-hidden="true" />;
+    if (tabKey === 'compress') return <Gauge className="w-4 h-4 shrink-0" aria-hidden="true" />;
+    return <FileStack className="w-4 h-4 shrink-0" aria-hidden="true" />;
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-0 w-full">
       <input
@@ -948,18 +943,11 @@ export default function AmanDokStudio() {
         }}
       />
 
-      {/* Single compact top studio header */}
-      <header className="sticky top-0 z-30 studio-header shrink-0">
-        <div className="max-w-[1600px] mx-auto px-3 sm:px-5 h-14 sm:h-16 flex items-center justify-between gap-2">
+      {/* Floating Liquid Glass Header Bar */}
+      <header className="sticky top-0 z-30 shrink-0 px-2.5 py-1.5 sm:mx-4 sm:mt-3 sm:px-4 sm:py-2 sm:rounded-2xl glass-bar">
+        <div className="max-w-[1600px] mx-auto min-h-[44px] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-              style={{
-                backgroundColor: 'var(--accent-surface)',
-                border: '1px solid var(--accent-border)',
-                color: 'var(--accent-text)',
-              }}
-            >
+            <div className="hidden min-[360px]:flex w-9 h-9 rounded-xl items-center justify-center shrink-0 glass-pill-active">
               <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             </div>
             <div className="min-w-0">
@@ -970,17 +958,20 @@ export default function AmanDokStudio() {
                 >
                   AmanDok
                 </span>
-                <span
-                  className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold border"
-                  style={{
-                    backgroundColor: 'var(--accent-surface)',
-                    borderColor: 'var(--accent-border)',
-                    color: 'var(--accent-text)',
-                  }}
-                >
+                <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold glass-pill-active">
                   <Lock className="w-3 h-3" aria-hidden="true" />
                   Zero-Upload
                 </span>
+                {docState && (
+                  <span
+                    className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium tabular-nums glass-well"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    <span className="truncate max-w-[160px]">{docState.fileName}</span>
+                    <span aria-hidden="true">|</span>
+                    <span>{formatBytes(docState.originalBytes)}</span>
+                  </span>
+                )}
               </div>
               <p
                 className="hidden sm:block text-xs truncate"
@@ -998,14 +989,13 @@ export default function AmanDokStudio() {
               onClick={() => setPrivacyOpen(true)}
               aria-haspopup="dialog"
               aria-label={t.privacyAria}
-              className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] px-2.5 sm:px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.97]"
-              style={{
-                backgroundColor: 'var(--bg-subtle)',
-                borderColor: 'var(--border-subtle)',
-                color: 'var(--text-primary)',
-              }}
+              className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] px-2.5 sm:px-3.5 rounded-xl text-xs font-semibold glass-pill active:scale-[0.97]"
             >
-              <ShieldCheck className="w-4 h-4 shrink-0" style={{ color: 'var(--accent-text)' }} aria-hidden="true" />
+              <ShieldCheck
+                className="w-4 h-4 shrink-0"
+                style={{ color: 'var(--accent-text)' }}
+                aria-hidden="true"
+              />
               <span className="hidden sm:inline">{t.privacyBtn}</span>
             </button>
 
@@ -1013,12 +1003,7 @@ export default function AmanDokStudio() {
               type="button"
               onClick={handleToggleLang}
               aria-label={t.langAria}
-              className="inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-xs font-bold border transition-transform active:scale-[0.97]"
-              style={{
-                backgroundColor: 'var(--bg-subtle)',
-                borderColor: 'var(--border-subtle)',
-                color: 'var(--text-primary)',
-              }}
+              className="inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-xl text-xs font-bold glass-pill active:scale-[0.97]"
             >
               <Languages className="w-3.5 h-3.5 hidden sm:inline shrink-0" aria-hidden="true" />
               <span>{lang.toUpperCase()}</span>
@@ -1028,12 +1013,7 @@ export default function AmanDokStudio() {
               type="button"
               onClick={() => setIsDark((prev) => !prev)}
               aria-label={isDark ? t.themeLightAria : t.themeDarkAria}
-              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg border transition-transform active:scale-[0.97]"
-              style={{
-                backgroundColor: 'var(--bg-subtle)',
-                borderColor: 'var(--border-subtle)',
-                color: 'var(--text-primary)',
-              }}
+              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl glass-pill active:scale-[0.97]"
             >
               {isDark ? (
                 <Sun className="w-4 h-4" aria-hidden="true" />
@@ -1046,11 +1026,12 @@ export default function AmanDokStudio() {
               type="button"
               onClick={handleWipeDesk}
               aria-label={t.wipeAria}
-              className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] px-2.5 sm:px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.97]"
+              className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] px-2.5 sm:px-3.5 rounded-xl text-xs font-semibold border transition-transform active:scale-[0.97]"
               style={{
                 backgroundColor: 'var(--danger-surface)',
                 borderColor: 'var(--danger-border)',
                 color: 'var(--danger-text)',
+                boxShadow: 'inset 0 1px 0 0 var(--glass-specular-top)',
               }}
             >
               <Trash2 className="w-4 h-4 shrink-0" aria-hidden="true" />
@@ -1060,212 +1041,114 @@ export default function AmanDokStudio() {
         </div>
       </header>
 
-      {/* Tablet top horizontal tool switcher (768px - 1023px) */}
+      {/* Tablet Floating Horizontal Pill Dock (768px - 1023px) */}
       <nav
         aria-label="Tool Switcher"
-        className="hidden md:flex lg:hidden items-center justify-center gap-2 px-4 py-2 border-b shrink-0"
-        style={{
-          backgroundColor: 'var(--bg-surface)',
-          borderColor: 'var(--border-subtle)',
-        }}
+        className="hidden md:flex lg:hidden justify-center px-4 mt-3 shrink-0"
       >
-        {VALID_TABS.map((tabKey) => {
-          const active = activeTab === tabKey;
-          const Icon =
-            tabKey === 'watermark'
-              ? Stamp
-              : tabKey === 'redact'
-                ? EyeOff
-                : tabKey === 'compress'
-                  ? Gauge
-                  : FileStack;
-          return (
-            <button
-              key={tabKey}
-              type="button"
-              onClick={() => setActiveTab(tabKey)}
-              className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
-              style={{
-                backgroundColor: active ? 'var(--accent-surface)' : 'var(--bg-subtle)',
-                borderColor: active ? 'var(--accent-border)' : 'var(--border-subtle)',
-                color: active ? 'var(--accent-text)' : 'var(--text-secondary)',
-              }}
-            >
-              <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span>{t.tabs[tabKey].label}</span>
-            </button>
-          );
-        })}
+        <div className="glass-bar rounded-2xl p-1.5 inline-flex items-center gap-2">
+          {VALID_TABS.map((tabKey) => {
+            const active = activeTab === tabKey;
+            const badgeCount =
+              tabKey === 'redact' ? redactions.length : tabKey === 'pdf' ? pdfQueue.length : 0;
+            return (
+              <button
+                key={tabKey}
+                type="button"
+                onClick={() => setActiveTab(tabKey)}
+                className={`inline-flex items-center gap-2 min-h-[44px] px-4 rounded-xl text-xs font-semibold active:scale-[0.98] ${
+                  active ? 'glass-pill-active' : 'glass-pill'
+                }`}
+              >
+                {renderTabIcon(tabKey)}
+                <span>{t.tabs[tabKey].label}</span>
+                {badgeCount > 0 && (
+                  <span
+                    className="px-1.5 py-0.5 rounded-full text-[11px] font-bold tabular-nums glass-well"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {badgeCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </nav>
 
-      {/* Main 3-state studio workspace */}
-      <div className="flex-1 flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_320px] lg:flex lg:flex-row lg:min-h-0">
-        {/* Desktop left tool rail (>= 1024px) */}
-        <aside
-          aria-label="Studio Tools"
-          className="hidden lg:flex lg:flex-col w-60 shrink-0 border-r p-3 justify-between gap-4"
-          style={{
-            backgroundColor: 'var(--bg-surface)',
-            borderColor: 'var(--border-subtle)',
-          }}
-        >
-          <div className="space-y-1.5">
-            {VALID_TABS.map((tabKey) => {
-              const active = activeTab === tabKey;
-              const Icon =
-                tabKey === 'watermark'
-                  ? Stamp
-                  : tabKey === 'redact'
-                    ? EyeOff
-                    : tabKey === 'compress'
-                      ? Gauge
-                      : FileStack;
-              return (
-                <button
-                  key={tabKey}
-                  type="button"
-                  onClick={() => setActiveTab(tabKey)}
-                  className="w-full min-h-[52px] px-3 py-2.5 rounded-lg border text-left flex items-start gap-3 transition-transform active:scale-[0.99]"
-                  style={{
-                    backgroundColor: active ? 'var(--accent-surface)' : 'transparent',
-                    borderColor: active ? 'var(--accent-border)' : 'transparent',
-                    color: active ? 'var(--accent-text)' : 'var(--text-primary)',
-                  }}
-                >
-                  <Icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-                  <span className="min-w-0">
-                    <span className="block text-sm font-semibold leading-tight">
-                      {t.tabs[tabKey].label}
-                    </span>
-                    <span
-                      className="block text-xs mt-0.5 leading-snug"
-                      style={{ color: 'var(--text-muted)' }}
-                    >
-                      {t.tabs[tabKey].desc}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div
-            className="rounded-lg p-3 border text-xs space-y-2 tabular-nums"
-            style={{
-              backgroundColor: 'var(--bg-subtle)',
-              borderColor: 'var(--border-subtle)',
-              color: 'var(--text-secondary)',
-            }}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <span style={{ color: 'var(--text-muted)' }}>{t.statusBar.docLabel}</span>
-              <span className="font-semibold truncate max-w-[115px]" style={{ color: 'var(--text-primary)' }}>
-                {docState ? formatBytes(docState.originalBytes) : t.statusBar.none}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <span style={{ color: 'var(--text-muted)' }}>{t.statusBar.redactionsLabel}</span>
-              <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-                {redactions.length}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <span style={{ color: 'var(--text-muted)' }}>{t.statusBar.queueLabel}</span>
-              <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-                {pdfQueue.length}
-              </span>
-            </div>
-          </div>
-        </aside>
-
-        {/* Center document stage */}
+      {/* Main Floating Canvas-First Studio Workspace */}
+      <div className="flex-1 flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_332px] lg:grid-cols-[minmax(0,1fr)_372px] xl:grid-cols-[minmax(0,1fr)_392px] lg:min-h-0">
+        {/* Document Stage (Full canvas expanse + Floating desktop dock) */}
         <section
           aria-label="Document Preview Stage"
-          className="flex-1 min-w-0 flex flex-col lg:min-h-0"
+          className="flex-1 min-w-0 flex flex-col justify-between p-2.5 sm:p-4 lg:py-3 lg:pl-4 lg:pr-3 gap-3 lg:min-h-0"
         >
-          {/* Visible sample indicator banner on both mobile and desktop */}
-          {docState?.isSample && (
-            <div
-              className="px-3 sm:px-5 py-2.5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-              style={{
-                backgroundColor: 'var(--accent-surface)',
-                borderColor: 'var(--accent-border)',
-              }}
-            >
-              <p className="text-xs leading-snug" style={{ color: 'var(--text-primary)' }}>
-                <span className="font-bold mr-1.5" style={{ color: 'var(--accent-text)' }}>
-                  [{t.sampleBadge}]
-                </span>
-                {t.sampleNotice}
-              </p>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3.5 rounded-lg text-xs font-semibold shrink-0 transition-transform active:scale-[0.98]"
-                style={{
-                  backgroundColor: 'var(--accent-solid)',
-                  color: 'var(--accent-on-solid)',
-                }}
-              >
-                <Upload className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>{t.uploadRealBtn}</span>
-              </button>
-            </div>
-          )}
+          {/* Floating sample notice + status/error stack */}
+          {(docState?.isSample || statusMessage || errorMessage) && (
+            <div className="space-y-2 shrink-0">
+              {docState?.isSample && (
+                <div className="rounded-2xl glass-panel px-3.5 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <p className="text-xs leading-snug" style={{ color: 'var(--text-primary)' }}>
+                    <span className="font-bold mr-1.5" style={{ color: 'var(--accent-text)' }}>
+                      [{t.sampleBadge}]
+                    </span>
+                    {t.sampleNotice}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-4 rounded-xl text-xs font-semibold shrink-0 glass-btn-primary active:scale-[0.98]"
+                  >
+                    <Upload className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>{t.uploadRealBtn}</span>
+                  </button>
+                </div>
+              )}
 
-          {/* Status & Error notifications */}
-          {statusMessage && (
-            <div
-              role="status"
-              aria-live="polite"
-              className="px-4 py-2.5 border-b text-xs font-medium flex items-center gap-2"
-              style={{
-                backgroundColor: 'var(--bg-subtle)',
-                borderColor: 'var(--border-subtle)',
-                color: 'var(--text-primary)',
-              }}
-            >
-              <span>{statusMessage}</span>
-            </div>
-          )}
-
-          {errorMessage && (
-            <div
-              role="alert"
-              className="px-4 py-2.5 border-b text-xs font-medium flex items-center justify-between gap-3"
-              style={{
-                backgroundColor: 'var(--danger-surface)',
-                borderColor: 'var(--danger-border)',
-                color: 'var(--danger-text)',
-              }}
-            >
-              <span className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span>{errorMessage}</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => setErrorMessage(null)}
-                aria-label={t.dismissError}
-                className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-md shrink-0"
-              >
-                <X className="w-4 h-4" aria-hidden="true" />
-              </button>
-            </div>
-          )}
-
-          {/* Active canvas stage or empty desk */}
-          <div className="flex-1 min-h-[260px] sm:min-h-[340px] lg:min-h-0 flex flex-col document-mat p-3 sm:p-5 lg:overflow-y-auto custom-scrollbar">
-            {!docState ? (
-              <div className="m-auto max-w-md w-full rounded-xl p-6 sm:p-8 text-center studio-panel space-y-5">
+              {statusMessage && (
                 <div
-                  className="w-12 h-12 rounded-xl mx-auto flex items-center justify-center"
+                  role="status"
+                  aria-live="polite"
+                  className="rounded-2xl glass-panel px-4 py-2.5 text-xs font-medium flex items-center gap-2"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  <span>{statusMessage}</span>
+                </div>
+              )}
+
+              {errorMessage && (
+                <div
+                  role="alert"
+                  className="rounded-2xl border px-4 py-2 text-xs font-medium flex items-center justify-between gap-3"
                   style={{
-                    backgroundColor: 'var(--accent-surface)',
-                    border: '1px solid var(--accent-border)',
-                    color: 'var(--accent-text)',
+                    backgroundColor: 'var(--danger-surface)',
+                    borderColor: 'var(--danger-border)',
+                    color: 'var(--danger-text)',
+                    boxShadow: 'inset 0 1px 0 0 var(--glass-specular-top)',
                   }}
                 >
+                  <span className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    <span>{errorMessage}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setErrorMessage(null)}
+                    aria-label={t.dismissError}
+                    className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl shrink-0"
+                  >
+                    <X className="w-4 h-4" aria-hidden="true" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Center Interactive Stage */}
+          <div className="flex-1 min-h-[250px] lg:min-h-0 flex flex-col items-center justify-center lg:overflow-y-auto custom-scrollbar">
+            {!docState ? (
+              <div className="my-auto max-w-md w-full rounded-3xl p-6 sm:p-8 text-center glass-panel space-y-5">
+                <div className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center glass-pill-active">
                   <ShieldCheck className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <div className="space-y-2">
@@ -1280,11 +1163,7 @@ export default function AmanDokStudio() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full min-h-[44px] px-4 py-2.5 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
-                    style={{
-                      backgroundColor: 'var(--accent-solid)',
-                      color: 'var(--accent-on-solid)',
-                    }}
+                    className="w-full min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 glass-btn-primary active:scale-[0.98]"
                   >
                     <Upload className="w-4 h-4" aria-hidden="true" />
                     <span>{t.emptyChooseBtn}</span>
@@ -1292,12 +1171,7 @@ export default function AmanDokStudio() {
                   <button
                     type="button"
                     onClick={() => loadSampleDocument(lang)}
-                    className="w-full min-h-[44px] px-4 py-2.5 rounded-lg text-sm font-semibold border inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
-                    style={{
-                      backgroundColor: 'var(--bg-subtle)',
-                      borderColor: 'var(--border-subtle)',
-                      color: 'var(--text-primary)',
-                    }}
+                    className="w-full min-h-[46px] px-4 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 glass-pill active:scale-[0.98]"
                   >
                     <FilePlus2 className="w-4 h-4" aria-hidden="true" />
                     <span>{t.emptySampleBtn}</span>
@@ -1305,19 +1179,14 @@ export default function AmanDokStudio() {
                 </div>
               </div>
             ) : (
-              <div className="w-full max-w-3xl mx-auto my-auto flex flex-col gap-3">
-                {/* Compact stage action strip */}
+              <div className="w-full max-w-3xl my-auto flex flex-col gap-3">
+                {/* Floating stage utility pill strip */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderColor: 'var(--border-subtle)',
-                        color: 'var(--text-primary)',
-                      }}
+                      className="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-xl text-xs font-semibold glass-pill active:scale-[0.98]"
                     >
                       <Upload className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>{t.changeImage}</span>
@@ -1325,12 +1194,7 @@ export default function AmanDokStudio() {
                     <button
                       type="button"
                       onClick={handleRotateDocument}
-                      className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderColor: 'var(--border-subtle)',
-                        color: 'var(--text-primary)',
-                      }}
+                      className="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-xl text-xs font-semibold glass-pill active:scale-[0.98]"
                     >
                       <RotateCw className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>{t.rotateBtn}</span>
@@ -1338,12 +1202,8 @@ export default function AmanDokStudio() {
                   </div>
 
                   <div
-                    className="inline-flex items-center gap-2 px-3 min-h-[44px] rounded-lg border text-xs font-medium tabular-nums"
-                    style={{
-                      backgroundColor: 'var(--bg-surface)',
-                      borderColor: 'var(--border-subtle)',
-                      color: 'var(--text-secondary)',
-                    }}
+                    className="inline-flex items-center gap-2 px-3.5 min-h-[44px] rounded-xl text-xs font-medium tabular-nums glass-well"
+                    style={{ color: 'var(--text-secondary)' }}
                   >
                     <span>
                       {docState.width} x {docState.height} px
@@ -1353,10 +1213,8 @@ export default function AmanDokStudio() {
                   </div>
                 </div>
 
-                {/* Framed Document Canvas */}
-                <div
-                  className="relative rounded-xl p-2 sm:p-3 studio-panel flex items-center justify-center overflow-hidden"
-                >
+                {/* Refractive Optical Document Plate */}
+                <div className="relative rounded-2xl p-2.5 sm:p-4 glass-canvas-frame flex items-center justify-center overflow-hidden">
                   <canvas
                     ref={canvasRef}
                     width={docState.width}
@@ -1364,7 +1222,7 @@ export default function AmanDokStudio() {
                     onPointerDown={handlePointerDown}
                     onPointerMove={handlePointerMove}
                     onPointerUp={handlePointerUp}
-                    className={`max-w-full max-h-[52vh] lg:max-h-[60vh] h-auto rounded-lg select-none ${
+                    className={`max-w-full max-h-[46vh] lg:max-h-[54vh] h-auto rounded-xl select-none shadow-sm ${
                       activeTab === 'redact' ? 'cursor-crosshair touch-none' : 'cursor-default'
                     }`}
                   />
@@ -1372,7 +1230,7 @@ export default function AmanDokStudio() {
                   {activeTab === 'compress' && cropPreset !== 'original' && (
                     <div
                       aria-hidden="true"
-                      className={`pointer-events-none absolute inset-4 rounded-lg crop-frame ${
+                      className={`pointer-events-none absolute inset-4 rounded-xl crop-frame ${
                         cropPreset === '3x4'
                           ? 'aspect-[3/4] max-h-[82%] mx-auto my-auto'
                           : 'aspect-[1.586/1] max-w-[88%] mx-auto my-auto'
@@ -1383,30 +1241,67 @@ export default function AmanDokStudio() {
               </div>
             )}
           </div>
+
+          {/* Desktop Floating Bottom Pill Dock (>= 1024px) */}
+          <nav
+            aria-label="Desktop Studio Tool Dock"
+            className="hidden lg:flex justify-center shrink-0"
+          >
+            <div className="glass-bar rounded-2xl p-1.5 inline-flex items-center gap-2">
+              {VALID_TABS.map((tabKey) => {
+                const active = activeTab === tabKey;
+                const badgeCount =
+                  tabKey === 'redact' ? redactions.length : tabKey === 'pdf' ? pdfQueue.length : 0;
+                return (
+                  <button
+                    key={tabKey}
+                    type="button"
+                    onClick={() => setActiveTab(tabKey)}
+                    className={`inline-flex items-center gap-2 min-h-[48px] px-4 rounded-xl text-xs font-semibold active:scale-[0.98] ${
+                      active ? 'glass-pill-active' : 'glass-pill'
+                    }`}
+                  >
+                    {renderTabIcon(tabKey)}
+                    <span>{t.tabs[tabKey].label}</span>
+                    {badgeCount > 0 && (
+                      <span
+                        className="px-1.5 py-0.5 rounded-full text-[11px] font-bold tabular-nums glass-well"
+                        style={{ color: 'var(--text-primary)' }}
+                      >
+                        {badgeCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
         </section>
 
-        {/* Right Control Inspector (or bottom flow on mobile < 768px) */}
+        {/* Floating Liquid Glass Control Inspector Sheet */}
         <aside
           aria-label="Tool Controls"
-          className="w-full md:w-80 lg:w-[340px] xl:w-[360px] shrink-0 border-t md:border-t-0 md:border-l p-4 space-y-5 lg:overflow-y-auto custom-scrollbar"
-          style={{
-            backgroundColor: 'var(--bg-surface)',
-            borderColor: 'var(--border-subtle)',
-          }}
+          className="mx-2.5 mt-1 sm:mx-4 md:mx-0 md:my-3 md:mr-4 rounded-2xl glass-panel p-4 flex flex-col gap-4 lg:overflow-y-auto custom-scrollbar"
         >
+          {/* Inspector Tool Heading */}
+          <div className="flex items-start gap-2.5">
+            <span className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 glass-pill-active">
+              {renderTabIcon(activeTab)}
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-sm font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                {t.tabs[activeTab].label}
+              </h2>
+              <p className="text-xs mt-0.5 leading-snug" style={{ color: 'var(--text-muted)' }}>
+                {t.tabs[activeTab].desc}
+              </p>
+            </div>
+          </div>
+
           {/* TAB 1: WATERMARK */}
           {activeTab === 'watermark' && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {t.tabs.watermark.label}
-                </h2>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  {t.tabs.watermark.desc}
-                </p>
-              </div>
-
-              <div className="space-y-2">
+            <div className="space-y-3.5">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.watermark.presetsTitle}
                 </p>
@@ -1421,12 +1316,9 @@ export default function AmanDokStudio() {
                           setWatermarkEnabled(true);
                           setWmConfig((prev) => ({ ...prev, text: preset.text }));
                         }}
-                        className="min-h-[44px] px-3 py-2 rounded-lg text-xs font-semibold border text-left transition-transform active:scale-[0.98]"
-                        style={{
-                          backgroundColor: selected ? 'var(--accent-surface)' : 'var(--bg-subtle)',
-                          borderColor: selected ? 'var(--accent-border)' : 'var(--border-subtle)',
-                          color: selected ? 'var(--accent-text)' : 'var(--text-primary)',
-                        }}
+                        className={`min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold text-left active:scale-[0.98] ${
+                          selected ? 'glass-pill-active' : 'glass-pill'
+                        }`}
                       >
                         {preset.label}
                       </button>
@@ -1435,7 +1327,7 @@ export default function AmanDokStudio() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.watermark.modeTitle}
                 </p>
@@ -1447,16 +1339,9 @@ export default function AmanDokStudio() {
                         key={mode}
                         type="button"
                         onClick={() => setWmConfig((prev) => ({ ...prev, mode }))}
-                        className="min-h-[44px] px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
-                        style={{
-                          backgroundColor: selected
-                            ? 'var(--neutral-active-bg)'
-                            : 'var(--bg-subtle)',
-                          borderColor: selected
-                            ? 'var(--neutral-active-bg)'
-                            : 'var(--border-subtle)',
-                          color: selected ? 'var(--neutral-active-text)' : 'var(--text-primary)',
-                        }}
+                        className={`min-h-[44px] px-3 rounded-xl text-xs font-semibold active:scale-[0.98] ${
+                          selected ? 'glass-pill-active' : 'glass-pill'
+                        }`}
                       >
                         {mode === 'tiled' ? t.watermark.modeTiled : t.watermark.modeSingle}
                       </button>
@@ -1465,130 +1350,134 @@ export default function AmanDokStudio() {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="wm-purpose-input"
-                  className="block text-xs font-semibold"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  {t.watermark.purposeLabel}
-                </label>
-                <input
-                  id="wm-purpose-input"
-                  type="text"
-                  value={wmConfig.text}
-                  onChange={(e) => {
-                    setWatermarkEnabled(true);
-                    setWmConfig((prev) => ({ ...prev, text: e.target.value }));
-                  }}
-                  className="w-full min-h-[44px] px-3 rounded-lg border text-sm"
-                  style={{
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderColor: 'var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                  }}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="wm-date-input"
-                  className="block text-xs font-semibold"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  {t.watermark.dateLabel}
-                </label>
-                <input
-                  id="wm-date-input"
-                  type="text"
-                  value={wmConfig.subtext || ''}
-                  onChange={(e) => {
-                    setWatermarkEnabled(true);
-                    setWmConfig((prev) => ({ ...prev, subtext: e.target.value }));
-                  }}
-                  className="w-full min-h-[44px] px-3 rounded-lg border text-sm"
-                  style={{
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderColor: 'var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                  }}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <label htmlFor="wm-size-slider" style={{ color: 'var(--text-secondary)' }}>
-                    {t.watermark.fontSizeLabel}
+              <div className="rounded-xl p-3 glass-well space-y-3">
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="wm-purpose-input"
+                    className="block text-xs font-semibold"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {t.watermark.purposeLabel}
                   </label>
-                  <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
-                    {Math.round(wmConfig.fontSizeScale * 100)}%
-                  </span>
+                  <input
+                    id="wm-purpose-input"
+                    type="text"
+                    value={wmConfig.text}
+                    onChange={(e) => {
+                      setWatermarkEnabled(true);
+                      setWmConfig((prev) => ({ ...prev, text: e.target.value }));
+                    }}
+                    className="w-full min-h-[44px] px-3 rounded-xl border text-sm"
+                    style={{
+                      backgroundColor: 'var(--glass-pill-bg)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
                 </div>
-                <input
-                  id="wm-size-slider"
-                  type="range"
-                  min={50}
-                  max={200}
-                  step={5}
-                  value={Math.round(wmConfig.fontSizeScale * 100)}
-                  onChange={(e) =>
-                    setWmConfig((prev) => ({
-                      ...prev,
-                      fontSizeScale: Number(e.target.value) / 100,
-                    }))
-                  }
-                  className="studio-range"
-                />
-              </div>
 
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <label htmlFor="wm-opacity-slider" style={{ color: 'var(--text-secondary)' }}>
-                    {t.watermark.opacityLabel}
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="wm-date-input"
+                    className="block text-xs font-semibold"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {t.watermark.dateLabel}
                   </label>
-                  <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
-                    {Math.round(wmConfig.opacity * 100)}%
-                  </span>
+                  <input
+                    id="wm-date-input"
+                    type="text"
+                    value={wmConfig.subtext || ''}
+                    onChange={(e) => {
+                      setWatermarkEnabled(true);
+                      setWmConfig((prev) => ({ ...prev, subtext: e.target.value }));
+                    }}
+                    className="w-full min-h-[44px] px-3 rounded-xl border text-sm"
+                    style={{
+                      backgroundColor: 'var(--glass-pill-bg)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
                 </div>
-                <input
-                  id="wm-opacity-slider"
-                  type="range"
-                  min={10}
-                  max={85}
-                  value={Math.round(wmConfig.opacity * 100)}
-                  onChange={(e) =>
-                    setWmConfig((prev) => ({
-                      ...prev,
-                      opacity: Number(e.target.value) / 100,
-                    }))
-                  }
-                  className="studio-range"
-                />
               </div>
 
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <label htmlFor="wm-angle-slider" style={{ color: 'var(--text-secondary)' }}>
-                    {t.watermark.angleLabel}
-                  </label>
-                  <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
-                    {wmConfig.angle}°
-                  </span>
+              <div className="rounded-xl p-3 glass-well space-y-2.5">
+                <div className="space-y-0.5">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <label htmlFor="wm-size-slider" style={{ color: 'var(--text-secondary)' }}>
+                      {t.watermark.fontSizeLabel}
+                    </label>
+                    <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                      {Math.round(wmConfig.fontSizeScale * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    id="wm-size-slider"
+                    type="range"
+                    min={50}
+                    max={200}
+                    step={5}
+                    value={Math.round(wmConfig.fontSizeScale * 100)}
+                    onChange={(e) =>
+                      setWmConfig((prev) => ({
+                        ...prev,
+                        fontSizeScale: Number(e.target.value) / 100,
+                      }))
+                    }
+                    className="studio-range"
+                  />
                 </div>
-                <input
-                  id="wm-angle-slider"
-                  type="range"
-                  min={-60}
-                  max={60}
-                  value={wmConfig.angle}
-                  onChange={(e) =>
-                    setWmConfig((prev) => ({ ...prev, angle: Number(e.target.value) }))
-                  }
-                  className="studio-range"
-                />
+
+                <div className="space-y-0.5">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <label htmlFor="wm-opacity-slider" style={{ color: 'var(--text-secondary)' }}>
+                      {t.watermark.opacityLabel}
+                    </label>
+                    <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                      {Math.round(wmConfig.opacity * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    id="wm-opacity-slider"
+                    type="range"
+                    min={10}
+                    max={85}
+                    value={Math.round(wmConfig.opacity * 100)}
+                    onChange={(e) =>
+                      setWmConfig((prev) => ({
+                        ...prev,
+                        opacity: Number(e.target.value) / 100,
+                      }))
+                    }
+                    className="studio-range"
+                  />
+                </div>
+
+                <div className="space-y-0.5">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <label htmlFor="wm-angle-slider" style={{ color: 'var(--text-secondary)' }}>
+                      {t.watermark.angleLabel}
+                    </label>
+                    <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                      {wmConfig.angle}°
+                    </span>
+                  </div>
+                  <input
+                    id="wm-angle-slider"
+                    type="range"
+                    min={-60}
+                    max={60}
+                    value={wmConfig.angle}
+                    onChange={(e) =>
+                      setWmConfig((prev) => ({ ...prev, angle: Number(e.target.value) }))
+                    }
+                    className="studio-range"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.watermark.colorLabel}
                 </p>
@@ -1604,11 +1493,13 @@ export default function AmanDokStudio() {
                         }
                         aria-label={swatch.name}
                         title={swatch.name}
-                        className="w-11 h-11 rounded-lg border flex items-center justify-center transition-transform active:scale-[0.95]"
+                        className="w-11 h-11 rounded-xl border flex items-center justify-center transition-transform active:scale-[0.95]"
                         style={{
                           backgroundColor: swatch.hex,
                           borderColor: selected ? 'var(--accent-solid)' : 'var(--border-strong)',
-                          boxShadow: selected ? '0 0 0 2px var(--accent-solid)' : undefined,
+                          boxShadow: selected
+                            ? '0 0 0 2px var(--accent-solid), inset 0 1px 0 rgba(255,255,255,0.4)'
+                            : 'inset 0 1px 0 rgba(255,255,255,0.28)',
                           color: swatch.hex === '#ffffff' ? '#0f172a' : '#ffffff',
                         }}
                       >
@@ -1619,16 +1510,12 @@ export default function AmanDokStudio() {
                 </div>
               </div>
 
-              <div className="pt-2 space-y-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="pt-1 space-y-2">
                 <button
                   type="button"
                   disabled={!docState}
                   onClick={handleDownloadCanvasImage}
-                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
-                  style={{
-                    backgroundColor: 'var(--accent-solid)',
-                    color: 'var(--accent-on-solid)',
-                  }}
+                  className="w-full min-h-[46px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 glass-btn-primary active:scale-[0.98]"
                 >
                   <Download className="w-4 h-4" aria-hidden="true" />
                   <span>{t.exportImgBtn}</span>
@@ -1637,12 +1524,7 @@ export default function AmanDokStudio() {
                   type="button"
                   disabled={!docState}
                   onClick={handleAddCurrentToPdfQueue}
-                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold border inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
-                  style={{
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderColor: 'var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                  }}
+                  className="w-full min-h-[44px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 glass-pill active:scale-[0.98]"
                 >
                   <FilePlus2 className="w-4 h-4" aria-hidden="true" />
                   <span>{t.addToPdfBtn}</span>
@@ -1653,17 +1535,12 @@ export default function AmanDokStudio() {
 
           {/* TAB 2: REDACT */}
           {activeTab === 'redact' && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {t.tabs.redact.label}
-                </h2>
-                <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  {t.redact.hint}
-                </p>
-              </div>
+            <div className="space-y-3.5">
+              <p className="text-xs leading-relaxed rounded-xl p-3 glass-well" style={{ color: 'var(--text-secondary)' }}>
+                {t.redact.hint}
+              </p>
 
-              <div className="space-y-2">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.redact.styleLabel}
                 </p>
@@ -1675,16 +1552,9 @@ export default function AmanDokStudio() {
                         key={item.key}
                         type="button"
                         onClick={() => setRedactionStyle(item.key)}
-                        className="min-h-[44px] px-2 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
-                        style={{
-                          backgroundColor: selected
-                            ? 'var(--neutral-active-bg)'
-                            : 'var(--bg-subtle)',
-                          borderColor: selected
-                            ? 'var(--neutral-active-bg)'
-                            : 'var(--border-subtle)',
-                          color: selected ? 'var(--neutral-active-text)' : 'var(--text-primary)',
-                        }}
+                        className={`min-h-[44px] px-2.5 rounded-xl text-xs font-semibold active:scale-[0.98] ${
+                          selected ? 'glass-pill-active' : 'glass-pill'
+                        }`}
                       >
                         {item.label}
                       </button>
@@ -1693,7 +1563,7 @@ export default function AmanDokStudio() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.redact.quickLabel}
                 </p>
@@ -1702,12 +1572,7 @@ export default function AmanDokStudio() {
                     type="button"
                     disabled={!docState}
                     onClick={() => handleAddQuickRedaction('nik')}
-                    className="min-h-[44px] px-3 rounded-lg text-xs font-semibold border disabled:opacity-45 transition-transform active:scale-[0.98]"
-                    style={{
-                      backgroundColor: 'var(--bg-subtle)',
-                      borderColor: 'var(--border-subtle)',
-                      color: 'var(--text-primary)',
-                    }}
+                    className="min-h-[44px] px-3 rounded-xl text-xs font-semibold disabled:opacity-45 glass-pill active:scale-[0.98]"
                   >
                     {t.redact.addNik}
                   </button>
@@ -1715,19 +1580,14 @@ export default function AmanDokStudio() {
                     type="button"
                     disabled={!docState}
                     onClick={() => handleAddQuickRedaction('signature')}
-                    className="min-h-[44px] px-3 rounded-lg text-xs font-semibold border disabled:opacity-45 transition-transform active:scale-[0.98]"
-                    style={{
-                      backgroundColor: 'var(--bg-subtle)',
-                      borderColor: 'var(--border-subtle)',
-                      color: 'var(--text-primary)',
-                    }}
+                    className="min-h-[44px] px-3 rounded-xl text-xs font-semibold disabled:opacity-45 glass-pill active:scale-[0.98]"
                   >
                     {t.redact.addSig}
                   </button>
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                     {t.redact.listTitle} ({redactions.length})
@@ -1736,7 +1596,7 @@ export default function AmanDokStudio() {
                     <button
                       type="button"
                       onClick={() => setRedactions([])}
-                      className="min-h-[44px] px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1"
+                      className="min-h-[44px] px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1"
                       style={{ color: 'var(--danger-text)' }}
                     >
                       <Eraser className="w-3.5 h-3.5" aria-hidden="true" />
@@ -1746,14 +1606,7 @@ export default function AmanDokStudio() {
                 </div>
 
                 {redactions.length === 0 ? (
-                  <p
-                    className="text-xs rounded-lg p-3 border leading-relaxed"
-                    style={{
-                      backgroundColor: 'var(--bg-subtle)',
-                      borderColor: 'var(--border-subtle)',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                     {t.redact.none}
                   </p>
                 ) : (
@@ -1761,11 +1614,7 @@ export default function AmanDokStudio() {
                     {redactions.map((box, index) => (
                       <li
                         key={box.id}
-                        className="rounded-lg border px-3 py-1.5 flex items-center justify-between gap-2"
-                        style={{
-                          backgroundColor: 'var(--bg-subtle)',
-                          borderColor: 'var(--border-subtle)',
-                        }}
+                        className="rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 glass-pill"
                       >
                         <div className="min-w-0">
                           <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
@@ -1781,7 +1630,7 @@ export default function AmanDokStudio() {
                             setRedactions((prev) => prev.filter((item) => item.id !== box.id))
                           }
                           aria-label={`${t.redact.deleteBox} #${index + 1}`}
-                          className="min-h-[44px] min-w-[44px] rounded-lg inline-flex items-center justify-center shrink-0"
+                          className="min-h-[44px] min-w-[44px] rounded-xl inline-flex items-center justify-center shrink-0"
                           style={{ color: 'var(--danger-text)' }}
                         >
                           <Trash2 className="w-4 h-4" aria-hidden="true" />
@@ -1792,16 +1641,12 @@ export default function AmanDokStudio() {
                 )}
               </div>
 
-              <div className="pt-2 space-y-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="pt-1 space-y-2">
                 <button
                   type="button"
                   disabled={!docState}
                   onClick={handleDownloadCanvasImage}
-                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
-                  style={{
-                    backgroundColor: 'var(--accent-solid)',
-                    color: 'var(--accent-on-solid)',
-                  }}
+                  className="w-full min-h-[46px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 glass-btn-primary active:scale-[0.98]"
                 >
                   <Download className="w-4 h-4" aria-hidden="true" />
                   <span>{t.exportImgBtn}</span>
@@ -1810,12 +1655,7 @@ export default function AmanDokStudio() {
                   type="button"
                   disabled={!docState}
                   onClick={handleAddCurrentToPdfQueue}
-                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold border inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
-                  style={{
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderColor: 'var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                  }}
+                  className="w-full min-h-[44px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 glass-pill active:scale-[0.98]"
                 >
                   <FilePlus2 className="w-4 h-4" aria-hidden="true" />
                   <span>{t.addToPdfBtn}</span>
@@ -1826,17 +1666,8 @@ export default function AmanDokStudio() {
 
           {/* TAB 3: COMPRESS */}
           {activeTab === 'compress' && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {t.tabs.compress.label}
-                </h2>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  {t.tabs.compress.desc}
-                </p>
-              </div>
-
-              <div className="space-y-2">
+            <div className="space-y-3.5">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.compress.targetLabel}
                 </p>
@@ -1849,12 +1680,9 @@ export default function AmanDokStudio() {
                         key={kb}
                         type="button"
                         onClick={() => setTargetKb(kb)}
-                        className="min-h-[44px] px-3 rounded-lg text-xs font-semibold border tabular-nums transition-transform active:scale-[0.98]"
-                        style={{
-                          backgroundColor: selected ? 'var(--accent-surface)' : 'var(--bg-subtle)',
-                          borderColor: selected ? 'var(--accent-border)' : 'var(--border-subtle)',
-                          color: selected ? 'var(--accent-text)' : 'var(--text-primary)',
-                        }}
+                        className={`min-h-[44px] px-3 rounded-xl text-xs font-semibold tabular-nums active:scale-[0.98] ${
+                          selected ? 'glass-pill-active' : 'glass-pill'
+                        }`}
                       >
                         {label}
                       </button>
@@ -1863,7 +1691,7 @@ export default function AmanDokStudio() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.compress.cropLabel}
                 </p>
@@ -1875,16 +1703,9 @@ export default function AmanDokStudio() {
                         key={crop.key}
                         type="button"
                         onClick={() => setCropPreset(crop.key)}
-                        className="min-h-[44px] px-2 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
-                        style={{
-                          backgroundColor: selected
-                            ? 'var(--neutral-active-bg)'
-                            : 'var(--bg-subtle)',
-                          borderColor: selected
-                            ? 'var(--neutral-active-bg)'
-                            : 'var(--border-subtle)',
-                          color: selected ? 'var(--neutral-active-text)' : 'var(--text-primary)',
-                        }}
+                        className={`min-h-[44px] px-2 rounded-xl text-xs font-semibold active:scale-[0.98] ${
+                          selected ? 'glass-pill-active' : 'glass-pill'
+                        }`}
                       >
                         {crop.label}
                       </button>
@@ -1894,7 +1715,7 @@ export default function AmanDokStudio() {
               </div>
 
               {cropPreset === '3x4' && (
-                <div className="space-y-2">
+                <div className="rounded-xl p-3 glass-well space-y-2">
                   <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                     {t.compress.bgLabel}
                   </p>
@@ -1906,12 +1727,9 @@ export default function AmanDokStudio() {
                           key={bg.hex}
                           type="button"
                           onClick={() => setBgColor(bg.hex)}
-                          className="min-h-[44px] px-2 rounded-lg text-xs font-semibold border inline-flex items-center justify-center gap-1.5"
-                          style={{
-                            backgroundColor: selected ? 'var(--accent-surface)' : 'var(--bg-subtle)',
-                            borderColor: selected ? 'var(--accent-border)' : 'var(--border-subtle)',
-                            color: selected ? 'var(--accent-text)' : 'var(--text-primary)',
-                          }}
+                          className={`min-h-[44px] px-2 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1.5 ${
+                            selected ? 'glass-pill-active' : 'glass-pill'
+                          }`}
                         >
                           <span
                             className="w-3.5 h-3.5 rounded-full border shrink-0"
@@ -1930,24 +1748,14 @@ export default function AmanDokStudio() {
                 type="button"
                 disabled={!docState}
                 onClick={() => void handleRunCompression()}
-                className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
-                style={{
-                  backgroundColor: 'var(--accent-solid)',
-                  color: 'var(--accent-on-solid)',
-                }}
+                className="w-full min-h-[46px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 glass-btn-primary active:scale-[0.98]"
               >
                 <Gauge className="w-4 h-4" aria-hidden="true" />
                 <span>{t.compress.runBtn}</span>
               </button>
 
               {compressResult && (
-                <div
-                  className="rounded-xl border p-3.5 space-y-3"
-                  style={{
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderColor: 'var(--border-subtle)',
-                  }}
-                >
+                <div className="rounded-xl p-3.5 glass-well space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
                       {t.compress.resultTitle}
@@ -1961,13 +1769,7 @@ export default function AmanDokStudio() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs tabular-nums">
-                    <div
-                      className="rounded-lg p-2 border"
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderColor: 'var(--border-subtle)',
-                      }}
-                    >
+                    <div className="rounded-xl p-2 glass-pill">
                       <span className="block" style={{ color: 'var(--text-muted)' }}>
                         {t.compress.beforeLabel}
                       </span>
@@ -1975,13 +1777,7 @@ export default function AmanDokStudio() {
                         {formatBytes(compressResult.originalBytes)}
                       </strong>
                     </div>
-                    <div
-                      className="rounded-lg p-2 border"
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderColor: 'var(--border-subtle)',
-                      }}
-                    >
+                    <div className="rounded-xl p-2 glass-pill">
                       <span className="block" style={{ color: 'var(--text-muted)' }}>
                         {t.compress.afterLabel}
                       </span>
@@ -1991,14 +1787,13 @@ export default function AmanDokStudio() {
                     </div>
                   </div>
 
-                  <div className="rounded-lg overflow-hidden border" style={{ borderColor: 'var(--border-subtle)' }}>
+                  <div className="rounded-xl overflow-hidden glass-canvas-frame p-1.5">
                     <img
                       src={compressResult.dataUrl}
                       alt={t.compress.resultTitle}
                       width={compressResult.width}
                       height={compressResult.height}
-                      className="w-full max-h-40 object-contain"
-                      style={{ backgroundColor: 'var(--bg-mat)' }}
+                      className="w-full max-h-40 object-contain rounded-lg"
                     />
                   </div>
 
@@ -2011,11 +1806,7 @@ export default function AmanDokStudio() {
                     <button
                       type="button"
                       onClick={handleDownloadCompressed}
-                      className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
-                      style={{
-                        backgroundColor: 'var(--accent-solid)',
-                        color: 'var(--accent-on-solid)',
-                      }}
+                      className="w-full min-h-[44px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 glass-btn-primary active:scale-[0.98]"
                     >
                       <Download className="w-4 h-4" aria-hidden="true" />
                       <span>{t.compress.downloadCompressed}</span>
@@ -2023,12 +1814,7 @@ export default function AmanDokStudio() {
                     <button
                       type="button"
                       onClick={handleAddCurrentToPdfQueue}
-                      className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold border inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderColor: 'var(--border-subtle)',
-                        color: 'var(--text-primary)',
-                      }}
+                      className="w-full min-h-[44px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 glass-pill active:scale-[0.98]"
                     >
                       <FilePlus2 className="w-4 h-4" aria-hidden="true" />
                       <span>{t.addToPdfBtn}</span>
@@ -2041,17 +1827,8 @@ export default function AmanDokStudio() {
 
           {/* TAB 4: PDF MERGER */}
           {activeTab === 'pdf' && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {t.tabs.pdf.label}
-                </h2>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  {t.tabs.pdf.desc}
-                </p>
-              </div>
-
-              <div className="space-y-2">
+            <div className="space-y-3.5">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.pdf.layoutLabel}
                 </p>
@@ -2063,12 +1840,9 @@ export default function AmanDokStudio() {
                         key={layout.key}
                         type="button"
                         onClick={() => setPdfLayout(layout.key)}
-                        className="w-full min-h-[44px] px-3 rounded-lg text-xs font-semibold border text-left transition-transform active:scale-[0.99]"
-                        style={{
-                          backgroundColor: selected ? 'var(--accent-surface)' : 'var(--bg-subtle)',
-                          borderColor: selected ? 'var(--accent-border)' : 'var(--border-subtle)',
-                          color: selected ? 'var(--accent-text)' : 'var(--text-primary)',
-                        }}
+                        className={`w-full min-h-[44px] px-3 rounded-xl text-xs font-semibold text-left active:scale-[0.99] ${
+                          selected ? 'glass-pill-active' : 'glass-pill'
+                        }`}
                       >
                         {layout.label}
                       </button>
@@ -2082,12 +1856,7 @@ export default function AmanDokStudio() {
                   type="button"
                   disabled={!docState}
                   onClick={handleAddCurrentToPdfQueue}
-                  className="w-full min-h-[44px] px-3 rounded-lg text-xs font-semibold border inline-flex items-center justify-center gap-2 disabled:opacity-45"
-                  style={{
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderColor: 'var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                  }}
+                  className="w-full min-h-[44px] px-3 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 glass-pill"
                 >
                   <Plus className="w-4 h-4" aria-hidden="true" />
                   <span>{t.pdf.addCurrentBtn}</span>
@@ -2095,32 +1864,20 @@ export default function AmanDokStudio() {
                 <button
                   type="button"
                   onClick={() => pdfFileInputRef.current?.click()}
-                  className="w-full min-h-[44px] px-3 rounded-lg text-xs font-semibold border inline-flex items-center justify-center gap-2"
-                  style={{
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderColor: 'var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                  }}
+                  className="w-full min-h-[44px] px-3 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-2 glass-pill"
                 >
                   <Upload className="w-4 h-4" aria-hidden="true" />
                   <span>{t.pdf.addFilesBtn}</span>
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="rounded-xl p-3 glass-well space-y-2">
                 <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   {t.pdf.queueTitle} ({pdfQueue.length})
                 </p>
 
                 {pdfQueue.length === 0 ? (
-                  <p
-                    className="text-xs rounded-lg p-3 border leading-relaxed"
-                    style={{
-                      backgroundColor: 'var(--bg-subtle)',
-                      borderColor: 'var(--border-subtle)',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                     {t.pdf.emptyQueue}
                   </p>
                 ) : (
@@ -2128,11 +1885,7 @@ export default function AmanDokStudio() {
                     {pdfQueue.map((item, idx) => (
                       <li
                         key={item.id}
-                        className="rounded-lg border p-2 flex items-center gap-2"
-                        style={{
-                          backgroundColor: 'var(--bg-subtle)',
-                          borderColor: 'var(--border-subtle)',
-                        }}
+                        className="rounded-xl p-2 flex items-center gap-2 glass-pill"
                       >
                         {item.dataUrl && (
                           <img
@@ -2140,7 +1893,7 @@ export default function AmanDokStudio() {
                             alt={item.name}
                             width={item.width || 44}
                             height={item.height || 44}
-                            className="w-11 h-11 object-cover rounded border shrink-0"
+                            className="w-11 h-11 object-cover rounded-lg border shrink-0"
                             style={{ borderColor: 'var(--border-subtle)' }}
                           />
                         )}
@@ -2158,12 +1911,7 @@ export default function AmanDokStudio() {
                             disabled={idx === 0}
                             onClick={() => handleMovePdfItem(idx, -1)}
                             aria-label={`${t.pdf.moveUp} ${item.name}`}
-                            className="min-h-[44px] min-w-[44px] rounded-lg border inline-flex items-center justify-center disabled:opacity-35"
-                            style={{
-                              backgroundColor: 'var(--bg-surface)',
-                              borderColor: 'var(--border-subtle)',
-                              color: 'var(--text-primary)',
-                            }}
+                            className="min-h-[44px] min-w-[44px] rounded-xl inline-flex items-center justify-center disabled:opacity-35 glass-pill"
                           >
                             <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
                           </button>
@@ -2172,12 +1920,7 @@ export default function AmanDokStudio() {
                             disabled={idx === pdfQueue.length - 1}
                             onClick={() => handleMovePdfItem(idx, 1)}
                             aria-label={`${t.pdf.moveDown} ${item.name}`}
-                            className="min-h-[44px] min-w-[44px] rounded-lg border inline-flex items-center justify-center disabled:opacity-35"
-                            style={{
-                              backgroundColor: 'var(--bg-surface)',
-                              borderColor: 'var(--border-subtle)',
-                              color: 'var(--text-primary)',
-                            }}
+                            className="min-h-[44px] min-w-[44px] rounded-xl inline-flex items-center justify-center disabled:opacity-35 glass-pill"
                           >
                             <ArrowDown className="w-3.5 h-3.5" aria-hidden="true" />
                           </button>
@@ -2187,7 +1930,7 @@ export default function AmanDokStudio() {
                               setPdfQueue((prev) => prev.filter((q) => q.id !== item.id))
                             }
                             aria-label={`${t.pdf.removeItem} ${item.name}`}
-                            className="min-h-[44px] min-w-[44px] rounded-lg border inline-flex items-center justify-center"
+                            className="min-h-[44px] min-w-[44px] rounded-xl border inline-flex items-center justify-center"
                             style={{
                               backgroundColor: 'var(--danger-surface)',
                               borderColor: 'var(--danger-border)',
@@ -2203,40 +1946,26 @@ export default function AmanDokStudio() {
                 )}
               </div>
 
-              <div className="pt-2 space-y-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="pt-1 space-y-2">
                 <button
                   type="button"
                   disabled={pdfQueue.length === 0}
                   onClick={() => void handleBuildPdf()}
-                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
-                  style={{
-                    backgroundColor: 'var(--accent-solid)',
-                    color: 'var(--accent-on-solid)',
-                  }}
+                  className="w-full min-h-[46px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 glass-btn-primary active:scale-[0.98]"
                 >
                   <FileStack className="w-4 h-4" aria-hidden="true" />
                   <span>{t.pdf.buildBtn}</span>
                 </button>
 
                 {pdfDownloadUrl && (
-                  <div
-                    className="rounded-lg border p-3 space-y-2"
-                    style={{
-                      backgroundColor: 'var(--accent-surface)',
-                      borderColor: 'var(--accent-border)',
-                    }}
-                  >
+                  <div className="rounded-xl p-3 space-y-2 glass-pill-active">
                     <p className="text-xs font-medium tabular-nums" style={{ color: 'var(--text-primary)' }}>
                       {t.pdf.readyText} <strong>{formatBytes(pdfByteSize)}</strong>
                     </p>
                     <a
                       href={pdfDownloadUrl}
                       download="amandok-dokumen.pdf"
-                      className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2"
-                      style={{
-                        backgroundColor: 'var(--accent-solid)',
-                        color: 'var(--accent-on-solid)',
-                      }}
+                      className="w-full min-h-[44px] px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 glass-btn-primary"
                     >
                       <Download className="w-4 h-4" aria-hidden="true" />
                       <span>{t.pdf.downloadPdfBtn}</span>
@@ -2249,52 +1978,33 @@ export default function AmanDokStudio() {
         </aside>
       </div>
 
-      {/* Studio Footer landmark (compact bar on desktop, normal flow above mobile dock on < md) */}
+      {/* Single semantic Studio Footer (floating glass card on < lg, streamlined stage bar on lg+) */}
       <footer
-        className="border-t px-4 py-3 pb-24 md:pb-3 text-xs flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0"
-        style={{
-          backgroundColor: 'var(--bg-surface)',
-          borderColor: 'var(--border-subtle)',
-          color: 'var(--text-muted)',
-        }}
+        className="mx-2.5 sm:mx-4 lg:mx-4 mt-3 lg:mt-0 mb-28 md:mb-4 lg:mb-2 px-4 py-2.5 lg:py-1 rounded-2xl glass-panel lg:bg-none lg:bg-transparent lg:border-0 lg:shadow-none lg:backdrop-blur-none text-xs flex flex-col sm:flex-row items-center justify-between gap-1.5 shrink-0"
+        style={{ color: 'var(--text-muted)' }}
       >
         <span>{t.footer.guarantee}</span>
         <span>{t.footer.attribution}</span>
       </footer>
 
-      {/* Mobile Bottom Tool Dock (< 768px) */}
+      {/* Mobile Floating Bottom Tool Dock (< 768px) */}
       <nav
         aria-label="Mobile Tool Navigation"
-        className="md:hidden fixed bottom-0 inset-x-0 z-30 border-t px-2 py-1.5"
-        style={{
-          backgroundColor: 'var(--bg-surface)',
-          borderColor: 'var(--border-subtle)',
-        }}
+        className="md:hidden fixed bottom-2.5 inset-x-2.5 z-30 rounded-2xl p-1.5 glass-bar"
       >
         <div className="grid grid-cols-4 gap-1.5">
           {VALID_TABS.map((tabKey) => {
             const active = activeTab === tabKey;
-            const Icon =
-              tabKey === 'watermark'
-                ? Stamp
-                : tabKey === 'redact'
-                  ? EyeOff
-                  : tabKey === 'compress'
-                    ? Gauge
-                    : FileStack;
             return (
               <button
                 key={tabKey}
                 type="button"
                 onClick={() => setActiveTab(tabKey)}
-                className="min-h-[48px] px-1 py-1.5 rounded-lg border flex flex-col items-center justify-center gap-0.5 text-xs font-semibold transition-transform active:scale-[0.97]"
-                style={{
-                  backgroundColor: active ? 'var(--accent-surface)' : 'transparent',
-                  borderColor: active ? 'var(--accent-border)' : 'transparent',
-                  color: active ? 'var(--accent-text)' : 'var(--text-secondary)',
-                }}
+                className={`min-h-[48px] px-1 py-1.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-xs font-semibold active:scale-[0.97] ${
+                  active ? 'glass-pill-active' : 'glass-pill'
+                }`}
               >
-                <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                {renderTabIcon(tabKey)}
                 <span className="truncate max-w-full">{t.tabs[tabKey].short}</span>
               </button>
             );
@@ -2302,11 +2012,11 @@ export default function AmanDokStudio() {
         </div>
       </nav>
 
-      {/* Accessible Privacy & Architecture Modal Dialog */}
+      {/* Accessible Liquid Glass Privacy Architecture Dialog */}
       {privacyOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)' }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          style={{ backgroundColor: 'rgba(6, 13, 23, 0.52)' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setPrivacyOpen(false);
@@ -2318,23 +2028,12 @@ export default function AmanDokStudio() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="privacy-dialog-title"
-            className="w-full max-w-lg rounded-xl border p-5 sm:p-6 space-y-4 shadow-xl"
-            style={{
-              backgroundColor: 'var(--bg-surface)',
-              borderColor: 'var(--border-subtle)',
-              color: 'var(--text-primary)',
-            }}
+            className="w-full max-w-lg rounded-2xl p-5 sm:p-6 space-y-4 glass-panel"
+            style={{ color: 'var(--text-primary)' }}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <span
-                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                  style={{
-                    backgroundColor: 'var(--accent-surface)',
-                    border: '1px solid var(--accent-border)',
-                    color: 'var(--accent-text)',
-                  }}
-                >
+                <span className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 glass-pill-active">
                   <Lock className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <h2 id="privacy-dialog-title" className="text-base font-bold">
@@ -2346,12 +2045,7 @@ export default function AmanDokStudio() {
                 type="button"
                 onClick={() => setPrivacyOpen(false)}
                 aria-label={t.dialog.closeAria}
-                className="min-h-[44px] min-w-[44px] rounded-lg border inline-flex items-center justify-center shrink-0"
-                style={{
-                  backgroundColor: 'var(--bg-subtle)',
-                  borderColor: 'var(--border-subtle)',
-                  color: 'var(--text-primary)',
-                }}
+                className="min-h-[44px] min-w-[44px] rounded-xl inline-flex items-center justify-center shrink-0 glass-pill"
               >
                 <X className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -2361,15 +2055,11 @@ export default function AmanDokStudio() {
               {t.dialog.intro}
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {t.dialog.items.map((item) => (
                 <div
                   key={item.heading}
-                  className="rounded-lg border p-3 space-y-1"
-                  style={{
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderColor: 'var(--border-subtle)',
-                  }}
+                  className="rounded-xl p-3 space-y-1 glass-well"
                 >
                   <h3 className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
                     {item.heading}
@@ -2381,15 +2071,11 @@ export default function AmanDokStudio() {
               ))}
             </div>
 
-            <div className="pt-2 flex justify-end">
+            <div className="pt-1 flex justify-end">
               <button
                 type="button"
                 onClick={() => setPrivacyOpen(false)}
-                className="min-h-[44px] px-4 rounded-lg text-sm font-semibold"
-                style={{
-                  backgroundColor: 'var(--accent-solid)',
-                  color: 'var(--accent-on-solid)',
-                }}
+                className="min-h-[44px] px-5 rounded-xl text-sm font-semibold glass-btn-primary"
               >
                 {t.dialog.doneBtn}
               </button>

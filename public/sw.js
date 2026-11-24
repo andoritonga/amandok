@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amandok-studio-v4';
+const CACHE_NAME = 'amandok-liquid-glass-v5';
 const PRECACHE_URLS = ['/', '/favicon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {

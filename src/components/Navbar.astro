@@ -1,19 +1,17 @@
 ---
 ---
 
-<header class="sticky top-0 z-40 studio-header">
-  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 min-h-[56px] flex items-center justify-between gap-3">
+<header class="sticky top-0 z-40 px-2.5 py-1.5 sm:mx-4 sm:mt-3 sm:px-4 sm:py-2 sm:rounded-2xl glass-bar">
+  <div class="max-w-[1440px] mx-auto min-h-[44px] flex items-center justify-between gap-3">
     <a
       href="/"
-      class="inline-flex items-center gap-2.5 min-h-[44px] py-1.5 rounded-lg group"
+      class="inline-flex items-center gap-2.5 min-h-[44px] py-1 rounded-xl group"
     >
       <span
-        class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-        style="background-color: var(--accent-surface); border: 1px solid var(--accent-border);"
+        class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 glass-pill-active"
       >
         <svg
           class="w-4 h-4"
-          style="color: var(--accent-text);"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -45,8 +43,7 @@
       <button
         type="button"
         id="nav-lang-toggle"
-        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-3 rounded-lg text-xs font-bold border transition-transform active:scale-[0.97]"
-        style="background-color: var(--bg-subtle); border-color: var(--border-subtle); color: var(--text-primary);"
+        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-bold glass-pill active:scale-[0.97]"
         aria-label="Ubah bahasa ke English"
       >
         ID / EN
@@ -55,8 +52,7 @@
       <button
         type="button"
         id="nav-theme-toggle"
-        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg border transition-transform active:scale-[0.97]"
-        style="background-color: var(--bg-subtle); border-color: var(--border-subtle); color: var(--text-primary);"
+        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl glass-pill active:scale-[0.97]"
         aria-label="Ubah tema warna"
       >
         <svg
@@ -148,7 +144,7 @@
       }
       var meta = document.getElementById('amandok-theme-color');
       if (meta) {
-        meta.setAttribute('content', next ? '#090d16' : '#f1f5f9');
+        meta.setAttribute('content', next ? '#060d17' : '#e6f0f2');
       }
       try {
         localStorage.setItem('amandok_theme', next ? 'dark' : 'light');
