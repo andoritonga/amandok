@@ -1,4 +1,4 @@
-# Technical Specification: AmanDok — Zero-Upload Document Privacy & Preparation Toolkit
+# Technical Specification: AmanDok - Zero-Upload Document Privacy & Preparation Toolkit
 
 ## 1. Understanding Summary
 - **Product Name & Domain:** **AmanDok** (`dokumen.ritonga.ai.id` / `privasi.ritonga.ai.id`)
@@ -70,8 +70,8 @@ amandok/
 ### 4.2 In-Memory Chained Pipeline (`DocumentPipeline`)
 1. **Load & Normalize:** User selects or drops an image (`JPG`, `PNG`, `WEBP`). Image is decoded in browser memory, normalized to a safe max working dimension (`2400px`), and stripped of EXIF/GPS metadata.
 2. **Step-by-Step or Direct Tooling:**
-   - **Tab 1 — Watermark KTP/Dokumen:** Renders customizable verification text (single or tiled grid, custom date, purpose, color, opacity, angle, font size, rotation).
-   - **Tab 2 — Sensor Data (Redaksi):** Draws rectangular or brush masks (*Pixelate*, *Blur*, *Blackout*) with an Undo stack.
-   - **Tab 3 — Kompresor & Pasfoto:** Runs binary-search quality & scale optimization to hit `<100KB`, `<200KB`, `<300KB`, or `<500KB`, plus `3x4` / `4x6` / `1:1` crop presets.
-   - **Tab 4 — Gabung ke PDF:** Collects processed images (sent directly from Tabs 1–3 via *"Tambahkan ke Antrean PDF"* or uploaded directly) and merges them into a downloadable PDF file with `pdf-lib`.
+   - **Tab 1 - Watermark KTP/Dokumen:** Renders customizable verification text (single or tiled grid, custom date, purpose, color, opacity, angle, font size, rotation).
+   - **Tab 2 - Sensor Data (Redaksi):** Draws rectangular or brush masks (*Pixelate*, *Blur*, *Blackout*) with an Undo stack.
+   - **Tab 3 - Kompresor & Pasfoto:** Runs binary-search quality & scale optimization to hit `<100KB`, `<200KB`, `<300KB`, or `<500KB`, plus `3x4` / `4x6` / `1:1` crop presets.
+   - **Tab 4 - Gabung ke PDF:** Collects processed images (sent directly from Tabs 1-3 via *"Tambahkan ke Antrean PDF"* or uploaded directly) and merges them into a downloadable PDF file with `pdf-lib`.
 3. **One-Click Memory Wipe:** Clears all in-memory blobs, canvas buffers, and object URLs immediately.

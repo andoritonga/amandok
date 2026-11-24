@@ -1,66 +1,67 @@
-# 🛡️ AmanDok — Toolkit Privasi KTP & Persiapan Dokumen 100% Lokal (Zero-Upload)
+# AmanDok - Client-Side Document Privacy & Preparation Studio
 
-[![Live App](https://img.shields.io/badge/Live_App-dokumen.ritonga.ai.id-10B981?style=for-the-badge)](https://dokumen.ritonga.ai.id)
-[![Architecture](https://img.shields.io/badge/Privacy-100%25_Client--Side_Zero_Upload-0EA5E9?style=for-the-badge)](#arsitektur-keamanan-zero-upload)
-[![Tech Stack](https://img.shields.io/badge/Stack-Astro_5_%2B_React_%2B_TypeScript_%2B_pdf--lib-F59E0B?style=for-the-badge)](#teknologi)
+**AmanDok** adalah aplikasi web gratis tanpa iklan yang berjalan **100% di peramban (Client-Side / Zero-Upload)** untuk melindungi dan menyiapkan dokumen identitas sensitif (KTP, KK, NPWP, Ijazah, Surat Lamaran) sebelum dikirim secara daring ke aplikasi pinjaman, fintech, rekrutmen CPNS/BUMN/perusahaan, maupun keperluan administrasi sewa.
 
-**AmanDok** ([dokumen.ritonga.ai.id](https://dokumen.ritonga.ai.id)) adalah aplikasi web *100% client-side* untuk melindungi dokumen identitas masyarakat Indonesia (KTP, KK, NPWP, Ijazah) dari risiko penyalahgunaan data (seperti pinjol ilegal atau pencurian identitas) sekaligus menyiapkan ukuran berkas sesuai syarat portal rekrutmen (SSCASN/CPNS, BUMN, HRD, dan Bank).
-
-> **Jaminan Privasi Mutlak:** Tidak ada satu byte pun gambar atau PDF yang dikirim ke server. Seluruh proses manipulasi piksel dan pembuatan PDF berlangsung di dalam memori RAM browser perangkat pengguna (`HTML5 Canvas 2D API` & `pdf-lib`). Aplikasi tetap berfungsi penuh meskipun koneksi internet/Wi-Fi dimatikan setelah halaman dimuat.
+Seluruh proses manipulasi gambar, *watermarking*, penyensoran piksel, kompresi target ukuran KB, hingga penggabungan PDF berjalan secara lokal di memori peramban menggunakan HTML5 Canvas API dan `pdf-lib`, sehingga nol byte data dokumen dikirim ke server mana pun.
 
 ---
 
-## ✨ Fitur Utama (4-in-1 Studio Pipeline)
+## Fitur Utama
 
-1. **01 • Watermark KTP & Dokumen Anti-Pinjol (`Tiled`, `Single Stamp`, `Banner`)**
-   - Template cepat siap pakai (*Verifikasi Bank/KPR*, *Lamaran Kerja HRD*, *Seleksi CPNS/BUMN*, *Sewa Properti/Kos*).
-   - Pengaturan teks utama, subteks tanggal otomatis, warna tinta keamanan, kemiringan sudut (`-55°` s/d `55°`), transparansi, kerapatan grid, dan bingkai pelindung mikro.
-2. **02 • Sensor & Redaksi Data Sensitif (Penghancuran Piksel Permanen)**
-   - Klik & seret langsung pada pratinjau dokumen atau gunakan tombol cepat (*Sensor Baris NIK*, *Sensor Tanda Tangan*, *Sensor Nomor Rumah*, *Sensor Wajah*).
-   - 4 mode penghancuran raster permanen: **Mozaik Piksel (`Pixelate`)**, **Blur Halus (`Gaussian Blur`)**, **Blok Hitam (`Blackout`)**, dan **Blok Putih (`Whiteout`)** yang tidak bisa di-*unblur*.
-3. **03 • Kompresor Target KB Presisi & Pemotong Rasio Pasfoto**
-   - Algoritma *Binary Search JPEG Quality + Progressive Scaling* untuk mengejar batas ukuran file ketat portal Indonesia: **≤ 100 KB**, **≤ 200 KB**, **≤ 300 KB**, **≤ 500 KB**, atau kustom.
-   - Pemotong rasio otomatis: **KTP Standar**, **Pasfoto 3×4**, **4×6**, **1×1**, serta opsi warna latar belakang merah (`#dc2626`), biru (`#0284c7`), atau putih.
-4. **04 • Penggabung Gambar & Berkas ke PDF (`pdf-lib`)**
-   - Susun KTP + NPWP dalam **1 halaman A4 (2 Kartu/Halaman)**, **A4 Standar (1 Dokumen/Halaman)**, atau ukuran asli gambar tanpa keluar dari browser.
-5. **Pembersih Otomatis Metadata EXIF & GPS**
-   - Setiap foto dokumen yang dimuat otomatis melewati proses *canvas re-encoding* yang menghapus koordinat lokasi GPS rumah, seri perangkat, dan jam pemotretan kamera.
+### 1. Watermark KTP Pintar (Anti-Penyalahgunaan)
+- **Preset Instan:** Verifikasi Fintech/Bank, Daftar Kerja/HRD, Verifikasi E-Wallet, atau Sewa Kost/Properti dengan cap tanggal otomatis hari ini (`DD MMM YYYY`).
+- **Dual Mode:**
+  - *Single Diagonal:* Teks watermark miring di tengah dokumen dengan rotasi yang dapat disesuaikan (`-60°` s/d `60°`).
+  - *Tiled Pattern:* Pola berulang di seluruh kanvas untuk mencegah pemotongan (*cropping*) oleh pihak yang tidak bertanggung jawab.
+- **Kustomisasi Presisi:** Teks 2 baris (tujuan & tanggal), ukuran huruf, ketebalan/opasitas, rotasi, serta 6 pilihan warna (Hitam Arsip, Merah Dokumen, Biru Tinta, Hijau Segel, Abu Slate, Putih Bersih).
 
----
+### 2. Sensor & Tutup NIK / Data Pribadi (Redaction)
+- **Sensor Interaktif:** Klik & seret langsung di atas kanvas dokumen (mendukung mouse dan sentuhan layar) untuk menandai area sensitif seperti NIK 16 digit, Alamat, atau Tanda Tangan.
+- **Gaya Penyensoran Permanen:** Blok Solid Hitam, Blok Putih, atau Pixelate Permanen (menghancurkan piksel asli secara permanen saat diekspor ke PNG/JPEG agar tidak bisa dibalikkan).
+- **Pintasan Cepat:** Tambah kotak sensor tepat di posisi standar NIK KTP atau area Tanda Tangan dengan satu klik, serta kontrol hapus per kotak atau bersihkan semua.
 
-## 🔒 Arsitektur Keamanan Zero-Upload
+### 3. Kompresor Target Ukuran KB & Rasio Pas Foto
+- **Target Otomatis Cerdas:** Pilih batas ukuran (`<= 100 KB`, `<= 200 KB`, `<= 500 KB`, atau `<= 1 MB`) untuk memenuhi syarat portal SSCASN CPNS, Rekrutmen BUMN, atau formulir unggah ketat lainnya. Algoritma *binary search* menyesuaikan rasio kompresi JPEG dan skala resolusi secara berulang hingga tepat di bawah batas target.
+- **Crop & Bingkai Pas Foto:** Bebas (Asli), Rasio `3:4` (Pas Foto standar dengan opsi warna latar Merah `#D91E18`, Biru `#0052CC`, atau Putih `#FFFFFF`), serta rasio KTP `1.58:1`.
+- **Perbandingan Metrik Lokal:** Menampilkan ukuran asli vs hasil kompresi, persentase penghematan, serta resolusi akhir.
 
-- **Strict Content Security Policy (`public/_headers`):** Membatasi `connect-src 'self'` untuk memastikan tidak ada skrip atau koneksi jaringan keluar yang dapat mengirim dokumen keluar dari browser.
-- **In-Memory Pipeline Chaining:** Hasil dari Tab Watermark otomatis diteruskan ke Tab Sensor, Tab Kompresor KB, hingga Antrean PDF tanpa perlu mengunduh dan mengunggah ulang berkas berulang kali.
-- **Simulasi KTP Instan:** Dilengkapi generator KTP sintetis di memori browser sehingga pengguna dapat langsung menguji seluruh fitur tanpa harus mengunggah KTP asli terlebih dahulu.
-
----
-
-## 🛠️ Teknologi
-
-- **Framework:** [Astro 5](https://astro.build/) + [React 18](https://react.dev/)
-- **Bahasa:** TypeScript (`strict`)
-- **Styling:** Tailwind CSS + Custom Security Vault Theme (`Plus Jakarta Sans` & `JetBrains Mono`)
-- **Mesin Dokumen Lokal:** HTML5 Canvas 2D API & [`pdf-lib`](https://pdf-lib.js.org/)
-- **Deployment & CI/CD:** GitHub Actions + Cloudflare Workers (`dokumen.ritonga.ai.id`)
+### 4. Gabung Banyak Gambar ke PDF
+- **Penggabung Lokal (`pdf-lib`):** Tambahkan beberapa dokumen sekaligus (misalnya KTP + KK + Ijazah), urutkan naik/turun atau hapus item, lalu gabungkan menjadi 1 dokumen PDF.
+- **Pilihan Tata Letak Cetak:**
+  - *A4 Portrait:* Satu dokumen terpusat per halaman A4.
+  - *A4 Kartu Identitas (2 per halaman):* Menggabungkan dua kartu (seperti KTP + KK atau tampak depan & belakang) sejajar vertikal dalam 1 halaman A4.
+  - *Sesuai Ukuran Gambar:* Halaman PDF mengikuti rasio aspek dan resolusi asli setiap gambar.
 
 ---
 
-## 🚀 Menjalankan Secara Lokal
+## Arsitektur Teknis & Privasi (Zero-Upload)
+
+- **Framework:** [Astro](https://astro.build/) v4 + [React](https://react.dev/) 18 + [TypeScript](https://www.typescriptlang.org/) + [Tailwind CSS](https://tailwindcss.com/)
+- **Pemrosesan Gambar:** HTML5 `<canvas>` 2D context untuk merender gambar dengan resolusi terkelola (`MAX_CANVAS_DIM = 2400px`) serta membersihkan EXIF GPS/kamera saat ekspor.
+- **Pembuatan PDF:** [pdf-lib](https://pdf-lib.js.org/) sepenuhnya di peramban.
+- **Isolasi Memori Sesi:** Tidak menggunakan `localStorage` atau `IndexedDB` untuk menyimpan gambar dokumen. Tombol **"Kosongkan Meja"** mencabut seluruh Object URLs dan membersihkan buffer kanvas dari memori.
+- **Kebijakan Keamanan Konten (CSP):** Memblokir koneksi eksternal yang tidak diperlukan untuk memastikan proses tetap berjalan di perangkat pengguna.
+
+---
+
+## Pengembangan Lokal
 
 ```bash
-# 1. Instal dependensi
+# Masuk ke direktori proyek
+cd amandok
+
+# Instal dependensi
 npm install
 
-# 2. Jalankan server pengembangan lokal
+# Jalankan server pengembangan
 npm run dev
 
-# 3. Verifikasi tipe TypeScript & bangun produksi
+# Cek tipe & bangun berkas statis (./dist)
 npm run build
 ```
 
 ---
 
-## 👨‍💻 Pengembang
+## Catatan
 
-Dirancang dan dikembangkan oleh **[Ando Ritonga](https://ando.ritonga.ai.id)**.
+Proyek ini dibuat sebagai alat bantu publik untuk mengurangi risiko penyalahgunaan data kependudukan di era digital. Pengembang tidak mengumpulkan, menyimpan, atau memiliki akses terhadap dokumen apa pun yang Anda proses di AmanDok.

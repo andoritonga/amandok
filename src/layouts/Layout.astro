@@ -4,119 +4,126 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
-  canonicalPath?: string;
+  studioMode?: boolean;
 }
 
 const {
-  title = 'AmanDok — Cyber-Vault Studio Privasi KTP & Dokumen 100% Lokal (Tanpa Upload)',
-  description = 'Toolkit privasi dokumen #1 di Indonesia: beri watermark KTP anti-pinjol, sensor NIK & tanda tangan, kompres foto sesuai target KB (CPNS/BUMN), dan gabung PDF 100% di browser tanpa upload server.',
-  canonicalPath = '/',
+  title = 'AmanDok - Studio Privasi Dokumen & Watermark KTP 100% Lokal',
+  description = 'Lindungi KTP, KK, dan Ijazah langsung di peramban (Zero-Upload). Beri watermark anti-pinjol, sensor NIK & tanda tangan permanen, kompres target KB CPNS/BUMN, dan gabungkan ke PDF.',
+  studioMode = false,
 } = Astro.props;
 
-const siteUrl = 'https://dokumen.ritonga.ai.id';
-const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
-const ogImageUrl = `${siteUrl}/og-image.svg`;
+const canonicalURL = new URL(Astro.url.pathname, 'https://dokumen.ritonga.ai.id');
+const ogImageURL = new URL('/og-image.svg', 'https://dokumen.ritonga.ai.id');
 
-const schemaOrg = {
+const schemaJson = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'AmanDok',
-  url: siteUrl,
   applicationCategory: 'SecurityApplication',
-  operatingSystem: 'Any (Web Browser / PWA)',
+  operatingSystem: 'Any (Web Browser)',
+  url: 'https://dokumen.ritonga.ai.id',
   offers: {
     '@type': 'Offer',
     price: '0',
     priceCurrency: 'IDR',
   },
-  description,
+  description:
+    'Aplikasi web utilitas privasi dokumen 100% client-side untuk watermark KTP anti-pinjol, penyensoran data sensitif permanen, kompresor foto target KB, dan penggabung PDF A4.',
   author: {
     '@type': 'Person',
-    name: 'Ando Ritonga',
+    name: 'Yohannes Christiando Ritonga',
     url: 'https://ritonga.ai.id',
   },
-};
+  inLanguage: ['id-ID', 'en-US'],
+});
 ---
 
 <!doctype html>
-<html lang="id" class="dark scroll-smooth">
+<html lang="id" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="canonical" href={canonicalURL.toString()} />
+    <meta name="theme-color" content="#f1f5f9" id="amandok-theme-color" />
+    <meta name="generator" content={Astro.generator} />
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta
       name="keywords"
-      content="watermark ktp, watermark ktp online aman, sensor nik ktp, kompres foto 200kb cpns, gabung ktp npwp jadi pdf, tanpa upload server, amandok"
+      content="watermark ktp online aman, sensor nik ktp, kompres foto 100kb cpns, kompres foto bumn, gabung foto ke pdf tanpa upload, amandok, privasi dokumen"
     />
-    <meta name="author" content="Ando Ritonga" />
-    <link rel="canonical" href={canonicalUrl} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="theme-color" content="#0B0F17" id="meta-theme-color" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="AmanDok" />
-    <meta name="mobile-web-app-capable" content="yes" />
 
-    <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:url" content={canonicalURL.toString()} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image" content={ogImageURL.toString()} />
     <meta property="og:locale" content="id_ID" />
 
-    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image" content={ogImageURL.toString()} />
 
-    <!-- Clean Typography: Plus Jakarta Sans & JetBrains Mono -->
+    <script type="application/ld+json" set:html={schemaJson} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
-    <script type="application/ld+json" set:html={JSON.stringify(schemaOrg)} />
     <script is:inline>
       (function () {
+        function applyTheme(dark) {
+          var root = document.documentElement;
+          if (dark) {
+            root.classList.add('dark');
+          } else {
+            root.classList.remove('dark');
+          }
+          var meta = document.getElementById('amandok-theme-color');
+          if (meta) {
+            meta.setAttribute('content', dark ? '#090d16' : '#f1f5f9');
+          }
+        }
         try {
           var savedTheme = localStorage.getItem('amandok_theme');
-          // Default to Cyber-Vault Dark mode unless user explicitly chose 'light'
-          var isDark = savedTheme ? savedTheme === 'dark' : true;
-          var meta = document.getElementById('meta-theme-color');
-          if (isDark) {
-            document.documentElement.classList.add('dark');
-            if (meta) meta.setAttribute('content', '#0B0F17');
-          } else {
-            document.documentElement.classList.remove('dark');
-            if (meta) meta.setAttribute('content', '#F4F6F9');
+          var prefersDark =
+            typeof window !== 'undefined' &&
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+          applyTheme(isDark);
+        } catch (e) {
+          applyTheme(false);
+        }
+        try {
+          var savedLang = localStorage.getItem('amandok_lang');
+          if (savedLang === 'en' || savedLang === 'id') {
+            document.documentElement.lang = savedLang;
           }
         } catch (e) {}
-
-        if ('serviceWorker' in navigator) {
-          window.addEventListener('load', function () {
-            navigator.serviceWorker.register('/sw.js').catch(function () {});
-          });
-        }
       })();
     </script>
   </head>
-  <body class="h-[100dvh] w-screen overflow-hidden flex flex-col select-none">
-    <a
-      href="#studio"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-emerald-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
-    >
-      Langsung ke Studio Dokumen
-    </a>
+  <body
+    class={`min-h-dvh flex flex-col overflow-x-hidden antialiased ${
+      studioMode ? 'lg:h-dvh lg:overflow-hidden' : ''
+    }`}
+  >
     <slot />
+    <script is:inline>
+      if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+      }
+    </script>
   </body>
 </html>

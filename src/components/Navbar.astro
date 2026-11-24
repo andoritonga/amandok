@@ -1,214 +1,173 @@
 ---
 ---
 
-<header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl transition-colors dark:border-slate-800/80 dark:bg-slate-950/85">
-  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
-    <!-- Brand Identity -->
+<header class="sticky top-0 z-40 studio-header">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 min-h-[56px] flex items-center justify-between gap-3">
     <a
       href="/"
-      class="group flex items-center gap-3 focus:outline-none"
-      aria-label="AmanDok Beranda"
+      class="inline-flex items-center gap-2.5 min-h-[44px] py-1.5 rounded-lg group"
     >
-      <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 transition group-hover:border-emerald-500/50 group-hover:bg-emerald-500/15 dark:text-emerald-400">
+      <span
+        class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+        style="background-color: var(--accent-surface); border: 1px solid var(--accent-border);"
+      >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4"
+          style="color: var(--accent-text);"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2.2"
+          stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="h-5 w-5"
+          aria-hidden="true"
         >
-          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <path d="m9 12 2 2 4-4" />
         </svg>
-      </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Aman<span class="text-emerald-600 dark:text-emerald-400">Dok</span>
-          </span>
-          <span class="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
-            100% LOKAL
-          </span>
-        </div>
-        <p
-          class="hidden text-xs text-slate-500 dark:text-slate-400 sm:block"
-          data-i18n-id="Studio Privasi KTP & Dokumen Tanpa Upload"
-          data-i18n-en="Zero-Upload ID & Document Privacy Studio"
+      </span>
+      <span class="flex flex-col leading-tight">
+        <span class="text-sm font-bold tracking-tight" style="color: var(--text-primary);">
+          AmanDok
+        </span>
+        <span
+          class="text-xs"
+          style="color: var(--text-muted);"
+          data-i18n-id="Studio Privasi Lokal"
+          data-i18n-en="Local Privacy Studio"
         >
-          Studio Privasi KTP & Dokumen Tanpa Upload
-        </p>
-      </div>
+          Studio Privasi Lokal
+        </span>
+      </span>
     </a>
 
-    <!-- Navigation, Language Switcher & Theme Toggle -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <nav class="hidden items-center gap-1 md:flex" aria-label="Navigasi Utama">
-        <a
-          href="#studio"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"
-          data-i18n-id="Studio Dokumen"
-          data-i18n-en="Document Studio"
-        >
-          Studio Dokumen
-        </a>
-        <a
-          href="#jaminan-privasi"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"
-          data-i18n-id="Jaminan Privasi"
-          data-i18n-en="Privacy Guarantee"
-        >
-          Jaminan Privasi
-        </a>
-        <a
-          href="#panduan"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"
-          data-i18n-id="Panduan Ukuran"
-          data-i18n-en="Size Guide"
-        >
-          Panduan Ukuran
-        </a>
-      </nav>
-
-      <!-- Bilingual Segmented Pill (ID / EN) -->
-      <div class="inline-flex items-center rounded-xl border border-slate-200 bg-slate-100 p-0.5 dark:border-slate-800 dark:bg-slate-900">
-        <button
-          type="button"
-          id="lang-btn-id"
-          class="rounded-lg bg-white px-2.5 py-1 font-mono text-xs font-bold text-slate-900 shadow-sm transition dark:bg-emerald-500 dark:text-slate-950"
-          aria-label="Bahasa Indonesia"
-        >
-          ID
-        </button>
-        <button
-          type="button"
-          id="lang-btn-en"
-          class="rounded-lg px-2.5 py-1 font-mono text-xs font-semibold text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-          aria-label="English"
-        >
-          EN
-        </button>
-      </div>
-
-      <!-- Dark / Light Theme Toggle -->
+    <div class="flex items-center gap-2">
       <button
         type="button"
-        id="theme-toggle-btn"
-        class="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-        aria-label="Ganti Tema Gelap atau Terang"
-        title="Ganti Tema (Terang / Gelap)"
+        id="nav-lang-toggle"
+        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-3 rounded-lg text-xs font-bold border transition-transform active:scale-[0.97]"
+        style="background-color: var(--bg-subtle); border-color: var(--border-subtle); color: var(--text-primary);"
+        aria-label="Ubah bahasa ke English"
       >
-        <!-- Sun Icon (shown in dark mode) -->
+        ID / EN
+      </button>
+
+      <button
+        type="button"
+        id="nav-theme-toggle"
+        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg border transition-transform active:scale-[0.97]"
+        style="background-color: var(--bg-subtle); border-color: var(--border-subtle); color: var(--text-primary);"
+        aria-label="Ubah tema warna"
+      >
         <svg
-          id="theme-icon-sun"
-          xmlns="http://www.w3.org/2000/svg"
+          id="nav-icon-sun"
+          class="w-4 h-4 hidden dark:block"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="hidden h-4 w-4 text-amber-400"
+          aria-hidden="true"
         >
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2"></path>
-          <path d="M12 20v2"></path>
-          <path d="m4.93 4.93 1.41 1.41"></path>
-          <path d="m17.66 17.66 1.41 1.41"></path>
-          <path d="M2 12h2"></path>
-          <path d="M20 12h2"></path>
-          <path d="m6.34 17.66-1.41 1.41"></path>
-          <path d="m19.07 4.93-1.41 1.41"></path>
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
         </svg>
-        <!-- Moon Icon (shown in light mode) -->
         <svg
-          id="theme-icon-moon"
-          xmlns="http://www.w3.org/2000/svg"
+          id="nav-icon-moon"
+          class="w-4 h-4 block dark:hidden"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="h-4 w-4"
+          aria-hidden="true"
         >
-          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
         </svg>
       </button>
     </div>
   </div>
 </header>
 
-<script>
-  function setupNavbarControls() {
-    const btnId = document.getElementById('lang-btn-id');
-    const btnEn = document.getElementById('lang-btn-en');
-    const themeBtn = document.getElementById('theme-toggle-btn');
-    const iconSun = document.getElementById('theme-icon-sun');
-    const iconMoon = document.getElementById('theme-icon-moon');
-    const metaTheme = document.getElementById('meta-theme-color');
-
-    const activePillClass =
-      'rounded-lg bg-white px-2.5 py-1 font-mono text-xs font-bold text-slate-900 shadow-sm transition dark:bg-emerald-500 dark:text-slate-950';
-    const inactivePillClass =
-      'rounded-lg px-2.5 py-1 font-mono text-xs font-semibold text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white';
-
-    const applyLang = (lang: 'id' | 'en') => {
-      localStorage.setItem('amandok_lang', lang);
-      window.dispatchEvent(new CustomEvent('amandok-lang-change', { detail: lang }));
-
-      if (btnId && btnEn) {
-        if (lang === 'id') {
-          btnId.className = activePillClass;
-          btnEn.className = inactivePillClass;
-        } else {
-          btnEn.className = activePillClass;
-          btnId.className = inactivePillClass;
-        }
+<script is:inline>
+  (function () {
+    function getLang() {
+      try {
+        var saved = localStorage.getItem('amandok_lang');
+        return saved === 'en' ? 'en' : 'id';
+      } catch (e) {
+        return 'id';
       }
-
-      document.querySelectorAll<HTMLElement>('[data-i18n-id]').forEach((el) => {
-        const text = lang === 'id' ? el.getAttribute('data-i18n-id') : el.getAttribute('data-i18n-en');
-        if (text) el.textContent = text;
-      });
-    };
-
-    const syncThemeIcons = (isDark: boolean) => {
-      if (isDark) {
-        iconSun?.classList.remove('hidden');
-        iconMoon?.classList.add('hidden');
-        metaTheme?.setAttribute('content', '#090D16');
-      } else {
-        iconSun?.classList.add('hidden');
-        iconMoon?.classList.remove('hidden');
-        metaTheme?.setAttribute('content', '#F8FAFC');
-      }
-    };
-
-    const applyTheme = (theme: 'light' | 'dark') => {
-      const isDark = theme === 'dark';
-      document.documentElement.classList.toggle('dark', isDark);
-      localStorage.setItem('amandok_theme', theme);
-      syncThemeIcons(isDark);
-      window.dispatchEvent(new CustomEvent('amandok-theme-change', { detail: theme }));
-    };
-
-    syncThemeIcons(document.documentElement.classList.contains('dark'));
-
-    const saved = localStorage.getItem('amandok_lang');
-    if (saved === 'en') {
-      applyLang('en');
     }
 
-    btnId?.addEventListener('click', () => applyLang('id'));
-    btnEn?.addEventListener('click', () => applyLang('en'));
-    themeBtn?.addEventListener('click', () => {
-      const isCurrentlyDark = document.documentElement.classList.contains('dark');
-      applyTheme(isCurrentlyDark ? 'light' : 'dark');
-    });
-  }
+    function applyLang(lang) {
+      document.documentElement.lang = lang;
+      try {
+        localStorage.setItem('amandok_lang', lang);
+      } catch (e) {}
 
-  setupNavbarControls();
+      var langBtn = document.getElementById('nav-lang-toggle');
+      if (langBtn) {
+        langBtn.textContent = lang.toUpperCase();
+        langBtn.setAttribute(
+          'aria-label',
+          lang === 'id' ? 'Ubah bahasa ke English' : 'Switch language to Indonesian'
+        );
+      }
+
+      var themeBtn = document.getElementById('nav-theme-toggle');
+      if (themeBtn) {
+        var isDark = document.documentElement.classList.contains('dark');
+        themeBtn.setAttribute(
+          'aria-label',
+          lang === 'id'
+            ? isDark
+              ? 'Aktifkan mode terang'
+              : 'Aktifkan mode gelap'
+            : isDark
+              ? 'Switch to light theme'
+              : 'Switch to dark theme'
+        );
+      }
+
+      document.querySelectorAll('[data-i18n-id]').forEach(function (el) {
+        var next = lang === 'en' ? el.getAttribute('data-i18n-en') : el.getAttribute('data-i18n-id');
+        if (next) el.textContent = next;
+      });
+    }
+
+    function toggleTheme() {
+      var isDark = document.documentElement.classList.contains('dark');
+      var next = !isDark;
+      if (next) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      var meta = document.getElementById('amandok-theme-color');
+      if (meta) {
+        meta.setAttribute('content', next ? '#090d16' : '#f1f5f9');
+      }
+      try {
+        localStorage.setItem('amandok_theme', next ? 'dark' : 'light');
+      } catch (e) {}
+      applyLang(getLang());
+    }
+
+    var langBtn = document.getElementById('nav-lang-toggle');
+    if (langBtn) {
+      langBtn.addEventListener('click', function () {
+        applyLang(getLang() === 'id' ? 'en' : 'id');
+      });
+    }
+
+    var themeBtn = document.getElementById('nav-theme-toggle');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', toggleTheme);
+    }
+
+    applyLang(getLang());
+  })();
 </script>

@@ -1,13 +1,13 @@
 {
-  "name": "AmanDok — Cyber-Vault Studio Privasi KTP & Dokumen",
+  "name": "AmanDok - Studio Privasi KTP & Dokumen",
   "short_name": "AmanDok",
   "description": "Studio privasi dokumen 100% lokal (Zero-Upload): Watermark KTP anti-pinjol, sensor piksel NIK & tanda tangan, kompresor target KB CPNS/BUMN, dan penggabung PDF A4.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0B0F17",
-  "theme_color": "#0B0F17",
+  "background_color": "#f1f5f9",
+  "theme_color": "#f1f5f9",
   "categories": ["security", "productivity", "utilities"],
   "icons": [
     {

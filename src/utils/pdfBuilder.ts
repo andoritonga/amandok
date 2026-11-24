@@ -34,7 +34,7 @@ export async function buildCombinedPdf(
   layout: PdfPageLayout
 ): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
-  pdfDoc.setProducer('AmanDok — 100% Client-Side Document Privacy Toolkit');
+  pdfDoc.setProducer('AmanDok - 100% Client-Side Document Privacy Toolkit');
   pdfDoc.setCreator('dokumen.ritonga.ai.id');
 
   if (layout === 'a4-id-cards') {

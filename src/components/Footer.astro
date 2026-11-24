@@ -1,114 +1,148 @@
 ---
-const year = new Date().getFullYear();
+const currentYear = new Date().getFullYear();
 ---
 
-<footer class="mt-20 border-t border-slate-200/80 bg-white text-slate-600 transition-colors dark:border-slate-800/80 dark:bg-slate-950 dark:text-slate-400">
-  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-12">
-      <!-- Brand Summary -->
-      <div class="md:col-span-5">
-        <div class="flex items-center gap-2.5">
-          <div class="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+<footer
+  class="mt-auto border-t transition-colors"
+  style="background-color: var(--bg-surface); border-color: var(--border-subtle);"
+>
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 border-b" style="border-color: var(--border-subtle);">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2">
+          <span
+            class="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
+            style="background-color: var(--accent-surface); border: 1px solid var(--accent-border);"
+          >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+              class="w-3.5 h-3.5"
+              style="color: var(--accent-text);"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2.2"
+              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="h-4 w-4"
+              aria-hidden="true"
             >
-              <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               <path d="m9 12 2 2 4-4" />
             </svg>
-          </div>
-          <span class="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Aman<span class="text-emerald-600 dark:text-emerald-400">Dok</span>
           </span>
+          <span class="text-sm font-bold" style="color: var(--text-primary);">AmanDok</span>
         </div>
         <p
-          class="mt-3 max-w-sm text-xs leading-relaxed text-slate-500 dark:text-slate-400"
-          data-i18n-id="Aplikasi web mandiri untuk memberi watermark KTP, menyensor NIK & tanda tangan, mengompres berkas lamaran sesuai batas KB, dan menggabungkan PDF 100% di dalam browser tanpa upload ke server."
-          data-i18n-en="Self-contained web studio for ID card watermarking, permanent pixel redaction, target-KB compression, and A4 PDF merging strictly inside your browser."
+          class="text-xs leading-relaxed"
+          style="color: var(--text-secondary);"
+          data-i18n-id="Studio privasi dokumen 100% lokal (Zero-Upload). Dirancang untuk mengamankan KTP, KK, dan ijazah sebelum dikirim secara daring."
+          data-i18n-en="100% local (Zero-Upload) document privacy studio. Built to protect ID cards, certificates, and forms before sharing online."
         >
-          Aplikasi web mandiri untuk memberi watermark KTP, menyensor NIK & tanda tangan, mengompres berkas lamaran sesuai batas KB, dan menggabungkan PDF 100% di dalam browser tanpa upload ke server.
+          Studio privasi dokumen 100% lokal (Zero-Upload). Dirancang untuk mengamankan KTP, KK, dan ijazah sebelum dikirim secara daring.
         </p>
       </div>
 
-      <!-- Capabilities -->
-      <div class="md:col-span-4">
-        <h3
-          class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-200"
-          data-i18n-id="Fitur Utama"
-          data-i18n-en="Core Capabilities"
+      <div class="space-y-2">
+        <h2
+          class="text-xs font-bold"
+          style="color: var(--text-primary);"
+          data-i18n-id="Jaminan Privasi Lokal"
+          data-i18n-en="Local Privacy Guarantees"
         >
-          Fitur Utama
-        </h3>
-        <ul class="mt-3 space-y-2 text-xs text-slate-500 dark:text-slate-400">
-          <li>• Watermark KTP Anti-Pinjol (Rapat, Stempel & Pita)</li>
-          <li>• Sensor Piksel Permanen NIK, Alamat & Tanda Tangan</li>
-          <li>• Kompresor Target KB Presisi (100KB / 200KB / 300KB)</li>
-          <li>• Gabung KTP, NPWP & Berkas ke Lembar PDF A4</li>
+          Jaminan Privasi Lokal
+        </h2>
+        <ul class="space-y-1.5 text-xs" style="color: var(--text-secondary);">
+          <li
+            data-i18n-id="Nol byte gambar dikirim atau disimpan di server."
+            data-i18n-en="Zero image bytes are sent to or stored on any server."
+          >
+            Nol byte gambar dikirim atau disimpan di server.
+          </li>
+          <li
+            data-i18n-id="Metadata kamera dan koordinat GPS EXIF dibersihkan saat ekspor."
+            data-i18n-en="Camera EXIF and GPS coordinates are stripped on export."
+          >
+            Metadata kamera dan koordinat GPS EXIF dibersihkan saat ekspor.
+          </li>
+          <li
+            data-i18n-id="Sensor piksel dan watermark menyatu permanen menjadi piksel datar."
+            data-i18n-en="Redaction boxes and watermarks are flattened permanently into pixels."
+          >
+            Sensor piksel dan watermark menyatu permanen menjadi piksel datar.
+          </li>
         </ul>
       </div>
 
-      <!-- Developer & Links -->
-      <div class="md:col-span-3">
-        <h3
-          class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-200"
-          data-i18n-id="Pengembang & Tautan"
-          data-i18n-en="Developer & Links"
+      <div class="space-y-2">
+        <h2
+          class="text-xs font-bold"
+          style="color: var(--text-primary);"
+          data-i18n-id="Ekosistem Terkait"
+          data-i18n-en="Related Tools"
         >
-          Pengembang & Tautan
-        </h3>
-        <ul class="mt-3 space-y-2 text-xs">
-          <li>
-            <a
-              href="https://ritonga.ai.id"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="transition hover:text-emerald-600 dark:hover:text-emerald-400"
-            >
-              Ando (ritonga.ai.id) ↗
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://github.com/andoritonga/amandok"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="transition hover:text-emerald-600 dark:hover:text-emerald-400"
-            >
-              Kode Sumber (GitHub) ↗
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://gaji.ritonga.ai.id"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="transition hover:text-emerald-600 dark:hover:text-emerald-400"
-            >
-              HitungGaji.id (Kalkulator PPh 21) ↗
-            </a>
-          </li>
-        </ul>
+          Ekosistem Terkait
+        </h2>
+        <div class="flex flex-col gap-1 text-xs">
+          <a
+            href="/"
+            class="inline-flex items-center min-h-[44px] font-medium hover:underline"
+            style="color: var(--accent-text);"
+            data-i18n-id="Buka Studio AmanDok"
+            data-i18n-en="Open AmanDok Studio"
+          >
+            Buka Studio AmanDok
+          </a>
+          <a
+            href="https://gaji.ritonga.ai.id"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center min-h-[44px] hover:underline"
+            style="color: var(--text-secondary);"
+            data-i18n-id="Kalkulator Gaji Bersih & PPh 21"
+            data-i18n-en="Indonesia Net Salary & PPh 21 Calculator"
+          >
+            Kalkulator Gaji Bersih & PPh 21
+          </a>
+          <a
+            href="https://ritonga.ai.id"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center min-h-[44px] hover:underline"
+            style="color: var(--text-secondary);"
+            data-i18n-id="Portofolio Yohannes C. Ritonga"
+            data-i18n-en="Yohannes C. Ritonga Portfolio"
+          >
+            Portofolio Yohannes C. Ritonga
+          </a>
+        </div>
       </div>
     </div>
 
-    <div class="mt-8 flex flex-col items-center justify-between gap-3 border-t border-slate-200/80 pt-6 text-xs text-slate-500 dark:border-slate-800/80 dark:text-slate-400 sm:flex-row">
+    <div
+      class="pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
+      style="color: var(--text-muted);"
+    >
+      <p
+        data-i18n-id={`© ${currentYear} AmanDok. Bebas pelacak dan 100% di peramban.`}
+        data-i18n-en={`© ${currentYear} AmanDok. Tracker-free and 100% in your browser.`}
+      >
+        © {currentYear} AmanDok. Bebas pelacak dan 100% di peramban.
+      </p>
       <p>
-        © {year} AmanDok • Built by{' '}
+        <span
+          data-i18n-id="Dibangun oleh "
+          data-i18n-en="Engineered by "
+        >
+          Dibangun oleh{' '}
+        </span>
         <a
           href="https://ritonga.ai.id"
-          class="font-semibold text-slate-700 hover:text-emerald-600 dark:text-slate-200 dark:hover:text-emerald-400"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-semibold hover:underline"
+          style="color: var(--text-primary);"
         >
-          Ando
+          Yohannes C. Ritonga
         </a>
-      </p>
-      <p class="font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-        100% Client-Side • Zero Server Upload • Zero Cloud Storage
       </p>
     </div>
   </div>

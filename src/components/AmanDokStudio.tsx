@@ -1,613 +1,882 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Stamp,
-  EyeOff,
-  Minimize2,
-  FileStack,
-  Upload,
+  AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  Check,
   Download,
-  RotateCw,
-  Trash2,
-  Sparkles,
-  ArrowRight,
-  Plus,
-  CheckCircle2,
-  WifiOff,
-  FileText,
-  MoveUp,
-  MoveDown,
-  Layers,
-  ShieldCheck,
-  Crosshair,
-  Sun,
-  Moon,
+  Eraser,
+  EyeOff,
+  FilePlus2,
+  FileStack,
+  Gauge,
+  Languages,
   Lock,
-  Info,
+  Moon,
+  Plus,
+  RotateCw,
+  ShieldCheck,
+  Stamp,
+  Sun,
+  Trash2,
+  Upload,
   X,
-  SlidersHorizontal,
-  Cpu,
-  HardDriveDownload,
 } from 'lucide-react';
 import {
-  type WatermarkConfig,
-  type WatermarkMode,
-  type RedactionBox,
-  type RedactionStyle,
-  type CropPreset,
-  type CompressionResult,
+  compressToTargetKb,
   formatBytes,
+  generateSampleKtpDataUrl,
   loadNormalizedImage,
   renderDocumentCanvas,
-  compressToTargetKb,
-  generateSampleKtpDataUrl,
+  type CompressionResult,
+  type CropPreset,
+  type RedactionBox,
+  type RedactionStyle,
+  type WatermarkConfig,
+  type WatermarkMode,
 } from '../utils/imageProcessor';
 import {
-  type PdfQueueItem,
-  type PdfPageLayout,
   buildCombinedPdf,
+  type PdfPageLayout,
+  type PdfQueueItem,
 } from '../utils/pdfBuilder';
 
 type StudioTab = 'watermark' | 'redact' | 'compress' | 'pdf';
-export type Lang = 'id' | 'en';
+type Lang = 'id' | 'en';
 
-const WATERMARK_PRESETS: {
-  id: string;
-  labelId: string;
-  labelEn: string;
-  textId: string;
-  textEn: string;
-}[] = [
-  {
-    id: 'bank',
-    labelId: 'Verifikasi Bank / KPR',
-    labelEn: 'Bank / Mortgage',
-    textId: 'HANYA UNTUK VERIFIKASI BANK',
-    textEn: 'FOR BANK VERIFICATION ONLY',
-  },
-  {
-    id: 'hrd',
-    labelId: 'Lamaran Kerja / HRD',
-    labelEn: 'HR Recruitment',
-    textId: 'KHUSUS REKRUTMEN HRD PERUSAHAAN',
-    textEn: 'FOR HR RECRUITMENT ONLY',
-  },
-  {
-    id: 'cpns',
-    labelId: 'Seleksi CPNS / BUMN',
-    labelEn: 'SSCASN / SOE Portal',
-    textId: 'KHUSUS PENDAFTARAN SSCASN / BUMN',
-    textEn: 'FOR SSCASN / SOE REGISTRATION ONLY',
-  },
-  {
-    id: 'rental',
-    labelId: 'Sewa Properti / Kos',
-    labelEn: 'Property Rental',
-    textId: 'HANYA UNTUK ADMINISTRASI SEWA',
-    textEn: 'FOR RENTAL ADMINISTRATION ONLY',
-  },
-  {
-    id: 'telco',
-    labelId: 'Registrasi Mitra Resmi',
-    labelEn: 'Partner Onboarding',
-    textId: 'VERIFIKASI MITRA RESMI — DILARANG MENYALAHGUNAKAN',
-    textEn: 'OFFICIAL PARTNER VERIFICATION ONLY',
-  },
-];
+interface LoadedDocument {
+  dataUrl: string;
+  width: number;
+  height: number;
+  originalBytes: number;
+  fileName: string;
+  isSample: boolean;
+}
 
-const WATERMARK_COLORS = [
-  { id: 'crimson', label: 'Merah Segel (#e11d48)', hex: '#e11d48' },
-  { id: 'cobalt', label: 'Biru Resmi (#0284c7)', hex: '#0284c7' },
-  { id: 'emerald', label: 'Hijau Verifikasi (#059669)', hex: '#059669' },
-  { id: 'slate', label: 'Hitam Arsip (#0f172a)', hex: '#0f172a' },
-  { id: 'amber', label: 'Kuning Otorisasi (#d97706)', hex: '#d97706' },
-  { id: 'white', label: 'Putih Kontras (#f8fafc)', hex: '#f8fafc' },
-];
+const VALID_TABS: StudioTab[] = ['watermark', 'redact', 'compress', 'pdf'];
+
+const TEXT = {
+  id: {
+    brandSub: 'Studio Privasi Lokal',
+    privacyBtn: 'Privasi',
+    privacyAria: 'Buka rincian arsitektur privasi lokal',
+    langAria: 'Ubah bahasa ke English',
+    themeDarkAria: 'Aktifkan mode gelap',
+    themeLightAria: 'Aktifkan mode terang',
+    wipeBtn: 'Kosongkan Meja',
+    wipeAria: 'Kosongkan seluruh dokumen dari memori peramban',
+    sampleNotice:
+      'Sedang menampilkan contoh KTP sintetis. Unggah dokumen asli Anda untuk mulai memproses secara lokal.',
+    uploadRealBtn: 'Unggah Dokumen Asli',
+    sampleBadge: 'Contoh Sintetis',
+    emptyTitle: 'Meja Dokumen Kosong',
+    emptyDesc:
+      'Semua pemrosesan berjalan 100% di peramban Anda. Nol byte dokumen dikirim atau disimpan di server mana pun.',
+    emptyChooseBtn: 'Pilih Gambar dari Perangkat',
+    emptySampleBtn: 'Muat Contoh KTP Sintetis',
+    changeImage: 'Ganti Gambar',
+    rotateBtn: 'Putar 90°',
+    exportImgBtn: 'Unduh Gambar',
+    addToPdfBtn: 'Tambah ke Antrean PDF',
+    loadingImage: 'Membaca dan membersihkan metadata EXIF gambar...',
+    loadingCompress: 'Menjalankan kompresi target ukuran KB...',
+    loadingPdf: 'Menyusun dokumen PDF lokal...',
+    errorReadFile: 'Gagal membaca berkas gambar. Pastikan format JPG, PNG, atau WEBP valid.',
+    errorCompress: 'Gagal mengompres gambar di peramban. Coba gunakan berkas dengan dimensi lebih kecil.',
+    errorPdf: 'Gagal membuat berkas PDF. Periksa kembali item gambar di antrean.',
+    dismissError: 'Tutup pesan galat',
+    tabs: {
+      watermark: { label: 'Watermark', short: 'Watermark', desc: 'Cap teks anti-penyalahgunaan' },
+      redact: { label: 'Sensor NIK', short: 'Sensor', desc: 'Tutup data sensitif permanen' },
+      compress: { label: 'Kompres KB', short: 'Kompres', desc: 'Target ukuran & pas foto' },
+      pdf: { label: 'Gabung PDF', short: 'PDF', desc: 'Susun berkas ke dokumen PDF' },
+    },
+    watermark: {
+      presetsTitle: 'Preset Tujuan Verifikasi',
+      presets: [
+        { key: 'fintech', label: 'Fintech / Pinjol', text: 'HANYA UNTUK VERIFIKASI FINTECH' },
+        { key: 'hr', label: 'Lamaran Kerja', text: 'UNTUK LAMARAN KERJA RESMI' },
+        { key: 'ewallet', label: 'E-Wallet / Bank', text: 'VERIFIKASI AKUN PEMBAYARAN' },
+        { key: 'rent', label: 'Sewa / Properti', text: 'UNTUK ADMINISTRASI SEWA' },
+      ],
+      modeTitle: 'Pola Sebaran',
+      modeSingle: 'Diagonal Tunggal',
+      modeTiled: 'Pola Berulang',
+      purposeLabel: 'Teks Tujuan (Baris 1)',
+      dateLabel: 'Tanggal & Keterangan (Baris 2)',
+      fontSizeLabel: 'Skala Ukuran Huruf',
+      opacityLabel: 'Ketebalan Tinta',
+      angleLabel: 'Sudut Miring',
+      colorLabel: 'Warna Tinta',
+      colors: [
+        { hex: '#0f172a', name: 'Hitam Arsip' },
+        { hex: '#dc2626', name: 'Merah Dokumen' },
+        { hex: '#2563eb', name: 'Biru Tinta' },
+        { hex: '#047857', name: 'Hijau Segel' },
+        { hex: '#475569', name: 'Abu Slate' },
+        { hex: '#ffffff', name: 'Putih Bersih' },
+      ],
+    },
+    redact: {
+      hint: 'Seret langsung pada kanvas dokumen untuk menutup area NIK, alamat, atau tanda tangan.',
+      styleLabel: 'Gaya Penyensoran Permanen',
+      styles: [
+        { key: 'pixelate', label: 'Pixelate' },
+        { key: 'blur', label: 'Blur' },
+        { key: 'blackout', label: 'Blok Hitam' },
+        { key: 'whiteout', label: 'Blok Putih' },
+      ] as { key: RedactionStyle; label: string }[],
+      quickLabel: 'Pintasan Area Standar KTP',
+      addNik: '+ Area NIK',
+      addSig: '+ Tanda Tangan',
+      listTitle: 'Daftar Kotak Sensor',
+      clearAll: 'Hapus Semua',
+      none: 'Belum ada area sensor. Seret di kanvas atau pakai pintasan di atas.',
+      boxPrefix: 'Kotak Sensor',
+      deleteBox: 'Hapus kotak sensor',
+    },
+    compress: {
+      targetLabel: 'Batas Maksimum Ukuran Berkas',
+      cropLabel: 'Rasio Bingkai & Pas Foto',
+      crops: [
+        { key: 'original', label: 'Asli' },
+        { key: '3x4', label: 'Pas Foto 3:4' },
+        { key: 'ktp', label: 'Kartu KTP' },
+      ] as { key: CropPreset; label: string }[],
+      bgLabel: 'Warna Latar Pas Foto (3:4)',
+      bgs: [
+        { hex: '#D91E18', label: 'Merah' },
+        { hex: '#0052CC', label: 'Biru' },
+        { hex: '#FFFFFF', label: 'Putih' },
+      ],
+      runBtn: 'Kompres & Terapkan Rasio',
+      resultTitle: 'Hasil Kompresi Lokal',
+      beforeLabel: 'Asli',
+      afterLabel: 'Hasil',
+      savedLabel: 'Hemat',
+      downloadCompressed: 'Unduh JPEG Terkompresi',
+    },
+    pdf: {
+      layoutLabel: 'Tata Letak Halaman PDF',
+      layouts: [
+        { key: 'a4-portrait', label: 'A4 Portrait (1/halaman)' },
+        { key: 'a4-id-cards', label: 'A4 Kartu ID (2/halaman)' },
+        { key: 'fit-image', label: 'Sesuai Ukuran Gambar' },
+      ] as { key: PdfPageLayout; label: string }[],
+      addCurrentBtn: 'Tambah Dokumen Saat Ini',
+      addFilesBtn: 'Pilih Gambar dari Perangkat',
+      queueTitle: 'Antrean Halaman PDF',
+      emptyQueue: 'Antrean PDF masih kosong. Tambahkan gambar dari alat lain atau pilih berkas.',
+      moveUp: 'Geser ke atas',
+      moveDown: 'Geser ke bawah',
+      removeItem: 'Hapus dari antrean',
+      buildBtn: 'Gabungkan & Siapkan PDF',
+      readyText: 'PDF siap diunduh secara lokal:',
+      downloadPdfBtn: 'Unduh Berkas PDF',
+    },
+    dialog: {
+      title: 'Arsitektur Privasi Lokal (Zero-Upload)',
+      closeAria: 'Tutup dialog arsitektur privasi',
+      intro:
+        'AmanDok memproses seluruh gambar dan dokumen Anda langsung di memori peramban menggunakan HTML5 Canvas API dan pdf-lib.',
+      items: [
+        {
+          heading: 'Nol Koneksi Unggah Dokumen',
+          body: 'Tidak ada file atau hasil ekspor yang dikirim ke server eksternal maupun pihak ketiga.',
+        },
+        {
+          heading: 'Pembersihan Metadata EXIF Otomatis',
+          body: 'Saat gambar dimuat ulang lewat kanvas, informasi sensitif kamera dan koordinat GPS ikut terhapus.',
+        },
+        {
+          heading: 'Memori Terisolasi Tanpa Penyimpanan Permanen',
+          body: 'Gambar dokumen tidak pernah ditulis ke localStorage atau IndexedDB. Tekan Kosongkan Meja untuk mencabut seluruh URL objek dari RAM.',
+        },
+      ],
+      doneBtn: 'Tutup Penjelasan',
+    },
+    footer: {
+      guarantee: '100% Lokal di Peramban (Zero-Upload). EXIF/GPS dibersihkan saat ekspor.',
+      attribution: 'Dikembangkan oleh Yohannes C. Ritonga',
+    },
+    statusBar: {
+      docLabel: 'Dokumen',
+      none: 'Kosong',
+      redactionsLabel: 'Sensor',
+      queueLabel: 'Antrean PDF',
+    },
+  },
+  en: {
+    brandSub: 'Local Privacy Studio',
+    privacyBtn: 'Privacy',
+    privacyAria: 'Open local privacy architecture details',
+    langAria: 'Switch language to Indonesian',
+    themeDarkAria: 'Switch to dark theme',
+    themeLightAria: 'Switch to light theme',
+    wipeBtn: 'Wipe Desk',
+    wipeAria: 'Clear all documents from browser memory',
+    sampleNotice:
+      'Showing a synthetic ID sample. Upload your real document to begin local processing.',
+    uploadRealBtn: 'Upload Real Document',
+    sampleBadge: 'Synthetic Sample',
+    emptyTitle: 'Document Desk Empty',
+    emptyDesc:
+      'All processing runs 100% inside your browser. Zero document bytes are transmitted to or stored on any server.',
+    emptyChooseBtn: 'Choose Image from Device',
+    emptySampleBtn: 'Load Synthetic ID Sample',
+    changeImage: 'Replace Image',
+    rotateBtn: 'Rotate 90°',
+    exportImgBtn: 'Download Image',
+    addToPdfBtn: 'Add to PDF Queue',
+    loadingImage: 'Decoding image and stripping EXIF metadata...',
+    loadingCompress: 'Running target-KB compression...',
+    loadingPdf: 'Building local PDF document...',
+    errorReadFile: 'Failed to read image file. Please provide a valid JPG, PNG, or WEBP file.',
+    errorCompress: 'Failed to compress image in browser. Try a smaller source file.',
+    errorPdf: 'Failed to build PDF document. Check the queued image items.',
+    dismissError: 'Dismiss error message',
+    tabs: {
+      watermark: { label: 'Watermark', short: 'Watermark', desc: 'Anti-abuse verification text' },
+      redact: { label: 'Redact ID', short: 'Redact', desc: 'Permanent pixel masking' },
+      compress: { label: 'Compress KB', short: 'Compress', desc: 'Target size & ID photo crop' },
+      pdf: { label: 'Merge PDF', short: 'PDF', desc: 'Combine pages into one PDF' },
+    },
+    watermark: {
+      presetsTitle: 'Verification Presets',
+      presets: [
+        { key: 'fintech', label: 'Fintech / KYC', text: 'FOR FINTECH KYC VERIFICATION ONLY' },
+        { key: 'hr', label: 'Job Application', text: 'FOR OFFICIAL JOB APPLICATION' },
+        { key: 'ewallet', label: 'E-Wallet / Bank', text: 'PAYMENT ACCOUNT VERIFICATION' },
+        { key: 'rent', label: 'Lease / Property', text: 'FOR RENTAL ADMINISTRATION ONLY' },
+      ],
+      modeTitle: 'Layout Pattern',
+      modeSingle: 'Single Diagonal',
+      modeTiled: 'Tiled Pattern',
+      purposeLabel: 'Purpose Text (Line 1)',
+      dateLabel: 'Date & Reference (Line 2)',
+      fontSizeLabel: 'Font Size Scale',
+      opacityLabel: 'Ink Opacity',
+      angleLabel: 'Tilt Angle',
+      colorLabel: 'Ink Color',
+      colors: [
+        { hex: '#0f172a', name: 'Archive Black' },
+        { hex: '#dc2626', name: 'Document Red' },
+        { hex: '#2563eb', name: 'Stamp Blue' },
+        { hex: '#047857', name: 'Seal Green' },
+        { hex: '#475569', name: 'Slate Gray' },
+        { hex: '#ffffff', name: 'Pure White' },
+      ],
+    },
+    redact: {
+      hint: 'Drag directly across the document canvas to cover ID numbers, addresses, or signatures.',
+      styleLabel: 'Permanent Redaction Style',
+      styles: [
+        { key: 'pixelate', label: 'Pixelate' },
+        { key: 'blur', label: 'Blur' },
+        { key: 'blackout', label: 'Solid Black' },
+        { key: 'whiteout', label: 'Solid White' },
+      ] as { key: RedactionStyle; label: string }[],
+      quickLabel: 'Quick ID Area Presets',
+      addNik: '+ ID Number Box',
+      addSig: '+ Signature Box',
+      listTitle: 'Redaction Boxes',
+      clearAll: 'Clear All',
+      none: 'No redaction boxes yet. Drag on canvas or use the quick presets above.',
+      boxPrefix: 'Redaction Box',
+      deleteBox: 'Delete redaction box',
+    },
+    compress: {
+      targetLabel: 'Maximum File Size Limit',
+      cropLabel: 'Aspect Ratio & ID Photo Frame',
+      crops: [
+        { key: 'original', label: 'Original' },
+        { key: '3x4', label: '3:4 ID Photo' },
+        { key: 'ktp', label: 'ID Card' },
+      ] as { key: CropPreset; label: string }[],
+      bgLabel: 'ID Photo Background (3:4)',
+      bgs: [
+        { hex: '#D91E18', label: 'Red' },
+        { hex: '#0052CC', label: 'Blue' },
+        { hex: '#FFFFFF', label: 'White' },
+      ],
+      runBtn: 'Compress & Apply Crop',
+      resultTitle: 'Local Compression Output',
+      beforeLabel: 'Original',
+      afterLabel: 'Output',
+      savedLabel: 'Saved',
+      downloadCompressed: 'Download Compressed JPEG',
+    },
+    pdf: {
+      layoutLabel: 'PDF Page Layout',
+      layouts: [
+        { key: 'a4-portrait', label: 'A4 Portrait (1/page)' },
+        { key: 'a4-id-cards', label: 'A4 ID Cards (2/page)' },
+        { key: 'fit-image', label: 'Fit Image Dimensions' },
+      ] as { key: PdfPageLayout; label: string }[],
+      addCurrentBtn: 'Add Active Document',
+      addFilesBtn: 'Add Images from Device',
+      queueTitle: 'PDF Page Queue',
+      emptyQueue: 'Your PDF queue is empty. Add your active canvas or upload images from device.',
+      moveUp: 'Move up',
+      moveDown: 'Move down',
+      removeItem: 'Remove from queue',
+      buildBtn: 'Merge & Prepare PDF',
+      readyText: 'PDF built locally and ready:',
+      downloadPdfBtn: 'Download PDF File',
+    },
+    dialog: {
+      title: 'Local Privacy Architecture (Zero-Upload)',
+      closeAria: 'Close privacy architecture dialog',
+      intro:
+        'AmanDok processes every image and PDF page entirely in browser memory via the HTML5 Canvas API and pdf-lib.',
+      items: [
+        {
+          heading: 'Zero Upload Network Calls',
+          body: 'No source documents or exported files are ever uploaded to or cached on external servers.',
+        },
+        {
+          heading: 'Automatic EXIF & GPS Stripping',
+          body: 'Redrawing images on the local canvas strips embedded camera hardware tags and location coordinates.',
+        },
+        {
+          heading: 'RAM-Only Session Isolation',
+          body: 'Document pixels are never saved in localStorage or IndexedDB. Use Wipe Desk to revoke object URLs immediately.',
+        },
+      ],
+      doneBtn: 'Close Details',
+    },
+    footer: {
+      guarantee: '100% Browser-Local (Zero-Upload). Camera EXIF/GPS stripped on export.',
+      attribution: 'Engineered by Yohannes C. Ritonga',
+    },
+    statusBar: {
+      docLabel: 'Document',
+      none: 'Empty',
+      redactionsLabel: 'Redactions',
+      queueLabel: 'PDF Queue',
+    },
+  },
+} as const;
+
+function getTodayFormatted(lang: Lang): string {
+  const now = new Date();
+  return now.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function getInitialLang(): Lang {
+  if (typeof window === 'undefined') return 'id';
+  try {
+    return localStorage.getItem('amandok_lang') === 'en' ? 'en' : 'id';
+  } catch {
+    return 'id';
+  }
+}
+
+function getInitialTheme(): boolean {
+  if (typeof document === 'undefined') return false;
+  return document.documentElement.classList.contains('dark');
+}
+
+function getInitialTab(): StudioTab {
+  if (typeof window === 'undefined') return 'watermark';
+  const param = new URLSearchParams(window.location.search).get('tab');
+  if (param && VALID_TABS.includes(param as StudioTab)) {
+    return param as StudioTab;
+  }
+  return 'watermark';
+}
 
 export default function AmanDokStudio() {
   const [lang, setLang] = useState<Lang>('id');
-  const [isDark, setIsDark] = useState<boolean>(true);
+  const [isDark, setIsDark] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<StudioTab>('watermark');
-  const [showVaultInfo, setShowVaultInfo] = useState<boolean>(false);
-  const [isDraggingFile, setIsDraggingFile] = useState<boolean>(false);
 
-  // Base image state (shared across Watermark, Redact, and Compress tabs)
-  const [sourceDataUrl, setSourceDataUrl] = useState<string | null>(null);
-  const [sourceFileName, setSourceFileName] = useState<string>('dokumen-ktp.jpg');
-  const [sourceOriginalBytes, setSourceOriginalBytes] = useState<number>(0);
-  const [sourceDimensions, setSourceDimensions] = useState<{ width: number; height: number }>({
-    width: 0,
-    height: 0,
-  });
-  const [loadedImageEl, setLoadedImageEl] = useState<HTMLImageElement | null>(null);
-  const [isSampleLoaded, setIsSampleLoaded] = useState<boolean>(false);
+  const [docState, setDocState] = useState<LoadedDocument | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Watermark configuration
-  const todayStr = new Date().toISOString().slice(0, 10);
   const [watermarkEnabled, setWatermarkEnabled] = useState<boolean>(true);
-  const [watermarkConfig, setWatermarkConfig] = useState<WatermarkConfig>({
-    text: 'HANYA UNTUK VERIFIKASI BANK',
-    subtext: `TANGGAL: ${todayStr} • DILARANG MENYALAHGUNAKAN`,
+  const [wmConfig, setWmConfig] = useState<WatermarkConfig>({
+    text: 'HANYA UNTUK VERIFIKASI FINTECH',
+    subtext: '',
     mode: 'tiled',
-    color: '#e11d48',
-    opacity: 0.32,
-    angle: -28,
+    color: '#dc2626',
+    opacity: 0.34,
+    angle: -32,
     fontSizeScale: 1.0,
-    spacingScale: 1.05,
+    spacingScale: 1.0,
     rotation: 0,
-    addTimestampBorder: true,
+    addTimestampBorder: false,
   });
 
-  // Redaction state
   const [redactions, setRedactions] = useState<RedactionBox[]>([]);
-  const [activeRedactionStyle, setActiveRedactionStyle] = useState<RedactionStyle>('pixelate');
-  const [isDrawingRedaction, setIsDrawingRedaction] = useState<boolean>(false);
-  const [drawStart, setDrawStart] = useState<{ x: number; y: number } | null>(null);
-  const [draftBox, setDraftBox] = useState<RedactionBox | null>(null);
+  const [redactionStyle, setRedactionStyle] = useState<RedactionStyle>('pixelate');
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
+  const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>(null);
 
-  // Compressor & Pasfoto state
-  const [targetKb, setTargetKb] = useState<number>(200);
+  const [targetKb, setTargetKb] = useState<number>(100);
   const [cropPreset, setCropPreset] = useState<CropPreset>('original');
-  const [pasfotoBg, setPasfotoBg] = useState<string>('#dc2626');
-  const [compressionResult, setCompressionResult] = useState<CompressionResult | null>(null);
+  const [bgColor, setBgColor] = useState<string>('#D91E18');
+  const [compressResult, setCompressResult] = useState<CompressionResult | null>(null);
 
-  // PDF Queue state
   const [pdfQueue, setPdfQueue] = useState<PdfQueueItem[]>([]);
-  const [pdfLayout, setPdfLayout] = useState<PdfPageLayout>('a4-id-cards');
-  const [isBuildingPdf, setIsBuildingPdf] = useState<boolean>(false);
+  const [pdfLayout, setPdfLayout] = useState<PdfPageLayout>('a4-portrait');
   const [pdfDownloadUrl, setPdfDownloadUrl] = useState<string | null>(null);
-  const [pdfSizeBytes, setPdfSizeBytes] = useState<number>(0);
+  const [pdfByteSize, setPdfByteSize] = useState<number>(0);
 
-  // Feedback toast state
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [privacyOpen, setPrivacyOpen] = useState<boolean>(false);
 
-  const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const loadedImageRef = useRef<HTMLImageElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const pdfFileInputRef = useRef<HTMLInputElement | null>(null);
+  const privacyTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const pdfUrlRef = useRef<string | null>(null);
 
-  const showToast = useCallback((msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage((prev) => (prev === msg ? null : prev));
-    }, 3200);
-  }, []);
+  const t = TEXT[lang];
 
-  // Sync theme & language on mount
-  useEffect(() => {
-    try {
-      const savedLang = localStorage.getItem('amandok_lang') as Lang | null;
-      if (savedLang === 'id' || savedLang === 'en') {
-        setLang(savedLang);
-      }
-      const darkActive = document.documentElement.classList.contains('dark');
-      setIsDark(darkActive);
-    } catch {
-      // ignore storage errors
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const nextDark = !isDark;
-    setIsDark(nextDark);
-    const meta = document.getElementById('meta-theme-color');
-    if (nextDark) {
-      document.documentElement.classList.add('dark');
-      if (meta) meta.setAttribute('content', '#0B0F17');
-    } else {
-      document.documentElement.classList.remove('dark');
-      if (meta) meta.setAttribute('content', '#F4F6F9');
-    }
-    try {
-      localStorage.setItem('amandok_theme', nextDark ? 'dark' : 'light');
-    } catch {
-      // ignore
-    }
-  };
-
-  const toggleLanguage = () => {
-    const nextLang: Lang = lang === 'id' ? 'en' : 'id';
-    setLang(nextLang);
-    try {
-      localStorage.setItem('amandok_lang', nextLang);
-      window.dispatchEvent(new CustomEvent('amandok-lang-change', { detail: nextLang }));
-    } catch {
-      // ignore
-    }
-  };
-
-  // Load synthetic sample KTP on initial mount so the studio is immediately interactive
-  const handleLoadSampleKtp = useCallback(() => {
+  const loadSampleDocument = useCallback((currentLang: Lang) => {
     const sample = generateSampleKtpDataUrl();
-    setSourceDataUrl(sample.dataUrl);
-    setSourceFileName('simulasi-ktp-budi-santoso.jpg');
-    setSourceOriginalBytes(sample.bytes);
-    setSourceDimensions({ width: sample.width, height: sample.height });
-    setRedactions([]);
-    setIsSampleLoaded(true);
-    showToast(
-      lang === 'id'
-        ? 'Contoh KTP simulasi berhasil dimuat ke brankas lokal.'
-        : 'Simulated sample ID card loaded into local vault.'
-    );
-  }, [lang, showToast]);
-
-  useEffect(() => {
-    handleLoadSampleKtp();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Whenever sourceDataUrl changes, create HTMLImageElement for fast synchronous canvas redraws
-  useEffect(() => {
-    if (!sourceDataUrl) {
-      setLoadedImageEl(null);
-      return;
-    }
     const img = new Image();
     img.onload = () => {
-      setLoadedImageEl(img);
+      loadedImageRef.current = img;
+      setDocState({
+        dataUrl: sample.dataUrl,
+        width: sample.width,
+        height: sample.height,
+        originalBytes: sample.bytes,
+        fileName: 'contoh-ktp-sintetis.png',
+        isSample: true,
+      });
+      setRedactions([]);
+      setCompressResult(null);
+      setErrorMessage(null);
+      setWmConfig((prev) => ({
+        ...prev,
+        subtext: getTodayFormatted(currentLang),
+      }));
     };
-    img.src = sourceDataUrl;
-  }, [sourceDataUrl]);
+    img.src = sample.dataUrl;
+  }, []);
 
-  // Redraw main preview canvas whenever image, watermark, or redaction changes
   useEffect(() => {
-    const canvas = previewCanvasRef.current;
-    if (!canvas || !loadedImageEl) return;
-    renderDocumentCanvas(
-      canvas,
-      loadedImageEl,
-      watermarkEnabled ? watermarkConfig : null,
-      redactions
-    );
-  }, [loadedImageEl, watermarkEnabled, watermarkConfig, redactions, activeTab]);
+    const initialLang = getInitialLang();
+    setLang(initialLang);
+    setIsDark(getInitialTheme());
+    setActiveTab(getInitialTab());
+    loadSampleDocument(initialLang);
 
-  // Trigger compression automatically when entering 'compress' tab or changing compression settings
-  const runCompressionFromCurrentCanvas = useCallback(async () => {
-    if (!loadedImageEl) return;
-    const canvas = previewCanvasRef.current ?? document.createElement('canvas');
+    return () => {
+      if (pdfUrlRef.current) {
+        URL.revokeObjectURL(pdfUrlRef.current);
+        pdfUrlRef.current = null;
+      }
+    };
+  }, [loadSampleDocument]);
 
-    renderDocumentCanvas(
-      canvas,
-      loadedImageEl,
-      watermarkEnabled ? watermarkConfig : null,
-      redactions
-    );
-
-    const compositedDataUrl = canvas.toDataURL('image/png');
-
+  useEffect(() => {
+    document.documentElement.lang = lang;
     try {
-      const compImg = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const el = new Image();
-        el.onload = () => resolve(el);
-        el.onerror = reject;
-        el.src = compositedDataUrl;
-      });
-
-      const res = await compressToTargetKb(compImg, {
-        targetKb,
-        cropPreset,
-        bgColor: pasfotoBg,
-        originalBytes: sourceOriginalBytes || 350 * 1024,
-      });
-      setCompressionResult(res);
-    } catch (err) {
-      console.error(err);
+      localStorage.setItem('amandok_lang', lang);
+    } catch {
+      // Ignore storage failures
     }
+  }, [lang]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    const meta = document.getElementById('amandok-theme-color');
+    if (meta) {
+      meta.setAttribute('content', isDark ? '#090d16' : '#f1f5f9');
+    }
+    try {
+      localStorage.setItem('amandok_theme', isDark ? 'dark' : 'light');
+    } catch {
+      // Ignore storage failures
+    }
+  }, [isDark]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const img = loadedImageRef.current;
+    if (!canvas || !img || !docState) return;
+
+    const previewRedactions: RedactionBox[] = [...redactions];
+    if (dragStart && dragCurrent) {
+      const x = Math.min(dragStart.x, dragCurrent.x);
+      const y = Math.min(dragStart.y, dragCurrent.y);
+      const width = Math.abs(dragCurrent.x - dragStart.x);
+      const height = Math.abs(dragCurrent.y - dragStart.y);
+      if (width > 0.005 && height > 0.005) {
+        previewRedactions.push({
+          id: 'draft-drag',
+          x,
+          y,
+          width,
+          height,
+          style: redactionStyle,
+        });
+      }
+    }
+
+    renderDocumentCanvas(
+      canvas,
+      img,
+      watermarkEnabled ? wmConfig : null,
+      previewRedactions
+    );
   }, [
-    loadedImageEl,
+    docState,
     watermarkEnabled,
-    watermarkConfig,
+    wmConfig,
     redactions,
-    targetKb,
-    cropPreset,
-    pasfotoBg,
-    sourceOriginalBytes,
+    dragStart,
+    dragCurrent,
+    redactionStyle,
   ]);
 
   useEffect(() => {
-    if (activeTab === 'compress' && loadedImageEl) {
-      runCompressionFromCurrentCanvas();
-    }
-  }, [activeTab, loadedImageEl, targetKb, cropPreset, pasfotoBg, runCompressionFromCurrentCanvas]);
+    if (!privacyOpen) return;
 
-  const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB client-side memory guard
-
-  const loadSingleDocumentFile = async (file: File) => {
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      showToast(
-        lang === 'id'
-          ? 'Ukuran berkas terlalu besar (maksimal 25 MB).'
-          : 'File size is too large (maximum 25 MB).'
+    const previousFocused = document.activeElement as HTMLElement | null;
+    const dialogNode = dialogRef.current;
+    if (dialogNode) {
+      const firstFocusable = dialogNode.querySelector<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
-      return;
+      firstFocusable?.focus();
     }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setPrivacyOpen(false);
+        return;
+      }
+      if (event.key === 'Tab' && dialogNode) {
+        const focusables = Array.from(
+          dialogNode.querySelectorAll<HTMLElement>(
+            'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])'
+          )
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previousFocused && typeof previousFocused.focus === 'function') {
+        previousFocused.focus();
+      } else {
+        privacyTriggerRef.current?.focus();
+      }
+    };
+  }, [privacyOpen]);
+
+  const handleToggleLang = () => {
+    const nextLang: Lang = lang === 'id' ? 'en' : 'id';
+    setLang(nextLang);
+    setWmConfig((prev) => ({
+      ...prev,
+      subtext: getTodayFormatted(nextLang),
+      text:
+        prev.text === TEXT.id.watermark.presets[0].text
+          ? TEXT.en.watermark.presets[0].text
+          : prev.text === TEXT.en.watermark.presets[0].text
+            ? TEXT.id.watermark.presets[0].text
+            : prev.text,
+    }));
+  };
+
+  const handleLoadImageFile = async (file: File) => {
+    setErrorMessage(null);
+    setStatusMessage(t.loadingImage);
     try {
       const normalized = await loadNormalizedImage(file);
-      setSourceDataUrl(normalized.dataUrl);
-      setSourceFileName(file.name.replace(/\.[^.]+$/, '') + '.jpg');
-      setSourceOriginalBytes(normalized.originalBytes);
-      setSourceDimensions({ width: normalized.width, height: normalized.height });
-      setRedactions([]);
-      setIsSampleLoaded(false);
-      showToast(
-        lang === 'id'
-          ? 'Dokumen dimuat di RAM lokal & metadata EXIF/GPS telah dibersihkan.'
-          : 'Document loaded in local RAM & EXIF/GPS metadata stripped.'
-      );
+      const img = new Image();
+      img.onload = () => {
+        loadedImageRef.current = img;
+        setDocState({
+          dataUrl: normalized.dataUrl,
+          width: normalized.width,
+          height: normalized.height,
+          originalBytes: normalized.originalBytes,
+          fileName: file.name,
+          isSample: false,
+        });
+        setRedactions([]);
+        setCompressResult(null);
+        setStatusMessage(null);
+      };
+      img.onerror = () => {
+        setStatusMessage(null);
+        setErrorMessage(t.errorReadFile);
+      };
+      img.src = normalized.dataUrl;
     } catch {
-      showToast(
-        lang === 'id'
-          ? 'Gagal membaca berkas gambar. Gunakan format JPG, PNG, atau WebP.'
-          : 'Failed to read image file. Please use JPG, PNG, or WebP.'
+      setStatusMessage(null);
+      setErrorMessage(t.errorReadFile);
+    }
+  };
+
+  const handleRotateDocument = () => {
+    const img = loadedImageRef.current;
+    if (!img || !docState) return;
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = img.naturalHeight || docState.height;
+    tempCanvas.height = img.naturalWidth || docState.width;
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+    ctx.rotate((90 * Math.PI) / 180);
+    ctx.drawImage(img, -docState.width / 2, -docState.height / 2, docState.width, docState.height);
+
+    const rotatedDataUrl = tempCanvas.toDataURL('image/png');
+    const nextImg = new Image();
+    nextImg.onload = () => {
+      loadedImageRef.current = nextImg;
+      setDocState((prev) =>
+        prev
+          ? {
+              ...prev,
+              dataUrl: rotatedDataUrl,
+              width: tempCanvas.width,
+              height: tempCanvas.height,
+            }
+          : null
       );
+      setRedactions([]);
+      setCompressResult(null);
+    };
+    nextImg.src = rotatedDataUrl;
+  };
+
+  const handleWipeDesk = () => {
+    if (pdfUrlRef.current) {
+      URL.revokeObjectURL(pdfUrlRef.current);
+      pdfUrlRef.current = null;
     }
+    loadedImageRef.current = null;
+    setDocState(null);
+    setRedactions([]);
+    setCompressResult(null);
+    setPdfQueue([]);
+    setPdfDownloadUrl(null);
+    setPdfByteSize(0);
+    setStatusMessage(null);
+    setErrorMessage(null);
   };
 
-  // Handle user uploading their own image
-  const handleImageFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    await loadSingleDocumentFile(file);
-    e.target.value = '';
-  };
-
-  // Handle drag & drop onto canvas workbench
-  const handleWorkbenchDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDraggingFile(false);
-    const files = Array.from(e.dataTransfer.files || []);
-    if (files.length === 0) return;
-
-    if (activeTab === 'pdf') {
-      await processPdfQueueFiles(files);
-    } else {
-      const imgFile = files.find((f) => f.type.startsWith('image/'));
-      if (imgFile) {
-        await loadSingleDocumentFile(imgFile);
-      }
-    }
-  };
-
-  // Pointer coordinates helper for interactive redaction drawing
-  const getNormalizedPointerCoords = (
-    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
-  ): { x: number; y: number } | null => {
-    const canvas = previewCanvasRef.current;
+  const getRelativeCanvasPoint = (clientX: number, clientY: number) => {
+    const canvas = canvasRef.current;
     if (!canvas) return null;
     const rect = canvas.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return null;
-
-    let clientX = 0;
-    let clientY = 0;
-    if ('touches' in e) {
-      const touch = e.touches[0] || e.changedTouches[0];
-      if (!touch) return null;
-      clientX = touch.clientX;
-      clientY = touch.clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-
-    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+    const x = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    const y = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
     return { x, y };
   };
 
-  const handlePointerDown = (
-    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
-  ) => {
-    if (activeTab !== 'redact') return;
-    const coords = getNormalizedPointerCoords(e);
-    if (!coords) return;
-    setIsDrawingRedaction(true);
-    setDrawStart(coords);
-    setDraftBox({
-      id: 'draft',
-      x: coords.x,
-      y: coords.y,
-      width: 0,
-      height: 0,
-      style: activeRedactionStyle,
-    });
+  const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (activeTab !== 'redact' || !docState) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const point = getRelativeCanvasPoint(event.clientX, event.clientY);
+    if (point) {
+      setDragStart(point);
+      setDragCurrent(point);
+    }
   };
 
-  const handlePointerMove = (
-    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
-  ) => {
-    if (!isDrawingRedaction || !drawStart || activeTab !== 'redact') return;
-    const coords = getNormalizedPointerCoords(e);
-    if (!coords) return;
-
-    const x = Math.min(drawStart.x, coords.x);
-    const y = Math.min(drawStart.y, coords.y);
-    const width = Math.abs(coords.x - drawStart.x);
-    const height = Math.abs(coords.y - drawStart.y);
-
-    setDraftBox({
-      id: 'draft',
-      x,
-      y,
-      width,
-      height,
-      style: activeRedactionStyle,
-    });
+  const handlePointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (activeTab !== 'redact' || !dragStart) return;
+    const point = getRelativeCanvasPoint(event.clientX, event.clientY);
+    if (point) {
+      setDragCurrent(point);
+    }
   };
 
   const handlePointerUp = () => {
-    if (!isDrawingRedaction || !draftBox) return;
-    setIsDrawingRedaction(false);
-    setDrawStart(null);
+    if (activeTab !== 'redact' || !dragStart || !dragCurrent) {
+      setDragStart(null);
+      setDragCurrent(null);
+      return;
+    }
+    const x = Math.min(dragStart.x, dragCurrent.x);
+    const y = Math.min(dragStart.y, dragCurrent.y);
+    const width = Math.abs(dragCurrent.x - dragStart.x);
+    const height = Math.abs(dragCurrent.y - dragStart.y);
 
-    if (draftBox.width > 0.015 && draftBox.height > 0.015) {
+    if (width > 0.015 && height > 0.015) {
       setRedactions((prev) => [
         ...prev,
         {
-          ...draftBox,
-          id: `redact-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          id: `redact-${Date.now()}-${prev.length + 1}`,
+          x,
+          y,
+          width,
+          height,
+          style: redactionStyle,
         },
       ]);
     }
-    setDraftBox(null);
+    setDragStart(null);
+    setDragCurrent(null);
   };
 
-  // Quick KTP Redaction Presets (NIK, Signature, Photo, Address)
-  const addQuickRedactionPreset = (preset: 'nik' | 'signature' | 'photo' | 'address') => {
-    const presetBoxes: Record<
-      'nik' | 'signature' | 'photo' | 'address',
-      Omit<RedactionBox, 'id' | 'style'>
-    > = {
-      nik: { x: 0.23, y: 0.22, width: 0.46, height: 0.068 },
-      address: { x: 0.24, y: 0.46, width: 0.45, height: 0.055 },
-      photo: { x: 0.715, y: 0.295, width: 0.22, height: 0.43 },
-      signature: { x: 0.72, y: 0.81, width: 0.21, height: 0.13 },
-    };
+  const handleAddQuickRedaction = (preset: 'nik' | 'signature') => {
+    if (!docState) return;
+    const box: RedactionBox =
+      preset === 'nik'
+        ? {
+            id: `nik-${Date.now()}`,
+            x: 0.25,
+            y: 0.22,
+            width: 0.36,
+            height: 0.08,
+            style: redactionStyle,
+          }
+        : {
+            id: `sig-${Date.now()}`,
+            x: 0.72,
+            y: 0.72,
+            width: 0.22,
+            height: 0.16,
+            style: redactionStyle,
+          };
+    setRedactions((prev) => [...prev, box]);
+  };
 
-    const box = presetBoxes[preset];
-    setRedactions((prev) => [
+  const exportCanvasDataUrl = (): string | null => {
+    const canvas = canvasRef.current;
+    if (!canvas || !docState) return null;
+    return canvas.toDataURL('image/png');
+  };
+
+  const handleDownloadCanvasImage = () => {
+    const dataUrl = exportCanvasDataUrl();
+    if (!dataUrl || !docState) return;
+    const baseName = docState.fileName.replace(/\.[^.]+$/, '');
+    const anchor = document.createElement('a');
+    anchor.href = dataUrl;
+    anchor.download = `${baseName}-amandok.png`;
+    anchor.click();
+  };
+
+  const handleAddCurrentToPdfQueue = () => {
+    const dataUrl =
+      activeTab === 'compress' && compressResult ? compressResult.dataUrl : exportCanvasDataUrl();
+    if (!dataUrl || !docState) return;
+    const width = activeTab === 'compress' && compressResult ? compressResult.width : docState.width;
+    const height =
+      activeTab === 'compress' && compressResult ? compressResult.height : docState.height;
+    const sizeBytes =
+      activeTab === 'compress' && compressResult
+        ? compressResult.compressedBytes
+        : docState.originalBytes;
+
+    setPdfQueue((prev) => [
       ...prev,
       {
-        id: `preset-${preset}-${Date.now()}`,
-        ...box,
-        style: activeRedactionStyle,
+        id: `pdf-${Date.now()}-${prev.length + 1}`,
+        name: docState.fileName,
+        type: 'image',
+        dataUrl,
+        width,
+        height,
+        sizeBytes,
       },
     ]);
-    showToast(
-      lang === 'id'
-        ? 'Area sensor ditambahkan. Anda juga bisa klik & seret langsung pada gambar.'
-        : 'Redaction zone added. You can also click & drag directly on the image.'
-    );
-  };
-
-  // Download current protected canvas image
-  const handleDownloadProtectedImage = (format: 'jpeg' | 'png' = 'jpeg') => {
-    const canvas = previewCanvasRef.current;
-    if (!canvas) return;
-    const mime = format === 'png' ? 'image/png' : 'image/jpeg';
-    const dataUrl = canvas.toDataURL(mime, 0.92);
-    const link = document.createElement('a');
-    const cleanBase = sourceFileName.replace(/\.[^.]+$/, '');
-    link.download = `${cleanBase}-amandok.${format === 'png' ? 'png' : 'jpg'}`;
-    link.href = dataUrl;
-    link.click();
-    showToast(
-      lang === 'id'
-        ? 'Dokumen terlindungi berhasil diunduh ke perangkat Anda!'
-        : 'Protected document downloaded to your device!'
-    );
-  };
-
-  // Download compressed target-KB image
-  const handleDownloadCompressed = () => {
-    if (!compressionResult) return;
-    const link = document.createElement('a');
-    const cleanBase = sourceFileName.replace(/\.[^.]+$/, '');
-    link.download = `${cleanBase}-${targetKb}kb.jpg`;
-    link.href = compressionResult.dataUrl;
-    link.click();
-    showToast(
-      lang === 'id'
-        ? `Berkas terkompresi (${formatBytes(compressionResult.compressedBytes)}) berhasil diunduh!`
-        : `Compressed file (${formatBytes(compressionResult.compressedBytes)}) downloaded!`
-    );
-  };
-
-  // Send current active image to PDF queue
-  const handleSendCurrentToPdfQueue = () => {
-    if (!loadedImageEl) return;
-    const canvas = previewCanvasRef.current ?? document.createElement('canvas');
-    if (!previewCanvasRef.current) {
-      renderDocumentCanvas(
-        canvas,
-        loadedImageEl,
-        watermarkEnabled ? watermarkConfig : null,
-        redactions
-      );
-    }
-
-    const dataUrl =
-      activeTab === 'compress' && compressionResult
-        ? compressionResult.dataUrl
-        : canvas.toDataURL('image/jpeg', 0.9);
-
-    const approxBytes = Math.round(((dataUrl.split(',')[1]?.length || 0) * 3) / 4);
-    const newItem: PdfQueueItem = {
-      id: `pdf-item-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      name: `${sourceFileName.replace(/\.[^.]+$/, '')}-amandok.jpg`,
-      type: 'image',
-      dataUrl,
-      width: canvas.width,
-      height: canvas.height,
-      sizeBytes: approxBytes,
-    };
-
-    setPdfQueue((prev) => [...prev, newItem]);
-    setPdfDownloadUrl(null);
     setActiveTab('pdf');
-    showToast(
-      lang === 'id'
-        ? 'Dokumen ditambahkan ke antrean PDF Binder A4!'
-        : 'Document added to A4 PDF Binder queue!'
-    );
   };
 
-  const processPdfQueueFiles = async (files: File[]) => {
-    const addedItems: PdfQueueItem[] = [];
-    let skippedOversized = 0;
+  const handleRunCompression = async () => {
+    const canvas = canvasRef.current;
+    const img = loadedImageRef.current;
+    if (!canvas || !img || !docState) return;
 
-    for (const file of files) {
-      if (file.size > MAX_FILE_SIZE_BYTES) {
-        skippedOversized++;
-        continue;
-      }
-      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-        const buffer = await file.arrayBuffer();
-        addedItems.push({
-          id: `pdf-doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          name: file.name,
-          type: 'pdf',
-          arrayBuffer: buffer,
-          sizeBytes: file.size,
-        });
-      } else if (file.type.startsWith('image/')) {
-        const norm = await loadNormalizedImage(file);
-        addedItems.push({
-          id: `pdf-img-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    setErrorMessage(null);
+    setStatusMessage(t.loadingCompress);
+    try {
+      const renderedUrl = canvas.toDataURL('image/png');
+      const renderedImg = new Image();
+      await new Promise<void>((resolve, reject) => {
+        renderedImg.onload = () => resolve();
+        renderedImg.onerror = () => reject(new Error('Image decode error'));
+        renderedImg.src = renderedUrl;
+      });
+
+      const result = await compressToTargetKb(renderedImg, {
+        targetKb,
+        cropPreset,
+        bgColor,
+        originalBytes: docState.originalBytes,
+      });
+      setCompressResult(result);
+      setStatusMessage(null);
+    } catch {
+      setStatusMessage(null);
+      setErrorMessage(t.errorCompress);
+    }
+  };
+
+  const handleDownloadCompressed = () => {
+    if (!compressResult || !docState) return;
+    const baseName = docState.fileName.replace(/\.[^.]+$/, '');
+    const anchor = document.createElement('a');
+    anchor.href = compressResult.dataUrl;
+    anchor.download = `${baseName}-${targetKb}kb.jpg`;
+    anchor.click();
+  };
+
+  const handleAddPdfFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setErrorMessage(null);
+    setStatusMessage(t.loadingImage);
+    try {
+      const added: PdfQueueItem[] = [];
+      for (const file of Array.from(files)) {
+        const normalized = await loadNormalizedImage(file);
+        added.push({
+          id: `pdf-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           name: file.name,
           type: 'image',
-          dataUrl: norm.dataUrl,
-          width: norm.width,
-          height: norm.height,
-          sizeBytes: norm.originalBytes,
+          dataUrl: normalized.dataUrl,
+          width: normalized.width,
+          height: normalized.height,
+          sizeBytes: normalized.originalBytes,
         });
       }
-    }
-
-    if (addedItems.length > 0) {
-      setPdfQueue((prev) => [...prev, ...addedItems]);
-      setPdfDownloadUrl(null);
-      showToast(
-        lang === 'id'
-          ? `${addedItems.length} berkas ditambahkan ke antrean PDF.${skippedOversized > 0 ? ` (${skippedOversized} berkas >25 MB dilewati)` : ''}`
-          : `${addedItems.length} file(s) added to PDF queue.${skippedOversized > 0 ? ` (${skippedOversized} file(s) >25 MB skipped)` : ''}`
-      );
-    } else if (skippedOversized > 0) {
-      showToast(
-        lang === 'id'
-          ? 'Ukuran berkas melebihi batas maksimal 25 MB.'
-          : 'File size exceeds the 25 MB maximum limit.'
-      );
+      setPdfQueue((prev) => [...prev, ...added]);
+      setStatusMessage(null);
+    } catch {
+      setStatusMessage(null);
+      setErrorMessage(t.errorReadFile);
     }
   };
 
-  // Add external images or PDFs directly to PDF queue
-  const handlePdfQueueFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-    await processPdfQueueFiles(files);
-    e.target.value = '';
-  };
-
-  const movePdfQueueItem = (index: number, direction: -1 | 1) => {
+  const handleMovePdfItem = (index: number, direction: -1 | 1) => {
     setPdfQueue((prev) => {
       const targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= prev.length) return prev;
@@ -616,1146 +885,906 @@ export default function AmanDokStudio() {
       copy.splice(targetIndex, 0, item);
       return copy;
     });
-    setPdfDownloadUrl(null);
   };
 
-  const removePdfQueueItem = (id: string) => {
-    setPdfQueue((prev) => prev.filter((item) => item.id !== id));
-    setPdfDownloadUrl(null);
-  };
-
-  const handleGenerateCombinedPdf = async () => {
+  const handleBuildPdf = async () => {
     if (pdfQueue.length === 0) return;
-    setIsBuildingPdf(true);
+    setErrorMessage(null);
+    setStatusMessage(t.loadingPdf);
     try {
-      const pdfBytes = await buildCombinedPdf(pdfQueue, pdfLayout);
-      const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-      if (pdfDownloadUrl) {
-        URL.revokeObjectURL(pdfDownloadUrl);
+      const bytes = await buildCombinedPdf(pdfQueue, pdfLayout);
+      if (pdfUrlRef.current) {
+        URL.revokeObjectURL(pdfUrlRef.current);
       }
-      const url = URL.createObjectURL(blob);
-      setPdfDownloadUrl(url);
-      setPdfSizeBytes(blob.size);
-      showToast(
-        lang === 'id'
-          ? 'Dokumen PDF A4 berhasil digabungkan di memori lokal!'
-          : 'Combined A4 PDF generated in local memory!'
-      );
-    } catch (err) {
-      console.error(err);
-      showToast(
-        lang === 'id'
-          ? 'Terjadi kesalahan saat menggabungkan PDF.'
-          : 'An error occurred while generating the PDF.'
-      );
-    } finally {
-      setIsBuildingPdf(false);
+      const buffer = new ArrayBuffer(bytes.byteLength);
+      new Uint8Array(buffer).set(bytes);
+      const blob = new Blob([buffer], { type: 'application/pdf' });
+      const nextUrl = URL.createObjectURL(blob);
+      pdfUrlRef.current = nextUrl;
+      setPdfDownloadUrl(nextUrl);
+      setPdfByteSize(blob.size);
+      setStatusMessage(null);
+    } catch {
+      setStatusMessage(null);
+      setErrorMessage(t.errorPdf);
     }
   };
 
-  // Wipe entire session memory
-  const handleWipeSessionMemory = () => {
-    if (pdfDownloadUrl) URL.revokeObjectURL(pdfDownloadUrl);
-    setRedactions([]);
-    setPdfQueue([]);
-    setPdfDownloadUrl(null);
-    setCompressionResult(null);
-    handleLoadSampleKtp();
-    showToast(
-      lang === 'id'
-        ? 'RAM sesi dibersihkan & dikembalikan ke contoh simulasi.'
-        : 'Session RAM wiped & reset to sample.'
-    );
-  };
-
-  const studioTools: {
-    id: StudioTab;
-    step: string;
-    shortId: string;
-    shortEn: string;
-    titleId: string;
-    titleEn: string;
-    descId: string;
-    descEn: string;
-    icon: typeof Stamp;
-    badge: string | null;
-  }[] = [
-    {
-      id: 'watermark',
-      step: '01',
-      shortId: 'Watermark',
-      shortEn: 'Watermark',
-      titleId: 'Watermark KTP',
-      titleEn: 'ID Watermark',
-      descId: 'Segel teks anti-pinjol',
-      descEn: 'Anti-fraud text stamp',
-      icon: Stamp,
-      badge: watermarkEnabled ? 'ON' : 'OFF',
-    },
-    {
-      id: 'redact',
-      step: '02',
-      shortId: 'Sensor NIK',
-      shortEn: 'Redact',
-      titleId: 'Sensor NIK & TTD',
-      titleEn: 'Pixel Redact',
-      descId: 'Lebur piksel sensitif',
-      descEn: 'Burn sensitive pixels',
-      icon: EyeOff,
-      badge: redactions.length > 0 ? `${redactions.length}` : null,
-    },
-    {
-      id: 'compress',
-      step: '03',
-      shortId: 'Target KB',
-      shortEn: 'Target KB',
-      titleId: 'Target KB & Pasfoto',
-      titleEn: 'Target KB & Crop',
-      descId: 'Kompres & rasio 3×4',
-      descEn: 'CPNS KB & 3×4 crop',
-      icon: Minimize2,
-      badge: `≤${targetKb}K`,
-    },
-    {
-      id: 'pdf',
-      step: '04',
-      shortId: 'PDF Binder',
-      shortEn: 'PDF Binder',
-      titleId: 'Gabung PDF A4',
-      titleEn: 'A4 PDF Binder',
-      descId: 'Susun lampiran A4',
-      descEn: 'Merge into A4 PDF',
-      icon: FileStack,
-      badge: pdfQueue.length > 0 ? `${pdfQueue.length}` : null,
-    },
-  ];
+  const savingsPct =
+    compressResult && compressResult.originalBytes > 0
+      ? Math.max(
+          0,
+          Math.round(
+            ((compressResult.originalBytes - compressResult.compressedBytes) /
+              compressResult.originalBytes) *
+              100
+          )
+        )
+      : 0;
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#F4F6F9] text-slate-900 dark:bg-[#080C14] dark:text-[#E6EDF7]">
-      {/* Ambient Liquid Glass Depth Orbs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="animate-orb absolute -left-24 -top-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-500/15" />
-        <div className="animate-orb-slow absolute -bottom-24 -right-20 h-96 w-96 rounded-full bg-teal-400/20 blur-3xl dark:bg-cyan-500/12" />
-      </div>
-
-      {/* Hidden File Inputs */}
+    <div className="flex-1 flex flex-col min-h-0 w-full">
       <input
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
-        onChange={handleImageFileSelect}
-        className="hidden"
+        className="sr-only"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void handleLoadImageFile(file);
+          e.currentTarget.value = '';
+        }}
       />
+
       <input
         ref={pdfFileInputRef}
         type="file"
+        accept="image/jpeg,image/png,image/webp"
         multiple
-        accept="image/jpeg,image/png,image/webp,application/pdf"
-        onChange={handlePdfQueueFilesUpload}
-        className="hidden"
+        className="sr-only"
+        onChange={(e) => {
+          void handleAddPdfFiles(e.target.files);
+          e.currentTarget.value = '';
+        }}
       />
 
-      {/* Floating Toast Notification */}
-      {toastMessage && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="glass-surface animate-toast-in fixed bottom-24 right-4 z-50 flex items-center gap-2.5 rounded-2xl px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white lg:bottom-5 lg:right-5"
-        >
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
-      {/* =========================================================
-          TOP CYBER-VAULT COMMAND BAR (56px Fixed Studio Header)
-         ========================================================= */}
-      <header className="glass-panel relative z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200/70 px-3.5 dark:border-white/[0.08] sm:px-5">
-        {/* Left: Vault Brand Identity + Active File Pill */}
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-slate-950 shadow-sm shadow-emerald-500/25">
-              <ShieldCheck className="h-5 w-5 stroke-[2.2]" />
-              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400 dark:border-[#0F1520]" />
+      {/* Single compact top studio header */}
+      <header className="sticky top-0 z-30 studio-header shrink-0">
+        <div className="max-w-[1600px] mx-auto px-3 sm:px-5 h-14 sm:h-16 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+              style={{
+                backgroundColor: 'var(--accent-surface)',
+                border: '1px solid var(--accent-border)',
+                color: 'var(--accent-text)',
+              }}
+            >
+              <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             </div>
-            <div className="leading-tight">
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-[15px]">
+                <span
+                  className="text-sm sm:text-base font-bold tracking-tight truncate"
+                  style={{ color: 'var(--text-primary)' }}
+                >
                   AmanDok
                 </span>
-                <span className="hidden rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 sm:inline-block">
-                  Cyber-Vault
+                <span
+                  className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold border"
+                  style={{
+                    backgroundColor: 'var(--accent-surface)',
+                    borderColor: 'var(--accent-border)',
+                    color: 'var(--accent-text)',
+                  }}
+                >
+                  <Lock className="w-3 h-3" aria-hidden="true" />
+                  Zero-Upload
                 </span>
               </div>
-              <p className="hidden text-[11px] font-medium text-slate-500 dark:text-slate-400 md:block">
-                {lang === 'id'
-                  ? 'Studio Privasi KTP & Dokumen Lokal'
-                  : 'Client-Side ID & Document Vault'}
+              <p
+                className="hidden sm:block text-xs truncate"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                {t.brandSub}
               </p>
             </div>
           </div>
 
-          <div className="hidden h-6 w-px bg-slate-200 dark:bg-slate-800 lg:block" />
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              ref={privacyTriggerRef}
+              type="button"
+              onClick={() => setPrivacyOpen(true)}
+              aria-haspopup="dialog"
+              aria-label={t.privacyAria}
+              className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] px-2.5 sm:px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.97]"
+              style={{
+                backgroundColor: 'var(--bg-subtle)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-primary)',
+              }}
+            >
+              <ShieldCheck className="w-4 h-4 shrink-0" style={{ color: 'var(--accent-text)' }} aria-hidden="true" />
+              <span className="hidden sm:inline">{t.privacyBtn}</span>
+            </button>
 
-          {/* Active File Telemetry Pill (Desktop) */}
-          <div className="hidden min-w-0 items-center gap-2 rounded-lg border border-slate-200/80 bg-slate-100/80 px-2.5 py-1 text-xs dark:border-slate-800 dark:bg-slate-900/90 lg:flex">
-            <Lock className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-            <span className="max-w-[190px] truncate font-semibold text-slate-700 dark:text-slate-200 xl:max-w-[260px]">
-              {sourceFileName}
-            </span>
-            <span className="font-mono text-[10.5px] text-slate-500 dark:text-slate-400">
-              {sourceDimensions.width}×{sourceDimensions.height}
-            </span>
-            {isSampleLoaded && (
-              <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
-                SAMPLE
-              </span>
-            )}
+            <button
+              type="button"
+              onClick={handleToggleLang}
+              aria-label={t.langAria}
+              className="inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-xs font-bold border transition-transform active:scale-[0.97]"
+              style={{
+                backgroundColor: 'var(--bg-subtle)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-primary)',
+              }}
+            >
+              <Languages className="w-3.5 h-3.5 hidden sm:inline shrink-0" aria-hidden="true" />
+              <span>{lang.toUpperCase()}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsDark((prev) => !prev)}
+              aria-label={isDark ? t.themeLightAria : t.themeDarkAria}
+              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg border transition-transform active:scale-[0.97]"
+              style={{
+                backgroundColor: 'var(--bg-subtle)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-primary)',
+              }}
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4" aria-hidden="true" />
+              ) : (
+                <Moon className="w-4 h-4" aria-hidden="true" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleWipeDesk}
+              aria-label={t.wipeAria}
+              className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] px-2.5 sm:px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.97]"
+              style={{
+                backgroundColor: 'var(--danger-surface)',
+                borderColor: 'var(--danger-border)',
+                color: 'var(--danger-text)',
+              }}
+            >
+              <Trash2 className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span className="hidden md:inline">{t.wipeBtn}</span>
+            </button>
           </div>
-        </div>
-
-        {/* Center: Zero-Upload Security Telemetry Badge */}
-        <button
-          type="button"
-          onClick={() => setShowVaultInfo(true)}
-          title={
-            lang === 'id'
-              ? 'Lihat Arsitektur Keamanan Lokal AmanDok'
-              : 'View AmanDok Local Security Architecture'
-          }
-          className="hidden items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-800 transition hover:border-emerald-500/50 hover:bg-emerald-500/15 dark:text-emerald-300 xl:inline-flex"
-        >
-          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>
-            {lang === 'id'
-              ? '0 KB Upload Server • Diproses di RAM Browser'
-              : '0 KB Server Upload • Browser RAM Sandbox'}
-          </span>
-          <WifiOff className="h-3 w-3 opacity-80" />
-        </button>
-
-        {/* Right: Vault Controls (Sample, Wipe, Lang, Theme, Info) */}
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <button
-            type="button"
-            onClick={handleLoadSampleKtp}
-            className="hidden items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/40 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 sm:inline-flex"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-teal-500" />
-            <span>{lang === 'id' ? 'Contoh KTP' : 'Sample ID'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleWipeSessionMemory}
-            title={lang === 'id' ? 'Bersihkan Memori Sesi' : 'Wipe Session RAM'}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/25 bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-500/20 dark:text-rose-300"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">
-              {lang === 'id' ? 'Bersihkan Sesi' : 'Wipe RAM'}
-            </span>
-          </button>
-
-          <div className="h-5 w-px bg-slate-200 dark:bg-slate-800" />
-
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 font-mono text-[11px] font-bold text-slate-700 transition hover:border-emerald-500/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-            title="Switch Language (ID / EN)"
-          >
-            {lang.toUpperCase()}
-          </button>
-
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 transition hover:border-emerald-500/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-            title={isDark ? 'Switch to Light Vault' : 'Switch to Dark Cyber-Vault'}
-          >
-            {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowVaultInfo(true)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 transition hover:border-emerald-500/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-            title={lang === 'id' ? 'Jaminan Privasi Lokal' : 'Local Privacy Guarantee'}
-          >
-            <Info className="h-4 w-4 text-emerald-500" />
-          </button>
         </div>
       </header>
 
-      {/* =========================================================
-          MAIN 3-PANE CYBER-VAULT WORKSPACE
-         ========================================================= */}
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto pb-20 lg:flex-row lg:overflow-hidden lg:pb-0">
-        {/* -------------------------------------------------------
-            PANE 1: LEFT VERTICAL PIPELINE RAIL (Desktop Only)
-           ------------------------------------------------------- */}
+      {/* Tablet top horizontal tool switcher (768px - 1023px) */}
+      <nav
+        aria-label="Tool Switcher"
+        className="hidden md:flex lg:hidden items-center justify-center gap-2 px-4 py-2 border-b shrink-0"
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          borderColor: 'var(--border-subtle)',
+        }}
+      >
+        {VALID_TABS.map((tabKey) => {
+          const active = activeTab === tabKey;
+          const Icon =
+            tabKey === 'watermark'
+              ? Stamp
+              : tabKey === 'redact'
+                ? EyeOff
+                : tabKey === 'compress'
+                  ? Gauge
+                  : FileStack;
+          return (
+            <button
+              key={tabKey}
+              type="button"
+              onClick={() => setActiveTab(tabKey)}
+              className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
+              style={{
+                backgroundColor: active ? 'var(--accent-surface)' : 'var(--bg-subtle)',
+                borderColor: active ? 'var(--accent-border)' : 'var(--border-subtle)',
+                color: active ? 'var(--accent-text)' : 'var(--text-secondary)',
+              }}
+            >
+              <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span>{t.tabs[tabKey].label}</span>
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Main 3-state studio workspace */}
+      <div className="flex-1 flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_320px] lg:flex lg:flex-row lg:min-h-0">
+        {/* Desktop left tool rail (>= 1024px) */}
         <aside
-          aria-label="AmanDok Pipeline Tools"
-          className="glass-panel hidden shrink-0 flex-col justify-between border-r border-slate-200/70 p-3 dark:border-white/[0.08] lg:flex lg:w-[228px]"
+          aria-label="Studio Tools"
+          className="hidden lg:flex lg:flex-col w-60 shrink-0 border-r p-3 justify-between gap-4"
+          style={{
+            backgroundColor: 'var(--bg-surface)',
+            borderColor: 'var(--border-subtle)',
+          }}
         >
           <div className="space-y-1.5">
-            <div className="px-2 pb-1.5 pt-1 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-              {lang === 'id' ? 'Alur Proteksi' : 'Vault Pipeline'}
-            </div>
-
-            {studioTools.map((tool) => {
-              const Icon = tool.icon;
-              const isActive = activeTab === tool.id;
+            {VALID_TABS.map((tabKey) => {
+              const active = activeTab === tabKey;
+              const Icon =
+                tabKey === 'watermark'
+                  ? Stamp
+                  : tabKey === 'redact'
+                    ? EyeOff
+                    : tabKey === 'compress'
+                      ? Gauge
+                      : FileStack;
               return (
                 <button
-                  key={tool.id}
+                  key={tabKey}
                   type="button"
-                  onClick={() => setActiveTab(tool.id)}
-                  className={`group relative flex w-full items-center gap-3 rounded-xl border p-2.5 text-left transition-all duration-200 active:scale-[0.98] ${
-                    isActive
-                      ? 'border-emerald-500/50 bg-emerald-500/15 shadow-sm shadow-emerald-500/10 dark:border-emerald-400/40 dark:bg-emerald-500/[0.14]'
-                      : 'border-transparent hover:border-slate-200/80 hover:bg-white/60 dark:hover:border-white/[0.08] dark:hover:bg-white/[0.04]'
-                  }`}
+                  onClick={() => setActiveTab(tabKey)}
+                  className="w-full min-h-[52px] px-3 py-2.5 rounded-lg border text-left flex items-start gap-3 transition-transform active:scale-[0.99]"
+                  style={{
+                    backgroundColor: active ? 'var(--accent-surface)' : 'transparent',
+                    borderColor: active ? 'var(--accent-border)' : 'transparent',
+                    color: active ? 'var(--accent-text)' : 'var(--text-primary)',
+                  }}
                 >
-                  {isActive && (
-                    <span className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full bg-emerald-500" />
-                  )}
-                  <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition ${
-                      isActive
-                        ? 'bg-emerald-500 text-slate-950 shadow-sm shadow-emerald-500/30'
-                        : 'bg-slate-100 text-slate-500 group-hover:text-slate-800 dark:bg-slate-800/90 dark:text-slate-400 dark:group-hover:text-slate-200'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-1">
-                      <span
-                        className={`truncate text-xs font-bold ${
-                          isActive
-                            ? 'text-emerald-950 dark:text-white'
-                            : 'text-slate-700 dark:text-slate-200'
-                        }`}
-                      >
-                        {lang === 'id' ? tool.titleId : tool.titleEn}
-                      </span>
-                      {tool.badge && (
-                        <span
-                          className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[9.5px] font-bold ${
-                            isActive
-                              ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
-                              : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
-                          }`}
-                        >
-                          {tool.badge}
-                        </span>
-                      )}
-                    </div>
-                    <div className="truncate text-[11px] text-slate-500 dark:text-slate-400">
-                      {lang === 'id' ? tool.descId : tool.descEn}
-                    </div>
-                  </div>
+                  <Icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold leading-tight">
+                      {t.tabs[tabKey].label}
+                    </span>
+                    <span
+                      className="block text-xs mt-0.5 leading-snug"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      {t.tabs[tabKey].desc}
+                    </span>
+                  </span>
                 </button>
               );
             })}
           </div>
 
-          {/* Left Rail Bottom Quick Upload & Privacy Card */}
-          <div className="space-y-2.5 border-t border-slate-200/80 pt-3 dark:border-slate-800/80">
-            <button
-              type="button"
-              onClick={() =>
-                activeTab === 'pdf'
-                  ? pdfFileInputRef.current?.click()
-                  : fileInputRef.current?.click()
-              }
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-2.5 text-xs font-extrabold text-slate-950 shadow-sm shadow-emerald-500/20 transition hover:brightness-105"
-            >
-              <Upload className="h-3.5 w-3.5 stroke-[2.5]" />
-              <span>
-                {activeTab === 'pdf'
-                  ? lang === 'id'
-                    ? 'Tambah File PDF/Gambar'
-                    : 'Add PDF / Images'
-                  : lang === 'id'
-                    ? 'Buka Foto Dokumen'
-                    : 'Open Document'}
+          <div
+            className="rounded-lg p-3 border text-xs space-y-2 tabular-nums"
+            style={{
+              backgroundColor: 'var(--bg-subtle)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span style={{ color: 'var(--text-muted)' }}>{t.statusBar.docLabel}</span>
+              <span className="font-semibold truncate max-w-[115px]" style={{ color: 'var(--text-primary)' }}>
+                {docState ? formatBytes(docState.originalBytes) : t.statusBar.none}
               </span>
-            </button>
-
-            <div className="glass-pill rounded-xl p-2.5">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
-                <Cpu className="h-3.5 w-3.5 shrink-0" />
-                <span>Zero-Cloud Vault</span>
-              </div>
-              <p className="mt-1 text-[10.5px] leading-relaxed text-slate-500 dark:text-slate-400">
-                {lang === 'id'
-                  ? 'KTP & dokumen diproses murni via HTML5 Canvas lokal. Matikan Wi-Fi untuk membuktikan.'
-                  : 'Processed purely via local HTML5 Canvas. Turn off Wi-Fi anytime to verify.'}
-              </p>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span style={{ color: 'var(--text-muted)' }}>{t.statusBar.redactionsLabel}</span>
+              <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {redactions.length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span style={{ color: 'var(--text-muted)' }}>{t.statusBar.queueLabel}</span>
+              <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {pdfQueue.length}
+              </span>
             </div>
           </div>
         </aside>
 
-        {/* -------------------------------------------------------
-            PANE 2: CENTER INTERACTIVE CANVAS / BINDER WORKBENCH
-           ------------------------------------------------------- */}
+        {/* Center document stage */}
         <section
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDraggingFile(true);
-          }}
-          onDragLeave={() => setIsDraggingFile(false)}
-          onDrop={handleWorkbenchDrop}
-          className="relative flex min-h-[380px] flex-1 flex-col overflow-hidden lg:min-h-0"
+          aria-label="Document Preview Stage"
+          className="flex-1 min-w-0 flex flex-col lg:min-h-0"
         >
-          {/* Drag-and-Drop Overlay */}
-          {isDraggingFile && (
-            <div className="animate-fade-in pointer-events-none absolute inset-3 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-emerald-400 bg-slate-950/75 text-white backdrop-blur-md">
-              <Upload className="mb-2 h-10 w-10 animate-bounce text-emerald-400" />
-              <p className="text-sm font-bold">
-                {lang === 'id'
-                  ? 'Lepaskan berkas untuk memuat ke brankas lokal (0 KB Upload)'
-                  : 'Drop file to load into local vault (0 KB Upload)'}
+          {/* Visible sample indicator banner on both mobile and desktop */}
+          {docState?.isSample && (
+            <div
+              className="px-3 sm:px-5 py-2.5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+              style={{
+                backgroundColor: 'var(--accent-surface)',
+                borderColor: 'var(--accent-border)',
+              }}
+            >
+              <p className="text-xs leading-snug" style={{ color: 'var(--text-primary)' }}>
+                <span className="font-bold mr-1.5" style={{ color: 'var(--accent-text)' }}>
+                  [{t.sampleBadge}]
+                </span>
+                {t.sampleNotice}
               </p>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3.5 rounded-lg text-xs font-semibold shrink-0 transition-transform active:scale-[0.98]"
+                style={{
+                  backgroundColor: 'var(--accent-solid)',
+                  color: 'var(--accent-on-solid)',
+                }}
+              >
+                <Upload className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>{t.uploadRealBtn}</span>
+              </button>
             </div>
           )}
 
-          {activeTab !== 'pdf' ? (
-            <>
-              {/* Workbench Floating Top Toolbar */}
-              <div className="glass-panel flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-slate-200/70 px-4 py-2.5 dark:border-white/[0.08]">
-                <div className="flex flex-wrap items-center gap-2">
+          {/* Status & Error notifications */}
+          {statusMessage && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="px-4 py-2.5 border-b text-xs font-medium flex items-center gap-2"
+              style={{
+                backgroundColor: 'var(--bg-subtle)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-primary)',
+              }}
+            >
+              <span>{statusMessage}</span>
+            </div>
+          )}
+
+          {errorMessage && (
+            <div
+              role="alert"
+              className="px-4 py-2.5 border-b text-xs font-medium flex items-center justify-between gap-3"
+              style={{
+                backgroundColor: 'var(--danger-surface)',
+                borderColor: 'var(--danger-border)',
+                color: 'var(--danger-text)',
+              }}
+            >
+              <span className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span>{errorMessage}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setErrorMessage(null)}
+                aria-label={t.dismissError}
+                className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-md shrink-0"
+              >
+                <X className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
+          )}
+
+          {/* Active canvas stage or empty desk */}
+          <div className="flex-1 min-h-[260px] sm:min-h-[340px] lg:min-h-0 flex flex-col document-mat p-3 sm:p-5 lg:overflow-y-auto custom-scrollbar">
+            {!docState ? (
+              <div className="m-auto max-w-md w-full rounded-xl p-6 sm:p-8 text-center studio-panel space-y-5">
+                <div
+                  className="w-12 h-12 rounded-xl mx-auto flex items-center justify-center"
+                  style={{
+                    backgroundColor: 'var(--accent-surface)',
+                    border: '1px solid var(--accent-border)',
+                    color: 'var(--accent-text)',
+                  }}
+                >
+                  <ShieldCheck className="w-6 h-6" aria-hidden="true" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                    {t.emptyTitle}
+                  </h2>
+                  <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    {t.emptyDesc}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2.5">
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-extrabold text-slate-950 shadow-sm transition hover:bg-emerald-400"
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+                    style={{
+                      backgroundColor: 'var(--accent-solid)',
+                      color: 'var(--accent-on-solid)',
+                    }}
                   >
-                    <Upload className="h-3.5 w-3.5 stroke-[2.4]" />
-                    <span>
-                      {lang === 'id' ? 'Pilih Foto KTP / Dokumen' : 'Select ID / Photo'}
-                    </span>
+                    <Upload className="w-4 h-4" aria-hidden="true" />
+                    <span>{t.emptyChooseBtn}</span>
                   </button>
-
                   <button
                     type="button"
-                    onClick={() =>
-                      setWatermarkConfig((prev) => ({
-                        ...prev,
-                        rotation: ((prev.rotation + 90) % 360) as 0 | 90 | 180 | 270,
-                      }))
-                    }
-                    title={lang === 'id' ? 'Putar Dokumen 90°' : 'Rotate Document 90°'}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                    onClick={() => loadSampleDocument(lang)}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-lg text-sm font-semibold border inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+                    style={{
+                      backgroundColor: 'var(--bg-subtle)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                    }}
                   >
-                    <RotateCw className="h-3.5 w-3.5" />
-                    <span>90°</span>
+                    <FilePlus2 className="w-4 h-4" aria-hidden="true" />
+                    <span>{t.emptySampleBtn}</span>
                   </button>
                 </div>
-
-                <div className="flex items-center gap-2 font-mono text-[11px] text-slate-500 dark:text-slate-400">
-                  {activeTab === 'redact' && (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-sans text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
-                      <Crosshair className="h-3 w-3" />
-                      {lang === 'id' ? 'Mode Tarik Area Sensor' : 'Drag-to-Redact Mode'}
-                    </span>
-                  )}
-                  <span className="rounded-md border border-slate-200/80 bg-slate-100 px-2 py-0.5 dark:border-slate-800 dark:bg-slate-900">
-                    {sourceDimensions.width}×{sourceDimensions.height}px • EXIF Stripped
-                  </span>
-                </div>
               </div>
+            ) : (
+              <div className="w-full max-w-3xl mx-auto my-auto flex flex-col gap-3">
+                {/* Compact stage action strip */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
+                      style={{
+                        backgroundColor: 'var(--bg-surface)',
+                        borderColor: 'var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      <Upload className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>{t.changeImage}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRotateDocument}
+                      className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
+                      style={{
+                        backgroundColor: 'var(--bg-surface)',
+                        borderColor: 'var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      <RotateCw className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>{t.rotateBtn}</span>
+                    </button>
+                  </div>
 
-              {/* Central Dot-Grid Interactive Viewport */}
-              <div
-                onMouseDown={handlePointerDown}
-                onMouseMove={handlePointerMove}
-                onMouseUp={handlePointerUp}
-                onMouseLeave={handlePointerUp}
-                onTouchStart={handlePointerDown}
-                onTouchMove={handlePointerMove}
-                onTouchEnd={handlePointerUp}
-                className={`canvas-backdrop relative flex min-h-[290px] flex-1 items-center justify-center overflow-hidden p-4 sm:p-6 ${
-                  activeTab === 'redact' ? 'cursor-crosshair select-none' : ''
-                }`}
-              >
-                {activeTab === 'redact' && (
-                  <div className="pointer-events-none absolute top-3 z-10 flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-slate-950/90 px-3.5 py-1 text-[11px] font-medium text-emerald-200 shadow-lg backdrop-blur-sm">
-                    <Crosshair className="h-3.5 w-3.5 text-emerald-400" />
+                  <div
+                    className="inline-flex items-center gap-2 px-3 min-h-[44px] rounded-lg border text-xs font-medium tabular-nums"
+                    style={{
+                      backgroundColor: 'var(--bg-surface)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     <span>
-                      {lang === 'id'
-                        ? 'Klik & seret langsung pada NIK / tanda tangan untuk melebur piksel'
-                        : 'Click & drag over ID number / signature to burn pixels'}
+                      {docState.width} x {docState.height} px
                     </span>
+                    <span aria-hidden="true">|</span>
+                    <span>{formatBytes(docState.originalBytes)}</span>
                   </div>
-                )}
+                </div>
 
-                {activeTab === 'compress' && compressionResult ? (
-                  <div className="relative flex max-h-full max-w-full flex-col items-center">
-                    <img
-                      src={compressionResult.dataUrl}
-                      alt="Pratinjau Hasil Kompresi & Pasfoto"
-                      className="max-h-[46vh] w-auto rounded-lg border border-slate-300/60 object-contain shadow-2xl dark:border-slate-700/80 lg:max-h-[calc(100dvh-230px)]"
+                {/* Framed Document Canvas */}
+                <div
+                  className="relative rounded-xl p-2 sm:p-3 studio-panel flex items-center justify-center overflow-hidden"
+                >
+                  <canvas
+                    ref={canvasRef}
+                    width={docState.width}
+                    height={docState.height}
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    className={`max-w-full max-h-[52vh] lg:max-h-[60vh] h-auto rounded-lg select-none ${
+                      activeTab === 'redact' ? 'cursor-crosshair touch-none' : 'cursor-default'
+                    }`}
+                  />
+
+                  {activeTab === 'compress' && cropPreset !== 'original' && (
+                    <div
+                      aria-hidden="true"
+                      className={`pointer-events-none absolute inset-4 rounded-lg crop-frame ${
+                        cropPreset === '3x4'
+                          ? 'aspect-[3/4] max-h-[82%] mx-auto my-auto'
+                          : 'aspect-[1.586/1] max-w-[88%] mx-auto my-auto'
+                      }`}
                     />
-                    <div className="mt-3 flex flex-wrap items-center justify-center gap-2 font-mono text-xs">
-                      <span className="rounded-lg border border-slate-200 bg-white/95 px-2.5 py-1 text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900/95 dark:text-slate-300">
-                        {lang === 'id' ? 'Awal:' : 'Raw:'}{' '}
-                        <strong>{formatBytes(compressionResult.originalBytes)}</strong>
-                      </span>
-                      <ArrowRight className="h-3.5 w-3.5 text-emerald-500" />
-                      <span className="rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-1 font-bold text-emerald-800 dark:text-emerald-300">
-                        {lang === 'id' ? 'Hasil:' : 'Output:'}{' '}
-                        {formatBytes(compressionResult.compressedBytes)} (Q:
-                        {compressionResult.qualityUsed}%)
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="relative inline-block max-w-full overflow-hidden rounded-lg ring-1 ring-slate-900/10 shadow-2xl dark:ring-white/10">
-                    <canvas
-                      ref={previewCanvasRef}
-                      className="block max-h-[46vh] w-auto max-w-full object-contain lg:max-h-[calc(100dvh-210px)]"
-                    />
-
-                    {/* Live Redaction Draft Box Overlay */}
-                    {activeTab === 'redact' && draftBox && (
-                      <div
-                        style={{
-                          left: `${draftBox.x * 100}%`,
-                          top: `${draftBox.y * 100}%`,
-                          width: `${draftBox.width * 100}%`,
-                          height: `${draftBox.height * 100}%`,
-                        }}
-                        className="pointer-events-none absolute rounded border-2 border-dashed border-rose-500 bg-rose-500/25"
-                      />
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Workbench Bottom Export & Pipeline Chaining Bar */}
-              <div className="glass-panel flex shrink-0 flex-wrap items-center justify-between gap-2.5 border-t border-slate-200/70 px-4 py-2.5 dark:border-white/[0.08]">
-                <div className="flex flex-wrap items-center gap-2">
-                  {activeTab === 'compress' && compressionResult ? (
-                    <button
-                      type="button"
-                      onClick={handleDownloadCompressed}
-                      className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-xs font-extrabold text-slate-950 shadow-sm transition hover:brightness-105"
-                    >
-                      <HardDriveDownload className="h-4 w-4 stroke-[2.2]" />
-                      {lang === 'id'
-                        ? `Simpan JPG (${formatBytes(compressionResult.compressedBytes)})`
-                        : `Save JPG (${formatBytes(compressionResult.compressedBytes)})`}
-                    </button>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => handleDownloadProtectedImage('jpeg')}
-                        className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-xs font-extrabold text-slate-950 shadow-sm transition hover:brightness-105"
-                      >
-                        <Download className="h-4 w-4 stroke-[2.3]" />
-                        {lang === 'id' ? 'Unduh JPG Aman' : 'Download Safe JPG'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDownloadProtectedImage('png')}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                        <span>PNG</span>
-                      </button>
-                    </>
                   )}
                 </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {activeTab === 'watermark' && (
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('redact')}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                    >
-                      <span>{lang === 'id' ? 'Lanjut Sensor' : 'Next: Redact'}</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-
-                  {activeTab === 'redact' && (
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('compress')}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                    >
-                      <span>{lang === 'id' ? 'Lanjut Target KB' : 'Next: Target KB'}</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={handleSendCurrentToPdfQueue}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/35 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-500/20 dark:text-emerald-300"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>{lang === 'id' ? 'Ke Antrean PDF' : 'Add to PDF'}</span>
-                  </button>
-                </div>
               </div>
-            </>
-          ) : (
-            /* CENTER PANE WHEN TAB 4 (PDF BINDER) IS ACTIVE */
-            <div className="canvas-backdrop vault-scroll flex flex-1 flex-col overflow-y-auto p-4 sm:p-6">
-              <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-xl backdrop-blur-sm dark:border-slate-800 dark:bg-[#0F1520]/95">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-3.5 dark:border-slate-800">
-                  <div>
-                    <h2 className="text-sm font-extrabold text-slate-900 dark:text-white sm:text-base">
-                      {lang === 'id'
-                        ? 'Antrean Lembar Kerja PDF A4'
-                        : 'A4 PDF Binder Queue'}
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {lang === 'id'
-                        ? 'Susun urutan KTP, NPWP, KK, atau Ijazah untuk digabung menjadi 1 PDF'
-                        : 'Order ID cards and scans to combine into one local PDF'}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={handleSendCurrentToPdfQueue}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                    >
-                      <Plus className="h-3.5 w-3.5 text-emerald-500" />
-                      {lang === 'id' ? 'Masukkan KTP Studio' : 'Insert Studio ID'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => pdfFileInputRef.current?.click()}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-extrabold text-slate-950 shadow-sm transition hover:bg-emerald-400"
-                    >
-                      <Upload className="h-3.5 w-3.5 stroke-[2.3]" />
-                      {lang === 'id' ? 'Tambah Berkas' : 'Add Files'}
-                    </button>
-                  </div>
-                </div>
-
-                {pdfQueue.length === 0 ? (
-                  <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300/80 bg-slate-50/60 px-6 py-12 text-center dark:border-slate-800 dark:bg-slate-950/40">
-                    <Layers className="mb-3 h-10 w-10 text-emerald-500/70" />
-                    <p className="mb-1 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      {lang === 'id'
-                        ? 'Antrean PDF Binder Masih Kosong'
-                        : 'Your PDF Binder Queue Is Empty'}
-                    </p>
-                    <p className="mb-5 max-w-md text-xs text-slate-500 dark:text-slate-400">
-                      {lang === 'id'
-                        ? 'Masukkan KTP ber-watermark dari studio atau seret beberapa berkas JPG/PNG/PDF (NPWP, Ijazah, KK) langsung ke area ini.'
-                        : 'Insert your protected ID card from the studio or drag & drop multiple JPG/PNG/PDF files here.'}
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-2.5">
-                      <button
-                        type="button"
-                        onClick={handleSendCurrentToPdfQueue}
-                        className="rounded-lg bg-emerald-500 px-4 py-2 text-xs font-extrabold text-slate-950 shadow-sm transition hover:bg-emerald-400"
-                      >
-                        {lang === 'id'
-                          ? '+ Masukkan KTP dari Studio'
-                          : '+ Insert Current Studio ID'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => pdfFileInputRef.current?.click()}
-                        className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-                      >
-                        {lang === 'id' ? 'Pilih File Perangkat' : 'Browse Device Files'}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <ul className="vault-scroll space-y-2 overflow-y-auto pr-1">
-                    {pdfQueue.map((item, idx) => (
-                      <li
-                        key={item.id}
-                        className="flex items-center justify-between gap-3 rounded-xl border border-slate-200/80 bg-slate-50/90 p-2.5 dark:border-slate-800 dark:bg-slate-900/70"
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 font-mono text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                            {idx + 1}
-                          </span>
-                          {item.type === 'image' && item.dataUrl ? (
-                            <img
-                              src={item.dataUrl}
-                              alt={item.name}
-                              className="h-10 w-14 shrink-0 rounded-lg border border-slate-200 object-cover dark:border-slate-700"
-                            />
-                          ) : (
-                            <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-rose-500 dark:border-slate-700 dark:bg-slate-950">
-                              <FileText className="h-5 w-5" />
-                            </div>
-                          )}
-                          <div className="min-w-0">
-                            <div className="truncate text-xs font-bold text-slate-800 dark:text-slate-200">
-                              {item.name}
-                            </div>
-                            <div className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
-                              {item.type.toUpperCase()} • {formatBytes(item.sizeBytes)}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex shrink-0 items-center gap-1">
-                          <button
-                            type="button"
-                            disabled={idx === 0}
-                            onClick={() => movePdfQueueItem(idx, -1)}
-                            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-200/70 hover:text-slate-900 disabled:opacity-30 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-                            title="Naikkan urutan"
-                          >
-                            <MoveUp className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={idx === pdfQueue.length - 1}
-                            onClick={() => movePdfQueueItem(idx, 1)}
-                            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-200/70 hover:text-slate-900 disabled:opacity-30 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-                            title="Turunkan urutan"
-                          >
-                            <MoveDown className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removePdfQueueItem(item.id)}
-                            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-500/15 hover:text-rose-500"
-                            title="Hapus"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </section>
 
-        {/* -------------------------------------------------------
-            PANE 3: RIGHT PRECISION INSPECTOR PANEL
-           ------------------------------------------------------- */}
-        <aside className="vault-scroll glass-panel w-full shrink-0 border-t border-slate-200/70 p-4 dark:border-white/[0.08] sm:p-5 lg:w-[376px] lg:overflow-y-auto lg:border-l lg:border-t-0 xl:w-[400px]">
-          <div key={activeTab} className="animate-panel-in">
-          {/* INSPECTOR 1: WATERMARK */}
+        {/* Right Control Inspector (or bottom flow on mobile < 768px) */}
+        <aside
+          aria-label="Tool Controls"
+          className="w-full md:w-80 lg:w-[340px] xl:w-[360px] shrink-0 border-t md:border-t-0 md:border-l p-4 space-y-5 lg:overflow-y-auto custom-scrollbar"
+          style={{
+            backgroundColor: 'var(--bg-surface)',
+            borderColor: 'var(--border-subtle)',
+          }}
+        >
+          {/* TAB 1: WATERMARK */}
           {activeTab === 'watermark' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-200/80 pb-3 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-emerald-500" />
-                  <div>
-                    <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                      {lang === 'id' ? 'Inspector Segel Watermark' : 'Watermark Inspector'}
-                    </h2>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      {lang === 'id'
-                        ? 'Kunci tujuan pemakaian di atas area KTP'
-                        : 'Stamp verification purpose across ID'}
-                    </p>
-                  </div>
-                </div>
-
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 dark:border-slate-800 dark:bg-slate-900">
-                  <input
-                    type="checkbox"
-                    checked={watermarkEnabled}
-                    onChange={(e) => setWatermarkEnabled(e.target.checked)}
-                    className="h-3.5 w-3.5 rounded accent-emerald-500"
-                  />
-                  <span className="font-mono text-[11px] font-bold text-slate-700 dark:text-slate-200">
-                    {watermarkEnabled ? 'ON' : 'OFF'}
-                  </span>
-                </label>
+              <div>
+                <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {t.tabs.watermark.label}
+                </h2>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  {t.tabs.watermark.desc}
+                </p>
               </div>
 
-              {/* Quick Purpose Presets */}
-              <div>
-                <label className="mb-1.5 block font-mono text-[10.5px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {lang === 'id' ? 'Preset Keperluan Cepat' : 'Quick Purpose Presets'}
-                </label>
-                <div className="flex flex-wrap gap-1.5">
-                  {WATERMARK_PRESETS.map((preset) => {
-                    const targetText = lang === 'id' ? preset.textId : preset.textEn;
-                    const isSelected = watermarkConfig.text === targetText;
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.watermark.presetsTitle}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {t.watermark.presets.map((preset) => {
+                    const selected = wmConfig.text === preset.text && watermarkEnabled;
                     return (
                       <button
-                        key={preset.id}
+                        key={preset.key}
                         type="button"
-                        onClick={() =>
-                          setWatermarkConfig((prev) => ({
-                            ...prev,
-                            text: targetText,
-                          }))
-                        }
-                        className={`rounded-lg border px-2.5 py-1 text-[11.5px] font-semibold transition ${
-                          isSelected
-                            ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
-                            : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-700'
-                        }`}
+                        onClick={() => {
+                          setWatermarkEnabled(true);
+                          setWmConfig((prev) => ({ ...prev, text: preset.text }));
+                        }}
+                        className="min-h-[44px] px-3 py-2 rounded-lg text-xs font-semibold border text-left transition-transform active:scale-[0.98]"
+                        style={{
+                          backgroundColor: selected ? 'var(--accent-surface)' : 'var(--bg-subtle)',
+                          borderColor: selected ? 'var(--accent-border)' : 'var(--border-subtle)',
+                          color: selected ? 'var(--accent-text)' : 'var(--text-primary)',
+                        }}
                       >
-                        {lang === 'id' ? preset.labelId : preset.labelEn}
+                        {preset.label}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Watermark Text & Subtext */}
-              <div className="space-y-2.5">
-                <div>
-                  <label
-                    htmlFor="wm-main-text"
-                    className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300"
-                  >
-                    {lang === 'id' ? 'Teks Segel Utama' : 'Primary Stamp Text'}
-                  </label>
-                  <input
-                    id="wm-main-text"
-                    type="text"
-                    value={watermarkConfig.text}
-                    onChange={(e) =>
-                      setWatermarkConfig((prev) => ({ ...prev, text: e.target.value }))
-                    }
-                    placeholder="HANYA UNTUK VERIFIKASI..."
-                    className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-900 placeholder-slate-400 transition focus:border-emerald-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:focus:border-emerald-500"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="wm-sub-text"
-                    className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300"
-                  >
-                    {lang === 'id'
-                      ? 'Baris Kedua (Tanggal / Instansi)'
-                      : 'Secondary Line (Date / Recipient)'}
-                  </label>
-                  <input
-                    id="wm-sub-text"
-                    type="text"
-                    value={watermarkConfig.subtext || ''}
-                    onChange={(e) =>
-                      setWatermarkConfig((prev) => ({ ...prev, subtext: e.target.value }))
-                    }
-                    placeholder={`TANGGAL: ${todayStr}`}
-                    className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800 placeholder-slate-400 transition focus:border-emerald-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-
-              {/* Pattern Mode & Ink Color */}
-              <div className="space-y-3">
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    {lang === 'id' ? 'Pola Segel' : 'Stamp Pattern'}
-                  </label>
-                  <div className="grid grid-cols-3 gap-1 rounded-lg border border-slate-200 bg-slate-100 p-1 dark:border-slate-800 dark:bg-slate-900">
-                    {(
-                      [
-                        { id: 'tiled', labelId: 'Rapat', labelEn: 'Tiled' },
-                        { id: 'single', labelId: 'Stempel', labelEn: 'Stamp' },
-                        { id: 'banner', labelId: 'Pita', labelEn: 'Banner' },
-                      ] as { id: WatermarkMode; labelId: string; labelEn: string }[]
-                    ).map((m) => (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.watermark.modeTitle}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['tiled', 'single'] as WatermarkMode[]).map((mode) => {
+                    const selected = wmConfig.mode === mode;
+                    return (
                       <button
-                        key={m.id}
+                        key={mode}
                         type="button"
-                        onClick={() =>
-                          setWatermarkConfig((prev) => ({ ...prev, mode: m.id }))
-                        }
-                        className={`rounded-md py-1.5 text-xs font-bold transition ${
-                          watermarkConfig.mode === m.id
-                            ? 'bg-white text-slate-900 shadow-sm dark:bg-emerald-500 dark:text-slate-950'
-                            : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                        }`}
+                        onClick={() => setWmConfig((prev) => ({ ...prev, mode }))}
+                        className="min-h-[44px] px-3 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
+                        style={{
+                          backgroundColor: selected
+                            ? 'var(--neutral-active-bg)'
+                            : 'var(--bg-subtle)',
+                          borderColor: selected
+                            ? 'var(--neutral-active-bg)'
+                            : 'var(--border-subtle)',
+                          color: selected ? 'var(--neutral-active-text)' : 'var(--text-primary)',
+                        }}
                       >
-                        {lang === 'id' ? m.labelId : m.labelEn}
+                        {mode === 'tiled' ? t.watermark.modeTiled : t.watermark.modeSingle}
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-200/80 bg-slate-50 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-900/60">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    {lang === 'id' ? 'Warna Tinta' : 'Ink Color'}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {WATERMARK_COLORS.map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        title={c.label}
-                        onClick={() =>
-                          setWatermarkConfig((prev) => ({ ...prev, color: c.hex }))
-                        }
-                        style={{ backgroundColor: c.hex }}
-                        className={`h-6 w-6 rounded-full border border-slate-300 transition dark:border-slate-600 ${
-                          watermarkConfig.color === c.hex
-                            ? 'scale-110 ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-[#0F1520]'
-                            : 'opacity-80 hover:opacity-100'
-                        }`}
-                      />
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Precision Sliders */}
-              <div className="grid grid-cols-2 gap-3.5 rounded-xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60">
-                <div>
-                  <div className="mb-1 flex justify-between text-[11.5px]">
-                    <span className="font-medium text-slate-600 dark:text-slate-400">
-                      {lang === 'id' ? 'Transparansi' : 'Opacity'}
-                    </span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                      {Math.round(watermarkConfig.opacity * 100)}%
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="0.85"
-                    step="0.05"
-                    value={watermarkConfig.opacity}
-                    onChange={(e) =>
-                      setWatermarkConfig((prev) => ({
-                        ...prev,
-                        opacity: parseFloat(e.target.value),
-                      }))
-                    }
-                    className="clean-slider w-full"
-                  />
-                </div>
-
-                <div>
-                  <div className="mb-1 flex justify-between text-[11.5px]">
-                    <span className="font-medium text-slate-600 dark:text-slate-400">
-                      {lang === 'id' ? 'Kemiringan' : 'Angle'}
-                    </span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                      {watermarkConfig.angle}°
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="-55"
-                    max="55"
-                    step="5"
-                    value={watermarkConfig.angle}
-                    onChange={(e) =>
-                      setWatermarkConfig((prev) => ({
-                        ...prev,
-                        angle: parseInt(e.target.value, 10),
-                      }))
-                    }
-                    className="clean-slider w-full"
-                  />
-                </div>
-
-                <div>
-                  <div className="mb-1 flex justify-between text-[11.5px]">
-                    <span className="font-medium text-slate-600 dark:text-slate-400">
-                      {lang === 'id' ? 'Ukuran Huruf' : 'Font Size'}
-                    </span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                      {Math.round(watermarkConfig.fontSizeScale * 100)}%
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0.6"
-                    max="1.8"
-                    step="0.1"
-                    value={watermarkConfig.fontSizeScale}
-                    onChange={(e) =>
-                      setWatermarkConfig((prev) => ({
-                        ...prev,
-                        fontSizeScale: parseFloat(e.target.value),
-                      }))
-                    }
-                    className="clean-slider w-full"
-                  />
-                </div>
-
-                <div>
-                  <div className="mb-1 flex justify-between text-[11.5px]">
-                    <span className="font-medium text-slate-600 dark:text-slate-400">
-                      {lang === 'id' ? 'Kerapatan' : 'Spacing'}
-                    </span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                      {Math.round(watermarkConfig.spacingScale * 100)}%
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0.7"
-                    max="1.7"
-                    step="0.1"
-                    value={watermarkConfig.spacingScale}
-                    onChange={(e) =>
-                      setWatermarkConfig((prev) => ({
-                        ...prev,
-                        spacingScale: parseFloat(e.target.value),
-                      }))
-                    }
-                    className="clean-slider w-full"
-                  />
-                </div>
-              </div>
-
-              {/* Timestamp Footer Toggle */}
-              <label className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200/80 bg-slate-50 px-3 py-2 text-xs dark:border-slate-800 dark:bg-slate-900/60">
-                <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  {lang === 'id'
-                    ? 'Sertakan Pita Timestamp di Tepi Bawah'
-                    : 'Include Bottom Timestamp Seal Bar'}
-                </span>
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="wm-purpose-input"
+                  className="block text-xs font-semibold"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {t.watermark.purposeLabel}
+                </label>
                 <input
-                  type="checkbox"
-                  checked={Boolean(watermarkConfig.addTimestampBorder)}
+                  id="wm-purpose-input"
+                  type="text"
+                  value={wmConfig.text}
+                  onChange={(e) => {
+                    setWatermarkEnabled(true);
+                    setWmConfig((prev) => ({ ...prev, text: e.target.value }));
+                  }}
+                  className="w-full min-h-[44px] px-3 rounded-lg border text-sm"
+                  style={{
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                    color: 'var(--text-primary)',
+                  }}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="wm-date-input"
+                  className="block text-xs font-semibold"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {t.watermark.dateLabel}
+                </label>
+                <input
+                  id="wm-date-input"
+                  type="text"
+                  value={wmConfig.subtext || ''}
+                  onChange={(e) => {
+                    setWatermarkEnabled(true);
+                    setWmConfig((prev) => ({ ...prev, subtext: e.target.value }));
+                  }}
+                  className="w-full min-h-[44px] px-3 rounded-lg border text-sm"
+                  style={{
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                    color: 'var(--text-primary)',
+                  }}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <label htmlFor="wm-size-slider" style={{ color: 'var(--text-secondary)' }}>
+                    {t.watermark.fontSizeLabel}
+                  </label>
+                  <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                    {Math.round(wmConfig.fontSizeScale * 100)}%
+                  </span>
+                </div>
+                <input
+                  id="wm-size-slider"
+                  type="range"
+                  min={50}
+                  max={200}
+                  step={5}
+                  value={Math.round(wmConfig.fontSizeScale * 100)}
                   onChange={(e) =>
-                    setWatermarkConfig((prev) => ({
+                    setWmConfig((prev) => ({
                       ...prev,
-                      addTimestampBorder: e.target.checked,
+                      fontSizeScale: Number(e.target.value) / 100,
                     }))
                   }
-                  className="h-4 w-4 rounded accent-emerald-500"
+                  className="studio-range"
                 />
-              </label>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <label htmlFor="wm-opacity-slider" style={{ color: 'var(--text-secondary)' }}>
+                    {t.watermark.opacityLabel}
+                  </label>
+                  <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                    {Math.round(wmConfig.opacity * 100)}%
+                  </span>
+                </div>
+                <input
+                  id="wm-opacity-slider"
+                  type="range"
+                  min={10}
+                  max={85}
+                  value={Math.round(wmConfig.opacity * 100)}
+                  onChange={(e) =>
+                    setWmConfig((prev) => ({
+                      ...prev,
+                      opacity: Number(e.target.value) / 100,
+                    }))
+                  }
+                  className="studio-range"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <label htmlFor="wm-angle-slider" style={{ color: 'var(--text-secondary)' }}>
+                    {t.watermark.angleLabel}
+                  </label>
+                  <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                    {wmConfig.angle}°
+                  </span>
+                </div>
+                <input
+                  id="wm-angle-slider"
+                  type="range"
+                  min={-60}
+                  max={60}
+                  value={wmConfig.angle}
+                  onChange={(e) =>
+                    setWmConfig((prev) => ({ ...prev, angle: Number(e.target.value) }))
+                  }
+                  className="studio-range"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.watermark.colorLabel}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {t.watermark.colors.map((swatch) => {
+                    const selected = wmConfig.color === swatch.hex;
+                    return (
+                      <button
+                        key={swatch.hex}
+                        type="button"
+                        onClick={() =>
+                          setWmConfig((prev) => ({ ...prev, color: swatch.hex }))
+                        }
+                        aria-label={swatch.name}
+                        title={swatch.name}
+                        className="w-11 h-11 rounded-lg border flex items-center justify-center transition-transform active:scale-[0.95]"
+                        style={{
+                          backgroundColor: swatch.hex,
+                          borderColor: selected ? 'var(--accent-solid)' : 'var(--border-strong)',
+                          boxShadow: selected ? '0 0 0 2px var(--accent-solid)' : undefined,
+                          color: swatch.hex === '#ffffff' ? '#0f172a' : '#ffffff',
+                        }}
+                      >
+                        {selected && <Check className="w-4 h-4" aria-hidden="true" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="pt-2 space-y-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                <button
+                  type="button"
+                  disabled={!docState}
+                  onClick={handleDownloadCanvasImage}
+                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
+                  style={{
+                    backgroundColor: 'var(--accent-solid)',
+                    color: 'var(--accent-on-solid)',
+                  }}
+                >
+                  <Download className="w-4 h-4" aria-hidden="true" />
+                  <span>{t.exportImgBtn}</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={!docState}
+                  onClick={handleAddCurrentToPdfQueue}
+                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold border inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
+                  style={{
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <FilePlus2 className="w-4 h-4" aria-hidden="true" />
+                  <span>{t.addToPdfBtn}</span>
+                </button>
+              </div>
             </div>
           )}
 
-          {/* INSPECTOR 2: PIXEL REDACTION */}
+          {/* TAB 2: REDACT */}
           {activeTab === 'redact' && (
             <div className="space-y-4">
-              <div className="border-b border-slate-200/80 pb-3 dark:border-slate-800">
-                <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                  {lang === 'id'
-                    ? 'Sensor Permanen NIK & Tanda Tangan'
-                    : 'Permanent Pixel Redaction'}
+              <div>
+                <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {t.tabs.redact.label}
                 </h2>
-                <p className="mt-0.5 text-[11.5px] text-slate-500 dark:text-slate-400">
-                  {lang === 'id'
-                    ? 'Tarik kursor pada gambar atau klik pintasan area KTP di bawah.'
-                    : 'Drag across the canvas or click quick ID card masks below.'}
+                <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  {t.redact.hint}
                 </p>
               </div>
 
-              {/* Redaction Style */}
-              <div>
-                <label className="mb-1.5 block font-mono text-[10.5px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {lang === 'id' ? 'Metode Peleburan Piksel' : 'Redaction Method'}
-                </label>
-                <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                  {(
-                    [
-                      { id: 'pixelate', labelId: 'Mozaik', labelEn: 'Pixelate' },
-                      { id: 'blur', labelId: 'Blur', labelEn: 'Blur' },
-                      { id: 'blackout', labelId: 'Hitam', labelEn: 'Blackout' },
-                      { id: 'whiteout', labelId: 'Putih', labelEn: 'Whiteout' },
-                    ] as { id: RedactionStyle; labelId: string; labelEn: string }[]
-                  ).map((st) => (
-                    <button
-                      key={st.id}
-                      type="button"
-                      onClick={() => setActiveRedactionStyle(st.id)}
-                      className={`rounded-lg border px-2.5 py-2 text-xs font-bold transition ${
-                        activeRedactionStyle === st.id
-                          ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
-                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
-                      }`}
-                    >
-                      {lang === 'id' ? st.labelId : st.labelEn}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quick ID Card Masks */}
-              <div>
-                <label className="mb-1.5 block font-mono text-[10.5px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {lang === 'id' ? 'Pintasan Area KTP Standar' : 'Quick ID Area Masks'}
-                </label>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.redact.styleLabel}
+                </p>
                 <div className="grid grid-cols-2 gap-2">
-                  {(
-                    [
-                      { id: 'nik', labelId: '+ Baris NIK', labelEn: '+ ID Number' },
-                      { id: 'signature', labelId: '+ Tanda Tangan', labelEn: '+ Signature' },
-                      { id: 'address', labelId: '+ Alamat Rumah', labelEn: '+ Address' },
-                      { id: 'photo', labelId: '+ Foto Wajah', labelEn: '+ Portrait' },
-                    ] as const
-                  ).map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => addQuickRedactionPreset(p.id)}
-                      className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/50 hover:bg-emerald-500/5 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                    >
-                      <span>{lang === 'id' ? p.labelId : p.labelEn}</span>
-                      <EyeOff className="h-3.5 w-3.5 text-emerald-500" />
-                    </button>
-                  ))}
+                  {t.redact.styles.map((item) => {
+                    const selected = redactionStyle === item.key;
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => setRedactionStyle(item.key)}
+                        className="min-h-[44px] px-2 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
+                        style={{
+                          backgroundColor: selected
+                            ? 'var(--neutral-active-bg)'
+                            : 'var(--bg-subtle)',
+                          borderColor: selected
+                            ? 'var(--neutral-active-bg)'
+                            : 'var(--border-subtle)',
+                          color: selected ? 'var(--neutral-active-text)' : 'var(--text-primary)',
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Active Redaction List */}
-              <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-900/60">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    {lang === 'id'
-                      ? `Daftar Zona Sensor (${redactions.length})`
-                      : `Redacted Zones (${redactions.length})`}
-                  </span>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.redact.quickLabel}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    disabled={!docState}
+                    onClick={() => handleAddQuickRedaction('nik')}
+                    className="min-h-[44px] px-3 rounded-lg text-xs font-semibold border disabled:opacity-45 transition-transform active:scale-[0.98]"
+                    style={{
+                      backgroundColor: 'var(--bg-subtle)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    {t.redact.addNik}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!docState}
+                    onClick={() => handleAddQuickRedaction('signature')}
+                    className="min-h-[44px] px-3 rounded-lg text-xs font-semibold border disabled:opacity-45 transition-transform active:scale-[0.98]"
+                    style={{
+                      backgroundColor: 'var(--bg-subtle)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    {t.redact.addSig}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                    {t.redact.listTitle} ({redactions.length})
+                  </p>
                   {redactions.length > 0 && (
                     <button
                       type="button"
                       onClick={() => setRedactions([])}
-                      className="text-xs font-bold text-rose-500 hover:underline"
+                      className="min-h-[44px] px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1"
+                      style={{ color: 'var(--danger-text)' }}
                     >
-                      {lang === 'id' ? 'Hapus Semua' : 'Clear All'}
+                      <Eraser className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>{t.redact.clearAll}</span>
                     </button>
                   )}
                 </div>
 
                 {redactions.length === 0 ? (
-                  <p className="py-5 text-center text-xs text-slate-400">
-                    {lang === 'id'
-                      ? 'Belum ada area sensor. Klik & seret langsung pada pratinjau KTP.'
-                      : 'No redaction zones yet. Click & drag on the ID preview.'}
+                  <p
+                    className="text-xs rounded-lg p-3 border leading-relaxed"
+                    style={{
+                      backgroundColor: 'var(--bg-subtle)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    {t.redact.none}
                   </p>
                 ) : (
-                  <ul className="vault-scroll max-h-44 space-y-1.5 overflow-y-auto pr-1">
-                    {redactions.map((box, i) => (
+                  <ul className="space-y-2">
+                    {redactions.map((box, index) => (
                       <li
                         key={box.id}
-                        className="flex items-center justify-between rounded-lg border border-slate-200/80 bg-white px-3 py-1.5 text-xs dark:border-slate-800 dark:bg-slate-950"
+                        className="rounded-lg border px-3 py-1.5 flex items-center justify-between gap-2"
+                        style={{
+                          backgroundColor: 'var(--bg-subtle)',
+                          borderColor: 'var(--border-subtle)',
+                        }}
                       >
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">
-                          Zona #{i + 1}{' '}
-                          <span className="ml-1 rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-emerald-600 dark:text-emerald-400">
-                            {box.style}
-                          </span>
-                        </span>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                            {t.redact.boxPrefix} #{index + 1}
+                          </p>
+                          <p className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                            {Math.round(box.width * 100)}% x {Math.round(box.height * 100)}%
+                          </p>
+                        </div>
                         <button
                           type="button"
                           onClick={() =>
-                            setRedactions((prev) => prev.filter((r) => r.id !== box.id))
+                            setRedactions((prev) => prev.filter((item) => item.id !== box.id))
                           }
-                          className="text-slate-400 transition hover:text-rose-500"
+                          aria-label={`${t.redact.deleteBox} #${index + 1}`}
+                          className="min-h-[44px] min-w-[44px] rounded-lg inline-flex items-center justify-center shrink-0"
+                          style={{ color: 'var(--danger-text)' }}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
                         </button>
                       </li>
                     ))}
@@ -1763,406 +1792,606 @@ export default function AmanDokStudio() {
                 )}
               </div>
 
-              <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-3 text-[11.5px] leading-relaxed text-slate-700 dark:text-slate-300">
-                <strong className="text-emerald-700 dark:text-emerald-400">
-                  Irreversible Burn:
-                </strong>{' '}
-                {lang === 'id'
-                  ? 'Piksel asli di bawah area sensor dihancurkan permanen pada bitmap keluaran.'
-                  : 'Underlying pixels are permanently destroyed in the exported bitmap.'}
+              <div className="pt-2 space-y-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                <button
+                  type="button"
+                  disabled={!docState}
+                  onClick={handleDownloadCanvasImage}
+                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
+                  style={{
+                    backgroundColor: 'var(--accent-solid)',
+                    color: 'var(--accent-on-solid)',
+                  }}
+                >
+                  <Download className="w-4 h-4" aria-hidden="true" />
+                  <span>{t.exportImgBtn}</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={!docState}
+                  onClick={handleAddCurrentToPdfQueue}
+                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold border inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
+                  style={{
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <FilePlus2 className="w-4 h-4" aria-hidden="true" />
+                  <span>{t.addToPdfBtn}</span>
+                </button>
               </div>
             </div>
           )}
 
-          {/* INSPECTOR 3: TARGET KB & PASFOTO */}
+          {/* TAB 3: COMPRESS */}
           {activeTab === 'compress' && (
             <div className="space-y-4">
-              <div className="border-b border-slate-200/80 pb-3 dark:border-slate-800">
-                <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                  {lang === 'id'
-                    ? 'Kompresor Target KB & Rasio Pasfoto'
-                    : 'Target-KB Compressor & Crop'}
+              <div>
+                <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {t.tabs.compress.label}
                 </h2>
-                <p className="mt-0.5 text-[11.5px] text-slate-500 dark:text-slate-400">
-                  {lang === 'id'
-                    ? 'Otomatis paskan batas unggah SSCASN/CPNS, BUMN, dan e-KYC.'
-                    : 'Fit strict portal upload caps (100KB, 200KB, 300KB) automatically.'}
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  {t.tabs.compress.desc}
                 </p>
               </div>
 
-              {/* Target KB Presets */}
-              <div>
-                <label className="mb-1.5 block font-mono text-[10.5px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {lang === 'id' ? 'Target Ukuran Maksimal' : 'Max Size Target'}
-                </label>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {[100, 200, 300, 500].map((kb) => (
-                    <button
-                      key={kb}
-                      type="button"
-                      onClick={() => setTargetKb(kb)}
-                      className={`rounded-lg border py-2 font-mono text-xs font-bold transition ${
-                        targetKb === kb
-                          ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
-                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
-                      }`}
-                    >
-                      ≤{kb}K
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mt-2.5 rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-900/60">
-                  <div className="mb-1 flex justify-between text-xs">
-                    <span className="font-medium text-slate-600 dark:text-slate-400">
-                      {lang === 'id' ? 'Batas Kustom Presisi:' : 'Custom KB Cap:'}
-                    </span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                      {targetKb} KB
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="40"
-                    max="800"
-                    step="10"
-                    value={targetKb}
-                    onChange={(e) => setTargetKb(parseInt(e.target.value, 10))}
-                    className="clean-slider w-full"
-                  />
-                </div>
-              </div>
-
-              {/* Aspect Ratio Crop */}
-              <div>
-                <label className="mb-1.5 block font-mono text-[10.5px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {lang === 'id' ? 'Rasio Pemotongan (Crop)' : 'Aspect Ratio Crop'}
-                </label>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {(
-                    [
-                      { id: 'original', labelId: 'Asli', labelEn: 'Orig' },
-                      { id: 'ktp', labelId: 'KTP', labelEn: 'ID' },
-                      { id: '3x4', labelId: '3×4', labelEn: '3×4' },
-                      { id: '4x6', labelId: '4×6', labelEn: '4×6' },
-                      { id: '1x1', labelId: '1×1', labelEn: '1×1' },
-                    ] as { id: CropPreset; labelId: string; labelEn: string }[]
-                  ).map((preset) => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => setCropPreset(preset.id)}
-                      className={`rounded-lg border py-2 text-xs font-bold transition ${
-                        cropPreset === preset.id
-                          ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
-                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
-                      }`}
-                    >
-                      {lang === 'id' ? preset.labelId : preset.labelEn}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pasfoto Backdrop Color */}
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  {lang === 'id'
-                    ? 'Warna Latar (PNG Transparan)'
-                    : 'Backdrop Fill (Transparent PNG)'}
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'red', label: 'Merah', hex: '#dc2626' },
-                    { id: 'blue', label: 'Biru', hex: '#0284c7' },
-                    { id: 'white', label: 'Putih', hex: '#ffffff' },
-                  ].map((bg) => (
-                    <button
-                      key={bg.id}
-                      type="button"
-                      onClick={() => setPasfotoBg(bg.hex)}
-                      className={`flex items-center justify-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-bold transition ${
-                        pasfotoBg === bg.hex
-                          ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
-                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
-                      }`}
-                    >
-                      <span
-                        style={{ backgroundColor: bg.hex }}
-                        className="h-3.5 w-3.5 shrink-0 rounded-full border border-slate-300 dark:border-slate-600"
-                      />
-                      <span>{bg.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Compression Telemetry */}
-              {compressionResult && (
-                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/[0.07] p-3.5">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                      {lang === 'id' ? 'Telemetri Kompresi' : 'Compression Telemetry'}
-                    </span>
-                    <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
-                      {compressionResult.compressedBytes <= targetKb * 1024
-                        ? 'TARGET OK'
-                        : 'MAX RATIO'}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-lg border border-slate-200/70 bg-white p-2 dark:border-slate-800 dark:bg-slate-950">
-                      <div className="text-[10px] text-slate-400">Output</div>
-                      <div className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        {formatBytes(compressionResult.compressedBytes)}
-                      </div>
-                    </div>
-                    <div className="rounded-lg border border-slate-200/70 bg-white p-2 dark:border-slate-800 dark:bg-slate-950">
-                      <div className="text-[10px] text-slate-400">Dimensi</div>
-                      <div className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
-                        {compressionResult.width}×{compressionResult.height}
-                      </div>
-                    </div>
-                    <div className="rounded-lg border border-slate-200/70 bg-white p-2 dark:border-slate-800 dark:bg-slate-950">
-                      <div className="text-[10px] text-slate-400">Kualitas</div>
-                      <div className="font-mono text-xs font-bold text-amber-600 dark:text-amber-400">
-                        {compressionResult.qualityUsed}%
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* INSPECTOR 4: PDF BINDER LAYOUT & EXPORT */}
-          {activeTab === 'pdf' && (
-            <div className="flex h-full flex-col justify-between space-y-5">
-              <div className="space-y-4">
-                <div className="border-b border-slate-200/80 pb-3 dark:border-slate-800">
-                  <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                    {lang === 'id' ? 'Tata Letak & Ekspor PDF A4' : 'A4 PDF Layout & Export'}
-                  </h2>
-                  <p className="mt-0.5 text-[11.5px] text-slate-500 dark:text-slate-400">
-                    {lang === 'id'
-                      ? 'Pilih format penyusunan kartu identitas atau berkas pindaian.'
-                      : 'Select how documents are arranged on each PDF page.'}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  {[
-                    {
-                      id: 'a4-id-cards' as PdfPageLayout,
-                      titleId: 'KTP + NPWP Satu Lembar A4 (2 Kartu/Hal)',
-                      titleEn: '2 ID Cards per A4 Sheet (KTP + NPWP)',
-                      descId:
-                        'Standar lampiran HRD & Bank: menyusun hingga 2 kartu identitas proporsional di 1 halaman A4.',
-                      descEn:
-                        'Places up to 2 ID cards centered proportionally on a single A4 portrait sheet.',
-                    },
-                    {
-                      id: 'a4-portrait' as PdfPageLayout,
-                      titleId: 'Dokumen A4 Standar (1 Berkas/Hal)',
-                      titleEn: 'Standard A4 Portrait (1 Scan/Page)',
-                      descId:
-                        'Cocok untuk Ijazah, Transkrip Nilai, KK, atau Surat Keterangan dengan margin rapi.',
-                      descEn:
-                        'Centers each document scan on a standard A4 portrait page with clean margins.',
-                    },
-                    {
-                      id: 'fit-image' as PdfPageLayout,
-                      titleId: 'Ukuran Asli Gambar (Tanpa Margin)',
-                      titleEn: 'Exact Image Dimensions (Zero Margin)',
-                      descId:
-                        'Ukuran halaman PDF mengikuti dimensi piksel asli masing-masing gambar.',
-                      descEn: 'Each PDF page matches the exact pixel dimensions of the image.',
-                    },
-                  ].map((opt) => {
-                    const isSelected = pdfLayout === opt.id;
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.compress.targetLabel}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[100, 200, 500, 1024].map((kb) => {
+                    const selected = targetKb === kb;
+                    const label = kb === 1024 ? '<= 1 MB' : `<= ${kb} KB`;
                     return (
                       <button
-                        key={opt.id}
+                        key={kb}
                         type="button"
-                        onClick={() => {
-                          setPdfLayout(opt.id);
-                          setPdfDownloadUrl(null);
+                        onClick={() => setTargetKb(kb)}
+                        className="min-h-[44px] px-3 rounded-lg text-xs font-semibold border tabular-nums transition-transform active:scale-[0.98]"
+                        style={{
+                          backgroundColor: selected ? 'var(--accent-surface)' : 'var(--bg-subtle)',
+                          borderColor: selected ? 'var(--accent-border)' : 'var(--border-subtle)',
+                          color: selected ? 'var(--accent-text)' : 'var(--text-primary)',
                         }}
-                        className={`w-full rounded-xl border p-3 text-left transition ${
-                          isSelected
-                            ? 'border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/25'
-                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100/70 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:bg-slate-900'
-                        }`}
                       >
-                        <div
-                          className={`text-xs font-bold ${
-                            isSelected
-                              ? 'text-emerald-950 dark:text-white'
-                              : 'text-slate-800 dark:text-slate-200'
-                          }`}
-                        >
-                          {lang === 'id' ? opt.titleId : opt.titleEn}
-                        </div>
-                        <div className="mt-1 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                          {lang === 'id' ? opt.descId : opt.descEn}
-                        </div>
+                        {label}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="space-y-2.5 border-t border-slate-200/80 pt-4 dark:border-slate-800">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.compress.cropLabel}
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {t.compress.crops.map((crop) => {
+                    const selected = cropPreset === crop.key;
+                    return (
+                      <button
+                        key={crop.key}
+                        type="button"
+                        onClick={() => setCropPreset(crop.key)}
+                        className="min-h-[44px] px-2 rounded-lg text-xs font-semibold border transition-transform active:scale-[0.98]"
+                        style={{
+                          backgroundColor: selected
+                            ? 'var(--neutral-active-bg)'
+                            : 'var(--bg-subtle)',
+                          borderColor: selected
+                            ? 'var(--neutral-active-bg)'
+                            : 'var(--border-subtle)',
+                          color: selected ? 'var(--neutral-active-text)' : 'var(--text-primary)',
+                        }}
+                      >
+                        {crop.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {cropPreset === '3x4' && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                    {t.compress.bgLabel}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {t.compress.bgs.map((bg) => {
+                      const selected = bgColor === bg.hex;
+                      return (
+                        <button
+                          key={bg.hex}
+                          type="button"
+                          onClick={() => setBgColor(bg.hex)}
+                          className="min-h-[44px] px-2 rounded-lg text-xs font-semibold border inline-flex items-center justify-center gap-1.5"
+                          style={{
+                            backgroundColor: selected ? 'var(--accent-surface)' : 'var(--bg-subtle)',
+                            borderColor: selected ? 'var(--accent-border)' : 'var(--border-subtle)',
+                            color: selected ? 'var(--accent-text)' : 'var(--text-primary)',
+                          }}
+                        >
+                          <span
+                            className="w-3.5 h-3.5 rounded-full border shrink-0"
+                            style={{ backgroundColor: bg.hex, borderColor: 'var(--border-strong)' }}
+                            aria-hidden="true"
+                          />
+                          <span>{bg.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="button"
+                disabled={!docState}
+                onClick={() => void handleRunCompression()}
+                className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
+                style={{
+                  backgroundColor: 'var(--accent-solid)',
+                  color: 'var(--accent-on-solid)',
+                }}
+              >
+                <Gauge className="w-4 h-4" aria-hidden="true" />
+                <span>{t.compress.runBtn}</span>
+              </button>
+
+              {compressResult && (
+                <div
+                  className="rounded-xl border p-3.5 space-y-3"
+                  style={{
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
+                      {t.compress.resultTitle}
+                    </p>
+                    <span
+                      className="text-xs font-bold tabular-nums"
+                      style={{ color: 'var(--accent-text)' }}
+                    >
+                      -{savingsPct}% {t.compress.savedLabel}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs tabular-nums">
+                    <div
+                      className="rounded-lg p-2 border"
+                      style={{
+                        backgroundColor: 'var(--bg-surface)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
+                    >
+                      <span className="block" style={{ color: 'var(--text-muted)' }}>
+                        {t.compress.beforeLabel}
+                      </span>
+                      <strong style={{ color: 'var(--text-primary)' }}>
+                        {formatBytes(compressResult.originalBytes)}
+                      </strong>
+                    </div>
+                    <div
+                      className="rounded-lg p-2 border"
+                      style={{
+                        backgroundColor: 'var(--bg-surface)',
+                        borderColor: 'var(--border-subtle)',
+                      }}
+                    >
+                      <span className="block" style={{ color: 'var(--text-muted)' }}>
+                        {t.compress.afterLabel}
+                      </span>
+                      <strong style={{ color: 'var(--accent-text)' }}>
+                        {formatBytes(compressResult.compressedBytes)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg overflow-hidden border" style={{ borderColor: 'var(--border-subtle)' }}>
+                    <img
+                      src={compressResult.dataUrl}
+                      alt={t.compress.resultTitle}
+                      width={compressResult.width}
+                      height={compressResult.height}
+                      className="w-full max-h-40 object-contain"
+                      style={{ backgroundColor: 'var(--bg-mat)' }}
+                    />
+                  </div>
+
+                  <p className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                    {compressResult.width} x {compressResult.height} px | JPEG{' '}
+                    {Math.round(compressResult.qualityUsed * 100)}%
+                  </p>
+
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={handleDownloadCompressed}
+                      className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+                      style={{
+                        backgroundColor: 'var(--accent-solid)',
+                        color: 'var(--accent-on-solid)',
+                      }}
+                    >
+                      <Download className="w-4 h-4" aria-hidden="true" />
+                      <span>{t.compress.downloadCompressed}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAddCurrentToPdfQueue}
+                      className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold border inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+                      style={{
+                        backgroundColor: 'var(--bg-surface)',
+                        borderColor: 'var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      <FilePlus2 className="w-4 h-4" aria-hidden="true" />
+                      <span>{t.addToPdfBtn}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 4: PDF MERGER */}
+          {activeTab === 'pdf' && (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {t.tabs.pdf.label}
+                </h2>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  {t.tabs.pdf.desc}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.pdf.layoutLabel}
+                </p>
+                <div className="space-y-2">
+                  {t.pdf.layouts.map((layout) => {
+                    const selected = pdfLayout === layout.key;
+                    return (
+                      <button
+                        key={layout.key}
+                        type="button"
+                        onClick={() => setPdfLayout(layout.key)}
+                        className="w-full min-h-[44px] px-3 rounded-lg text-xs font-semibold border text-left transition-transform active:scale-[0.99]"
+                        style={{
+                          backgroundColor: selected ? 'var(--accent-surface)' : 'var(--bg-subtle)',
+                          borderColor: selected ? 'var(--accent-border)' : 'var(--border-subtle)',
+                          color: selected ? 'var(--accent-text)' : 'var(--text-primary)',
+                        }}
+                      >
+                        {layout.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2">
                 <button
                   type="button"
-                  disabled={pdfQueue.length === 0 || isBuildingPdf}
-                  onClick={handleGenerateCombinedPdf}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-xs font-extrabold text-slate-950 shadow-sm transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-40"
+                  disabled={!docState}
+                  onClick={handleAddCurrentToPdfQueue}
+                  className="w-full min-h-[44px] px-3 rounded-lg text-xs font-semibold border inline-flex items-center justify-center gap-2 disabled:opacity-45"
+                  style={{
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
-                  <FileStack className="h-4 w-4 stroke-[2.3]" />
-                  {isBuildingPdf
-                    ? lang === 'id'
-                      ? 'Menyusun PDF Lokal...'
-                      : 'Building Local PDF...'
-                    : lang === 'id'
-                      ? `Gabung & Buat PDF (${pdfQueue.length} Berkas)`
-                      : `Merge & Generate PDF (${pdfQueue.length} Files)`}
+                  <Plus className="w-4 h-4" aria-hidden="true" />
+                  <span>{t.pdf.addCurrentBtn}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => pdfFileInputRef.current?.click()}
+                  className="w-full min-h-[44px] px-3 rounded-lg text-xs font-semibold border inline-flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <Upload className="w-4 h-4" aria-hidden="true" />
+                  <span>{t.pdf.addFilesBtn}</span>
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  {t.pdf.queueTitle} ({pdfQueue.length})
+                </p>
+
+                {pdfQueue.length === 0 ? (
+                  <p
+                    className="text-xs rounded-lg p-3 border leading-relaxed"
+                    style={{
+                      backgroundColor: 'var(--bg-subtle)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    {t.pdf.emptyQueue}
+                  </p>
+                ) : (
+                  <ul className="space-y-2">
+                    {pdfQueue.map((item, idx) => (
+                      <li
+                        key={item.id}
+                        className="rounded-lg border p-2 flex items-center gap-2"
+                        style={{
+                          backgroundColor: 'var(--bg-subtle)',
+                          borderColor: 'var(--border-subtle)',
+                        }}
+                      >
+                        {item.dataUrl && (
+                          <img
+                            src={item.dataUrl}
+                            alt={item.name}
+                            width={item.width || 44}
+                            height={item.height || 44}
+                            className="w-11 h-11 object-cover rounded border shrink-0"
+                            style={{ borderColor: 'var(--border-subtle)' }}
+                          />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                            {idx + 1}. {item.name}
+                          </p>
+                          <p className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                            {formatBytes(item.sizeBytes)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => handleMovePdfItem(idx, -1)}
+                            aria-label={`${t.pdf.moveUp} ${item.name}`}
+                            className="min-h-[44px] min-w-[44px] rounded-lg border inline-flex items-center justify-center disabled:opacity-35"
+                            style={{
+                              backgroundColor: 'var(--bg-surface)',
+                              borderColor: 'var(--border-subtle)',
+                              color: 'var(--text-primary)',
+                            }}
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={idx === pdfQueue.length - 1}
+                            onClick={() => handleMovePdfItem(idx, 1)}
+                            aria-label={`${t.pdf.moveDown} ${item.name}`}
+                            className="min-h-[44px] min-w-[44px] rounded-lg border inline-flex items-center justify-center disabled:opacity-35"
+                            style={{
+                              backgroundColor: 'var(--bg-surface)',
+                              borderColor: 'var(--border-subtle)',
+                              color: 'var(--text-primary)',
+                            }}
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" aria-hidden="true" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setPdfQueue((prev) => prev.filter((q) => q.id !== item.id))
+                            }
+                            aria-label={`${t.pdf.removeItem} ${item.name}`}
+                            className="min-h-[44px] min-w-[44px] rounded-lg border inline-flex items-center justify-center"
+                            style={{
+                              backgroundColor: 'var(--danger-surface)',
+                              borderColor: 'var(--danger-border)',
+                              color: 'var(--danger-text)',
+                            }}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="pt-2 space-y-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                <button
+                  type="button"
+                  disabled={pdfQueue.length === 0}
+                  onClick={() => void handleBuildPdf()}
+                  className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-45 transition-transform active:scale-[0.98]"
+                  style={{
+                    backgroundColor: 'var(--accent-solid)',
+                    color: 'var(--accent-on-solid)',
+                  }}
+                >
+                  <FileStack className="w-4 h-4" aria-hidden="true" />
+                  <span>{t.pdf.buildBtn}</span>
                 </button>
 
                 {pdfDownloadUrl && (
-                  <a
-                    href={pdfDownloadUrl}
-                    download={`dokumen-amandok-${todayStr}.pdf`}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/50 bg-emerald-500/15 px-4 py-3 text-xs font-extrabold text-emerald-800 transition hover:bg-emerald-500/25 dark:text-emerald-300"
+                  <div
+                    className="rounded-lg border p-3 space-y-2"
+                    style={{
+                      backgroundColor: 'var(--accent-surface)',
+                      borderColor: 'var(--accent-border)',
+                    }}
                   >
-                    <Download className="h-4 w-4" />
-                    {lang === 'id'
-                      ? `Unduh PDF (${formatBytes(pdfSizeBytes)})`
-                      : `Download PDF (${formatBytes(pdfSizeBytes)})`}
-                  </a>
+                    <p className="text-xs font-medium tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                      {t.pdf.readyText} <strong>{formatBytes(pdfByteSize)}</strong>
+                    </p>
+                    <a
+                      href={pdfDownloadUrl}
+                      download="amandok-dokumen.pdf"
+                      className="w-full min-h-[44px] px-4 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2"
+                      style={{
+                        backgroundColor: 'var(--accent-solid)',
+                        color: 'var(--accent-on-solid)',
+                      }}
+                    >
+                      <Download className="w-4 h-4" aria-hidden="true" />
+                      <span>{t.pdf.downloadPdfBtn}</span>
+                    </a>
+                  </div>
                 )}
               </div>
             </div>
           )}
-          </div>
         </aside>
       </div>
 
-      {/* =========================================================
-          MOBILE FLOATING LIQUID GLASS DOCK (< 1024px)
-         ========================================================= */}
-      <nav
-        aria-label="Mobile Studio Navigation"
-        className="glass-dock fixed bottom-3 left-3 right-3 z-40 grid h-16 grid-cols-4 rounded-2xl px-2 lg:hidden"
+      {/* Studio Footer landmark (compact bar on desktop, normal flow above mobile dock on < md) */}
+      <footer
+        className="border-t px-4 py-3 pb-24 md:pb-3 text-xs flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0"
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          borderColor: 'var(--border-subtle)',
+          color: 'var(--text-muted)',
+        }}
       >
-        {studioTools.map((tool) => {
-          const Icon = tool.icon;
-          const isActive = activeTab === tool.id;
-          return (
-            <button
-              key={tool.id}
-              type="button"
-              onClick={() => setActiveTab(tool.id)}
-              className={`relative my-1.5 flex flex-col items-center justify-center gap-1 rounded-xl transition-all duration-200 active:scale-95 ${
-                isActive
-                  ? 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              {isActive && (
-                <span className="absolute top-0 h-0.5 w-10 rounded-b-full bg-emerald-500" />
-              )}
-              <div className="relative">
-                <Icon className="h-4 w-4" />
-                {tool.badge && (
-                  <span className="absolute -right-5 -top-1.5 rounded bg-emerald-500/20 px-1 font-mono text-[9px] font-bold text-emerald-600 dark:text-emerald-300">
-                    {tool.badge}
-                  </span>
-                )}
-              </div>
-              <span className="text-[10.5px] font-bold">
-                {lang === 'id' ? tool.shortId : tool.shortEn}
-              </span>
-            </button>
-          );
-        })}
+        <span>{t.footer.guarantee}</span>
+        <span>{t.footer.attribution}</span>
+      </footer>
+
+      {/* Mobile Bottom Tool Dock (< 768px) */}
+      <nav
+        aria-label="Mobile Tool Navigation"
+        className="md:hidden fixed bottom-0 inset-x-0 z-30 border-t px-2 py-1.5"
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          borderColor: 'var(--border-subtle)',
+        }}
+      >
+        <div className="grid grid-cols-4 gap-1.5">
+          {VALID_TABS.map((tabKey) => {
+            const active = activeTab === tabKey;
+            const Icon =
+              tabKey === 'watermark'
+                ? Stamp
+                : tabKey === 'redact'
+                  ? EyeOff
+                  : tabKey === 'compress'
+                    ? Gauge
+                    : FileStack;
+            return (
+              <button
+                key={tabKey}
+                type="button"
+                onClick={() => setActiveTab(tabKey)}
+                className="min-h-[48px] px-1 py-1.5 rounded-lg border flex flex-col items-center justify-center gap-0.5 text-xs font-semibold transition-transform active:scale-[0.97]"
+                style={{
+                  backgroundColor: active ? 'var(--accent-surface)' : 'transparent',
+                  borderColor: active ? 'var(--accent-border)' : 'transparent',
+                  color: active ? 'var(--accent-text)' : 'var(--text-secondary)',
+                }}
+              >
+                <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span className="truncate max-w-full">{t.tabs[tabKey].short}</span>
+              </button>
+            );
+          })}
+        </div>
       </nav>
 
-      {/* =========================================================
-          CYBER-VAULT PRIVACY ARCHITECTURE MODAL
-         ========================================================= */}
-      {showVaultInfo && (
+      {/* Accessible Privacy & Architecture Modal Dialog */}
+      {privacyOpen && (
         <div
-          className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-md"
-          onClick={() => setShowVaultInfo(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setPrivacyOpen(false);
+            }
+          }}
         >
           <div
-            className="glass-surface animate-modal-in w-full max-w-lg rounded-3xl p-6"
-            onClick={(e) => e.stopPropagation()}
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="privacy-dialog-title"
+            className="w-full max-w-lg rounded-xl border p-5 sm:p-6 space-y-4 shadow-xl"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-primary)',
+            }}
           >
-            <div className="mb-4 flex items-center justify-between border-b border-slate-200/80 pb-3 dark:border-slate-800">
+            <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-500">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                    {lang === 'id'
-                      ? 'Arsitektur Privasi Cyber-Vault AmanDok'
-                      : 'AmanDok Cyber-Vault Privacy Architecture'}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    100% Client-Side • Zero Cloud Storage • PWA Offline Ready
-                  </p>
-                </div>
+                <span
+                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                  style={{
+                    backgroundColor: 'var(--accent-surface)',
+                    border: '1px solid var(--accent-border)',
+                    color: 'var(--accent-text)',
+                  }}
+                >
+                  <Lock className="w-4 h-4" aria-hidden="true" />
+                </span>
+                <h2 id="privacy-dialog-title" className="text-base font-bold">
+                  {t.dialog.title}
+                </h2>
               </div>
+
               <button
                 type="button"
-                onClick={() => setShowVaultInfo(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
+                onClick={() => setPrivacyOpen(false)}
+                aria-label={t.dialog.closeAria}
+                className="min-h-[44px] min-w-[44px] rounded-lg border inline-flex items-center justify-center shrink-0"
+                style={{
+                  backgroundColor: 'var(--bg-subtle)',
+                  borderColor: 'var(--border-subtle)',
+                  color: 'var(--text-primary)',
+                }}
               >
-                <X className="h-4 w-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
-              <div className="rounded-xl border border-slate-200/80 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/70">
-                <strong className="text-slate-900 dark:text-white">
-                  1. Tanpa Upload Server (0 KB Network Payload)
-                </strong>
-                <p className="mt-1">
-                  Seluruh foto KTP, NPWP, tanda tangan, dan berkas PDF diproses langsung di memori
-                  RAM perangkat Anda menggunakan HTML5 Canvas &amp; WebAssembly/JS lokal. Tidak ada
-                  API pengiriman gambar ke server mana pun.
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-200/80 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/70">
-                <strong className="text-slate-900 dark:text-white">
-                  2. Pembersihan Otomatis Metadata EXIF &amp; Lokasi GPS
-                </strong>
-                <p className="mt-1">
-                  Saat foto dimuat, AmanDok otomatis me-render ulang piksel bersih dan membuang tag
-                  EXIF kamera serta koordinat GPS tersembunyi.
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-200/80 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/70">
-                <strong className="text-slate-900 dark:text-white">
-                  3. Dapat Diuji dalam Mode Pesawat (Offline)
-                </strong>
-                <p className="mt-1">
-                  Setelah halaman ini terbuka (atau di-install sebagai PWA), Anda dapat mematikan
-                  koneksi internet/Wi-Fi sepenuhnya dan seluruh fitur tetap berjalan 100%.
-                </p>
-              </div>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              {t.dialog.intro}
+            </p>
+
+            <div className="space-y-3">
+              {t.dialog.items.map((item) => (
+                <div
+                  key={item.heading}
+                  className="rounded-lg border p-3 space-y-1"
+                  style={{
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                >
+                  <h3 className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
+                    {item.heading}
+                  </h3>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    {item.body}
+                  </p>
+                </div>
+              ))}
             </div>
 
-            <div className="mt-5 flex justify-end">
+            <div className="pt-2 flex justify-end">
               <button
                 type="button"
-                onClick={() => setShowVaultInfo(false)}
-                className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-extrabold text-slate-950 transition hover:bg-emerald-400"
+                onClick={() => setPrivacyOpen(false)}
+                className="min-h-[44px] px-4 rounded-lg text-sm font-semibold"
+                style={{
+                  backgroundColor: 'var(--accent-solid)',
+                  color: 'var(--accent-on-solid)',
+                }}
               >
-                {lang === 'id' ? 'Mengerti & Kembali ke Studio' : 'Got It'}
+                {t.dialog.doneBtn}
               </button>
             </div>
           </div>
